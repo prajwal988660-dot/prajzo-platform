@@ -74,7 +74,8 @@ Versions are the current stable releases on npm, checked on 17 October 2026. Eac
 | Tests | Vitest, Testing Library (React), jsdom, Supertest, mongodb-memory-server | 5.0.5, 16.3.3, 30.1.3, 7.3.1, 11.3.0 |
 | End to end | Playwright, @axe-core/playwright | 1.64.1, 4.14.0 (runs on the installed Chrome) |
 | Code quality | ESLint, typescript-eslint, Prettier | 10.13.0, 8.71.2, 3.9.10 |
-| Fonts | Self-hosted with @fontsource packages | chosen in Phase 1 |
+| Fonts | Inter and Sora, self-hosted with @fontsource-variable packages | 5.3.0 (D-021) |
+| API bundling | esbuild (production bundle of the API) | 0.28.2 (D-022) |
 
 Compatibility checked: @vitejs/plugin-react 6 needs Vite 8; @tailwindcss/vite 4.3 and Vitest 5 support Vite 8; @hookform/resolvers 5.9 supports Zod 4; connect-mongo 6 works with express-session 1.19 and the MongoDB driver Mongoose uses; Vite 8 and Mongoose 9 need Node ≥ 20.19.
 
@@ -101,7 +102,9 @@ prajzo/
 │  │     ├─ lib/                  API client, formatting, hooks
 │  │     └─ test/                 test setup and helpers
 │  └─ api/                        Express API
+│     ├─ scripts/build.mjs        production bundle (esbuild)
 │     └─ src/
+│        ├─ app.ts, server.ts     the Express app, and the process that runs it
 │        ├─ config/               settings loading and validation
 │        ├─ db/                   connection, models, seed data
 │        ├─ modules/              one folder per area: auth, catalogue, templates,
@@ -109,8 +112,11 @@ prajzo/
 │        │                        contact, demo-submissions, health
 │        │                        (each holds its routes, service, schemas and tests)
 │        ├─ middleware/           guards, validation, rate limits, errors, headers
-│        ├─ services/             mailer, file storage, logger
-│        └─ scripts/              seed, admin:create
+│        ├─ services/             mailer, file storage (from Phase 2)
+│        ├─ lib/                  logger, error types
+│        ├─ web/                  serves the built web app in production
+│        ├─ test/                 test helpers (in-memory MongoDB, test settings)
+│        └─ scripts/              seed, admin:create (later phases)
 ├─ packages/
 │  └─ shared/                     used by BOTH web and api (no React, no Express)
 │     └─ src/
@@ -122,6 +128,7 @@ prajzo/
 ├─ docs/                          roadmap, checklist, architecture, decisions, environment, setup
 ├─ legacy/static-site/            the earlier static marketing site (kept; see Q1)
 ├─ assets/brand/                  original logo files
+├─ .github/workflows/ci.yml       runs `npm run check` on every pull request
 └─ package.json                   workspaces and root scripts
 ```
 
@@ -406,7 +413,7 @@ Tests use an in-memory MongoDB that is created and thrown away for each test fil
 
 | Environment | Web | API | Database | Email | Files |
 |---|---|---|---|---|---|
-| Development | Vite on 5173 (proxies `/api` to 4000) | Node on 4000 | Local MongoDB or Atlas (Q2) | Console | Local disk |
+| Development | Vite on 5173 (proxies `/api` to 4000) | Node on 4000 (`tsx watch`) | MongoDB Atlas free cluster (D-024) | Console | Local disk |
 | Test | Vite build or dev server | In-process | In-memory MongoDB | Captured | Temporary folder |
 | Production | Built files served by the API | Node (one service) | MongoDB Atlas | SMTP provider | Cloud bucket |
 
@@ -430,7 +437,8 @@ Production is set up in Phase 13. That includes HTTPS from the host, a health ch
 - **Backgrounds:** white and very light cool greys, with subtle borders and soft shadows.
 - **Gradient:** the brand gradient (cyan → blue → violet → magenta) is used sparingly: the logo, the main call to action and small highlights. Large gradient areas, heavy glass effects and decorative animation are avoided, as the brief asks.
 - **Logo:** `logo.png` (a transparent crop) is used on light backgrounds; the original file is kept unchanged. A vector (SVG) logo would be sharper and smaller. One won't be created unless you ask.
-- **Typography:** one clean sans-serif for interface and body text, plus a display face for headings. Both are self-hosted and chosen in Phase 1 from a quick side-by-side comparison.
+- **Typography:** Inter for interface and body text, Sora for headings, both self-hosted (D-021). See them, along with every base component, at http://localhost:5173/dev/ui while `npm run dev` is running.
+- **Accessible colour use:** blue `#0072F6` is 4.4:1 on white, so it is used for focus rings, icons and large text only. Normal-size accent text and links use indigo `#364CDD` (6.5:1). Magenta is decoration only.
 
 The current static site uses an indigo (`#4338E0`) that doesn't come from the logo. The platform uses the logo's colours instead.
 

@@ -20,6 +20,12 @@ Secrets and settings live in environment variables, never in code.
 | `MONGODB_URI` | `mongodb://127.0.0.1:27017/prajzo` | Yes | Local server, or your Atlas connection string (Q2) |
 | `SESSION_SECRET` | 64 random hex characters | Yes | Generate one with the command below; use a different value in production |
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
+| `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
+| `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+
+On this machine `apps/api/.env` already exists, with a generated `SESSION_SECRET`. `MONGODB_URI` stays empty until you add your Atlas connection string ([SETUP.md](SETUP.md), step 1).
+
+If a variable is set both in the real environment and in `.env`, the real environment wins. That makes it easy to try a different database for one run without editing the file.
 
 To generate a secret, run:
 
@@ -37,7 +43,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | 5 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development |
 | 13 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Real email through your provider |
 | 13 | `STORAGE_DRIVER` (`s3`), `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `PUBLIC_ASSET_BASE_URL` | Cloud image storage (or `CLOUDINARY_URL` if Cloudinary is chosen) |
-| 13 | `TRUST_PROXY` (`1`) | Correct client IPs behind the host's proxy, needed for rate limits and secure cookies |
+| 13 | `TRUST_PROXY` (`true`) | Correct client IPs behind the host's proxy, needed for rate limits and secure cookies |
 
 ## Production checklist (Phase 13)
 
@@ -46,9 +52,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - A new, long `SESSION_SECRET` that has never been used in development
 - `MONGODB_URI` for the Atlas production cluster, with its own database user and a strong password
 - SMTP and storage credentials from your providers
-- `TRUST_PROXY=1`
+- `TRUST_PROXY=true`
 
 ## Things that are not environment variables
 
 - **Admin credentials.** Admins are created with `npm run admin:create`, which asks interactively. No admin email or password is ever stored in a file.
-- **Test settings.** Tests start their own in-memory MongoDB and use built-in test values. The first test run downloads a MongoDB binary of about 100 MB into a cache, which needs internet once.
+- **Test settings.** Tests start their own in-memory MongoDB and use built-in test values. `npm install` downloads the MongoDB binary they use (about 75 MB, cached in `node_modules/.cache`), which needs internet once.

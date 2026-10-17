@@ -2,7 +2,7 @@
 
 This file records each important technical decision: what was decided, why, and what else was considered. New decisions are added at the end. A changed decision is not deleted; it is marked **Replaced by D-0xx**.
 
-Every decision below was proposed in Phase 0 (17 October 2026). Each one becomes **Accepted** when you approve the plan.
+D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which is still to be confirmed before Phase 10. D-021 onwards were made during Phase 1.
 
 ---
 
@@ -20,6 +20,7 @@ Every decision below was proposed in Phase 0 (17 October 2026). Each one becomes
 - **Decision:** before anything moves, run `git init` and commit the current static site as a baseline. Then move it to `legacy/static-site/` in Phase 1, where it stays and keeps working.
 - **Why:** nothing is lost, its history is kept, and the platform gets a clean root folder.
 - **Considered:** building the platform in a new sibling folder and leaving this one untouched. That's safe too, but splits the project in two. You choose (Q1).
+- **Done (Phase 1):** baseline commit `45c8d7c`, then the move in `2588cee`. The original logo files are in `assets/brand/`.
 
 ### D-003: Current stable versions, TypeScript held at 6.0
 
@@ -54,9 +55,9 @@ Every decision below was proposed in Phase 0 (17 October 2026). Each one becomes
 - **Decision:** each demo route renders its template's default configuration, and "Customize This Design" starts the builder from that same configuration.
 - **Why:** the demo and the starting point of customization can never drift apart, and there's no duplicated demo code.
 
-### D-008: Build order
+### D-008: Build order (Replaced by D-025)
 
-- **Decision:** the order is:
+- **Decision (original proposal):** the order is:
   1. the template engine and the Portfolio demo
   2. the builder core
   3. Business, Event, Catalogue and Forms, each finished completely, including its builder integration, before your approval
@@ -144,3 +145,59 @@ Every decision below was proposed in Phase 0 (17 October 2026). Each one becomes
 
 - **Decision:** the 11 statuses and the transition table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), enforced on the server, with a history entry (who and when) for every change.
 - **Status:** proposed; to be confirmed with you before Phase 10.
+
+---
+
+## Phase 1 decisions (17 October 2026)
+
+### D-021: Fonts are Inter and Sora
+
+- **Decision:** Inter (variable) for interface and body text, Sora (variable) for headings. Both are self-hosted through `@fontsource-variable` packages (see D-019).
+- **Why:**
+  - Inter stays clear at small sizes in forms and dashboards.
+  - Sora's geometric shapes suit the logo's technical style.
+  - Both come as variable fonts, so each is one file per character set.
+- **Considered:** Plus Jakarta Sans, Manrope, Space Grotesk.
+- **Changing it later:** one line each in `apps/web/src/styles/index.css` (`--font-sans`, `--font-display`) plus the font package.
+
+### D-022: How the code is built and run
+
+- **Decision:**
+  - `packages/shared` is used as TypeScript source, with no build step.
+  - Vite builds the web app.
+  - In development the API runs with `tsx watch`, which restarts it when a file changes.
+  - For production, esbuild bundles the API into one file, `apps/api/dist/server.js`. The shared package is bundled in; npm packages stay external.
+  - TypeScript only type-checks (`noEmit`).
+- **Why:** there's no build order to remember, edits to shared rules show up instantly in both apps, and the production output is small (11 KB).
+- **Considered:**
+  - TypeScript project references with compiled packages: an extra build step, plus `.js` extensions in imports.
+  - Node's built-in TypeScript support: it restricts syntax, and it still prints experimental warnings.
+
+### D-023: Repository and review workflow
+
+- **Decision:**
+  - **Repository:** the code lives in the private GitHub repository `prajwal988660-dot/prajzo-platform`. The existing public `prajzo` repository is a different, older project and isn't touched.
+  - **Approval gate:** each phase is built on its own branch and opened as a pull request. **Approving a phase means merging its pull request into `main`.**
+  - **CI:** GitHub Actions runs `npm run check` on every pull request and on `main`.
+  - **Commit author:** commits use your name and your GitHub no-reply address. This is set for this repository only, not globally.
+- **Why:**
+  - `main` only ever contains approved, tested work.
+  - Each phase's changes can be reviewed in one place.
+  - CI proves the build on a clean Linux machine, not just on this PC.
+- **Note:** private repositories get 2,000 free GitHub Actions minutes a month. One CI run takes a few minutes.
+
+### D-024: Development database and startup behaviour
+
+- **Decision:**
+  - Development uses a free MongoDB Atlas cluster (your answer to Q2).
+  - If `MONGODB_URI` or another required setting is missing, the API refuses to start and names the setting.
+  - If the database is only unreachable (for example, your IP address isn't allowed in Atlas), the API starts anyway. It reports "not ready" on `/api/health/ready` and retries every 10 seconds, logging what to check.
+  - Tests never use Atlas; they use an in-memory MongoDB.
+- **Why:** configuration mistakes fail loudly, while network problems recover by themselves without a restart.
+
+### D-025: Build order, main website first (replaces D-008)
+
+- **Decision:** your answer to Q4 was to build the main website first and the demos after. Phases 1–3 (foundation, public website, accounts) come first, as already planned.
+- **Still to confirm:** the exact order of Phases 4–11, at the Phase 3 gate. The builder needs at least one template to customize, so the choice will be one of:
+  - Portfolio demo, then builder, then the other demos (the original order)
+  - project requests and the admin dashboard first, then the demos and builder

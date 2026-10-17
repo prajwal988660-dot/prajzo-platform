@@ -1,6 +1,6 @@
 # Prajzo roadmap
 
-Last updated: 17 October 2026 (end of Phase 0)
+Last updated: 17 October 2026 (end of Phase 1)
 
 This document covers the order in which Prajzo gets built, what each phase delivers, and how we'll know each phase is done. Every phase ends with a short summary and a pause for your approval before the next one starts.
 
@@ -34,7 +34,7 @@ Estimates are in 4-hour working sessions. They're rough and will be recalibrated
 | # | Phase | At the end you can… | Sessions | Gate |
 |---|---|---|---|---|
 | 0 | Discovery and plan | Read this plan | 1 (done) | Your approval |
-| 1 | Foundation | Run the app shell and the API locally; run every check with one command | 2–3 | Approval |
+| 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, awaiting approval) | Approval |
 | 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 4–5 | Approval |
 | 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 3–4 | Approval |
 | 4 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
@@ -61,6 +61,8 @@ So the order is:
 3. **Phases 6–9** each deliver one demo completely, including its builder integration, before you approve it.
 
 If you'd rather see all five demos before the builder, say so and Phases 5–9 will be reordered (decision Q4).
+
+**Update (17 October 2026):** you chose to build the main website first and the demos after (D-025). Phases 1–3 stay as they are. The order of Phases 4–11 is confirmed with you at the Phase 3 gate.
 
 ## Which phase builds which page
 
@@ -355,17 +357,18 @@ This phase needs your accounts, plus your approval for anything paid.
 
 ## Open decisions
 
-### Needed before Phase 1
+### Answered on 17 October 2026
 
-- **Q1: Existing site and repository.**
-  - Recommended: make this folder the platform repository. First run `git init` and commit the static site exactly as it is, then move it to `legacy/static-site/`, where it keeps working.
-  - Alternative: build the platform in a new sibling folder and leave this folder untouched.
-- **Q2: Development database.**
-  - Recommended: MongoDB Community Server installed locally (`winget install MongoDB.Server`; needs an admin prompt).
-  - Alternative: a free MongoDB Atlas cluster, which needs an account and an internet connection.
-  - Tests use an in-memory database either way.
-- **Q3: Git identity.** Your name and email for commits. They aren't set on this machine yet.
-- **Q4: Build order.** Recommended: the builder right after the Portfolio demo, as explained above.
+| Question | Your answer | What was done |
+|---|---|---|
+| Q1: Existing site and repository | Continue in this folder | Baseline commit, then the static site moved to `legacy/static-site/` (D-002); new private GitHub repo `prajzo-platform` (D-023) |
+| Q2: Development database | The free database | MongoDB Atlas free cluster; setup steps in [SETUP.md](SETUP.md) (D-024) |
+| Q3: Git identity | Your GitHub account | Commits use "Prajwal S" and your GitHub no-reply address, set for this repository only |
+| Q4: Build order | Main website first, demos after | Phases 1–3 unchanged; the order of Phases 4–11 is confirmed at the Phase 3 gate (D-025) |
+
+### Needed now (before Phase 2 can be tested against your own database)
+
+- **Your MongoDB Atlas connection string** in `apps/api/.env`. Follow [SETUP.md, step 1](SETUP.md#1-set-up-the-free-mongodb-atlas-database-once-about-10-minutes); it takes about 10 minutes.
 
 ### Needed later
 
