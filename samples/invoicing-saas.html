@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hisaab: sample landing page by Prajzo</title>
+<meta name="description" content="Hisaab is GST-ready invoicing for Indian freelancers: UPI payment links, automatic reminders and cash-flow forecasts. A sample landing page by Prajzo.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Poppins:wght@500;600&display=swap">
+<noscript><style>.menu-btn{display:none!important}.nav{display:flex!important;position:static!important;flex-wrap:wrap;box-shadow:none!important;padding:0!important;background:none!important;border:0!important}.nav a{min-height:44px!important;border:0!important}</style></noscript>
+<style>
+*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}
+.pz-bar{position:relative;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:8px 16px;background:#16253F;color:#D9E4F1;font:500 12.5px/1.45 "Poppins",system-ui,sans-serif;text-align:center}
+.pz-bar b{color:#fff;font-weight:600}
+.pz-back{color:#fff;font-weight:600;text-decoration:none;padding:3px 11px;border:1px solid rgba(255,255,255,.35);border-radius:999px;white-space:nowrap}
+.pz-back:hover,.pz-back:focus-visible{background:rgba(255,255,255,.14);outline:none}
+
+/* ---------- tokens and base ---------- */
+:root{--em:#047857;--em-d:#065F46;--em-dd:#064E3B;--mint:#D1FAE5;--mint-l:#ECFDF5;--ink:#0F172A;--slate:#475569;--mute:#5A667A;--line:#E2E8F0;--page:#F6F8FA;--amber:#D97706;--amber-t:#92400E;--amber-bg:#FEF3C7;--red:#DC2626;--red-t:#B91C1C;--red-bg:#FEE2E2;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--sh:0 1px 2px rgba(15,23,42,.05),0 14px 34px -18px rgba(15,23,42,.24)}
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,ul,ol,dl,dd,figure,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:var(--em)}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--em);outline-offset:3px}
+::selection{background:var(--mint);color:var(--ink)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-80px;z-index:2000;padding:12px 18px;border-radius:10px;background:var(--ink);color:#fff;font-weight:600;text-decoration:none}.skip:focus{top:12px}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{width:min(1160px,100% - 32px);margin-inline:auto}
+@media(min-width:720px){.wrap{width:min(1160px,100% - 48px)}}
+h1,h2{font-family:var(--serif);font-weight:400}
+h2{font-size:clamp(2.15rem,4.6vw,3.4rem);line-height:1.04;letter-spacing:-.015em;text-wrap:balance}
+h1 em,h2 em{font-style:italic;color:var(--em)}
+h3{font:600 1.125rem/1.3 var(--sans);letter-spacing:-.01em}
+.eyebrow{display:flex;align-items:center;gap:10px;font:600 12.5px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--em)}
+.eyebrow::before{content:"";width:22px;height:2px;border-radius:2px;background:currentColor}
+.lede{max-width:40rem;font-size:1.0625rem;color:var(--slate);text-wrap:pretty}
+.sec{padding:clamp(56px,8vw,104px) 0;scroll-margin-top:68px}
+.band{background:#fff;border-block:1px solid var(--line)}
+.sec-h{display:grid;gap:14px;margin-bottom:clamp(28px,4vw,52px)}
+.sec-h.c{justify-items:center;text-align:center}
+.rs{font-family:var(--sans);font-weight:500;font-size:.62em;vertical-align:.32em;margin-right:.06em;letter-spacing:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border:1px solid transparent;border-radius:12px;font:600 15px/1 var(--sans);text-decoration:none;white-space:nowrap;cursor:pointer}
+.btn .ic{width:18px;height:18px;stroke-width:2.2}
+.btn-p{background:var(--em);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 1px 2px rgba(4,120,87,.5),0 12px 22px -12px rgba(4,120,87,.8)}
+.btn-p:hover{background:var(--em-d)}
+.btn-g{background:#fff;color:var(--ink);border-color:#CBD5E1;box-shadow:0 1px 2px rgba(15,23,42,.06)}
+.btn-g:hover{border-color:var(--em);color:var(--em-d)}
+.btn-w{background:#fff;color:var(--em-d)}.btn-w:hover{background:var(--mint)}
+.btn-lg{min-height:54px;padding:0 28px;border-radius:14px;font-size:16px}
+.btn-sm{min-height:44px;padding:0 18px;font-size:14.5px}
+.btn-block{width:100%}
