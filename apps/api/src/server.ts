@@ -1,3 +1,4 @@
+import dns from 'node:dns';
 import { createServer } from 'node:http';
 import { createApp } from './app';
 import { ConfigError, loadEnv, type Env } from './config/env';
@@ -34,6 +35,12 @@ function main(): void {
   server.listen(env.PORT, () => {
     logger.info(`API listening on http://localhost:${env.PORT}`);
   });
+
+  if (env.DNS_SERVERS) {
+    // Used for the SRV and TXT lookups behind mongodb+srv:// addresses (see DNS_SERVERS in env.ts).
+    dns.setServers(env.DNS_SERVERS);
+    logger.info(`Using DNS servers ${env.DNS_SERVERS.join(', ')} for database address lookups`);
+  }
 
   void connectWithRetry(env.MONGODB_URI, logger, { signal: stopConnecting.signal });
 

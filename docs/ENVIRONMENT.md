@@ -22,6 +22,7 @@ Secrets and settings live in environment variables, never in code.
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
 | `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+| `DNS_SERVERS` | `1.1.1.1,8.8.8.8` | No | DNS servers for looking up `mongodb+srv://` addresses. Only needed when the API log shows `querySrv ECONNREFUSED` (a known Node.js-on-Windows problem; set on this PC) |
 
 On this machine `apps/api/.env` already exists, with a generated `SESSION_SECRET`. `MONGODB_URI` stays empty until you add your Atlas connection string ([SETUP.md](SETUP.md), step 1).
 

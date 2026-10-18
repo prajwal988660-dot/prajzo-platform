@@ -28,8 +28,7 @@ export async function connectWithRetry(
     } catch (error) {
       logger.error(
         { reason: describeError(error) },
-        `Database connection failed; retrying in ${retryDelayMs / 1000}s. Check MONGODB_URI, ` +
-          'and in MongoDB Atlas check Network Access (your IP address) and the database user.',
+        `Database connection failed; retrying in ${retryDelayMs / 1000}s. ${connectionHint(error)}`,
       );
       try {
         await sleep(retryDelayMs, undefined, { signal });
@@ -64,8 +63,34 @@ export async function disconnectDatabase(): Promise<void> {
   await mongoose.disconnect();
 }
 
+/** A plain-language next step for the most common MongoDB Atlas connection problems. */
+export function connectionHint(error: unknown): string {
+  const text = describeError(error);
+  if (/querySrv|querytxt/i.test(text)) {
+    return (
+      'This computer could not look up the mongodb+srv:// address (a known Node.js-on-Windows ' +
+      'DNS problem). Add DNS_SERVERS=1.1.1.1,8.8.8.8 to apps/api/.env and restart.'
+    );
+  }
+  if (/bad auth|authentication failed/i.test(text)) {
+    return (
+      'Atlas rejected the username or password in MONGODB_URI. Check the user under ' +
+      'Atlas → Database Access, and the password inside the connection string.'
+    );
+  }
+  if (/whitelist|ip address|server selection|timed out|ETIMEDOUT/i.test(text)) {
+    return (
+      'Atlas did not answer. Under Atlas → Network Access, add your current IP address ' +
+      '(it can change when your internet connection restarts).'
+    );
+  }
+  return 'Check MONGODB_URI, and in MongoDB Atlas check Network Access and the database user.';
+}
+
 /** Error text that is safe to log: credentials inside connection strings are removed. */
 export function describeError(error: unknown): string {
   const text = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-  return text.replace(/(mongodb(?:\+srv)?:\/\/)[^@/\s]+@/gi, '$1***@');
+  // Everything up to the last "@" of the address is removed, so a password that itself
+  // contains "@" doesn't leak either.
+  return text.replace(/(mongodb(?:\+srv)?:\/\/)\S*@/gi, '$1***@');
 }

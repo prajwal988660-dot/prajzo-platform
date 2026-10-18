@@ -50,6 +50,9 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] screenshots at 1280 px and 390 px
   - [x] production bundle smoke-tested
 - [x] CI workflow on GitHub runs `npm run check` for every pull request
+- [x] Atlas connection made reliable on Windows:
+  - [x] optional `DNS_SERVERS` setting, because Node 24 on this PC can't look up `mongodb+srv://` addresses (confirmed)
+  - [x] clear startup and connection messages for a wrong format, a leftover `<placeholder>`, a wrong password and a blocked IP
 - [x] README, SETUP, ENVIRONMENT, DECISIONS (D-021 to D-025), ROADMAP and this checklist updated
 - [ ] **Your action:** create the free MongoDB Atlas cluster and put its connection string in `apps/api/.env` ([SETUP.md](SETUP.md), step 1)
 - [ ] **(gate)** Approval for Phase 2: merge the `phase-1-foundation` pull request

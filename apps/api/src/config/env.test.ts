@@ -47,8 +47,20 @@ describe('parseEnv', () => {
 
   it('rejects a database address that is not a MongoDB connection string', () => {
     expect(problemsFor({ ...valid, MONGODB_URI: 'postgres://localhost/db' }).join('\n')).toMatch(
-      /MONGODB_URI must start with mongodb/,
+      /MONGODB_URI must be the full connection string from MongoDB Atlas/,
     );
+    expect(problemsFor({ ...valid, MONGODB_URI: 'my atlas connection here' }).join('\n')).toMatch(
+      /MONGODB_URI must be the full connection string/,
+    );
+  });
+
+  it('spots a connection string that still has a <placeholder> in it', () => {
+    const problems = problemsFor({
+      ...valid,
+      MONGODB_URI: 'mongodb://<db_username>:secret@host.example.mongodb.net:27017/prajzo',
+    });
+    expect(problems.join('\n')).toMatch(/MONGODB_URI still contains a placeholder/);
+    expect(problems.join('\n')).not.toContain('secret');
   });
 
   it('rejects an invalid port', () => {
@@ -68,5 +80,19 @@ describe('parseEnv', () => {
     expect(() =>
       parseEnv({ ...valid, NODE_ENV: 'production', APP_ORIGIN: 'https://prajzo.com' }),
     ).not.toThrow();
+  });
+
+  it('reads DNS_SERVERS as a list of IP addresses', () => {
+    expect(parseEnv({ ...valid, DNS_SERVERS: ' 1.1.1.1, 8.8.8.8 ' }).DNS_SERVERS).toEqual([
+      '1.1.1.1',
+      '8.8.8.8',
+    ]);
+    expect(parseEnv(valid).DNS_SERVERS).toBeUndefined();
+  });
+
+  it('rejects DNS_SERVERS entries that are not IP addresses, naming the setting', () => {
+    expect(problemsFor({ ...valid, DNS_SERVERS: '1.1.1.1,dns.google' }).join('\n')).toMatch(
+      /^DNS_SERVERS must be IP addresses separated by commas/m,
+    );
   });
 });

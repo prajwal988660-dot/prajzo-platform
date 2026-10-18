@@ -20,13 +20,42 @@ const envSchema = z
     }),
     MONGODB_URI: z
       .string(required('see docs/SETUP.md, "Development database"'))
-      .regex(/^mongodb(\+srv)?:\/\//, 'must start with mongodb:// or mongodb+srv://'),
+      .regex(
+        /^mongodb(\+srv)?:\/\/\S+$/,
+        'must be the full connection string from MongoDB Atlas (Connect → Drivers): one line, ' +
+          'no spaces, starting with mongodb+srv:// (see docs/SETUP.md, step 1)',
+      )
+      .refine(
+        (value) => !/[<>]/.test(value),
+        'still contains a placeholder such as <db_username> or <db_password>. Replace it with ' +
+          'your real value and remove the < and > too (see docs/SETUP.md, step 1)',
+      ),
     SESSION_SECRET: z
       .string(required('see docs/ENVIRONMENT.md'))
       .min(32, 'must be at least 32 characters'),
     LOG_LEVEL: z.enum(logLevels).default('info'),
     TRUST_PROXY: z.stringbool().default(false),
     WEB_DIST_DIR: z.string().optional(),
+    // Optional: DNS servers for looking up mongodb+srv:// addresses, e.g. "1.1.1.1,8.8.8.8".
+    // Works around a known Node.js-on-Windows problem ("querySrv ECONNREFUSED").
+    DNS_SERVERS: z
+      .string()
+      .transform((value) =>
+        value
+          .split(',')
+          .map((part) => part.trim())
+          .filter(Boolean),
+      )
+      .pipe(
+        z
+          .array(
+            z.union([z.ipv4(), z.ipv6()], {
+              error: 'must be IP addresses separated by commas, e.g. 1.1.1.1,8.8.8.8',
+            }),
+          )
+          .min(1),
+      )
+      .optional(),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {
@@ -59,7 +88,8 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(values);
   if (!result.success) {
     throw new ConfigError(
-      result.error.issues.map((issue) => `${issue.path.join('.') || 'settings'} ${issue.message}`),
+      // The first path segment is the setting's name (e.g. DNS_SERVERS, not DNS_SERVERS.1).
+      result.error.issues.map((issue) => `${String(issue.path[0] ?? 'settings')} ${issue.message}`),
     );
   }
   return result.data;
