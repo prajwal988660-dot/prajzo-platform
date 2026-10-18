@@ -1,6 +1,6 @@
 name: CI
 
-# Runs the same checks as `npm run check` on every pull request and on main.
+# Runs the same checks as `npm run check`, plus the browser tests, on every pull request and on main.
 on:
   pull_request:
   push:
@@ -26,3 +26,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  e2e:
+    name: End-to-end tests (desktop and mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

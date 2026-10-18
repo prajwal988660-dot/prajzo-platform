@@ -2,8 +2,10 @@ import dns from 'node:dns';
 import { createServer } from 'node:http';
 import { createApp } from './app';
 import { ConfigError, loadEnv, type Env } from './config/env';
-import { connectWithRetry, disconnectDatabase, pingDatabase } from './db/connection';
+import { connectWithRetry, describeError, disconnectDatabase, pingDatabase } from './db/connection';
 import { createLogger } from './lib/logger';
+import { ensureCatalogueDefaults } from './modules/catalogue/catalogue.service';
+import { createConsoleMailer } from './services/mailer';
 
 function readSettings(): Env {
   try {
@@ -24,7 +26,8 @@ function readSettings(): Env {
 function main(): void {
   const env = readSettings();
   const logger = createLogger(env);
-  const app = createApp({ env, logger, checkDatabase: () => pingDatabase() });
+  const mailer = createConsoleMailer(logger, { showBody: env.NODE_ENV === 'development' });
+  const app = createApp({ env, logger, checkDatabase: () => pingDatabase(), mailer });
   const server = createServer(app);
   const stopConnecting = new AbortController();
 
@@ -42,7 +45,16 @@ function main(): void {
     logger.info(`Using DNS servers ${env.DNS_SERVERS.join(', ')} for database address lookups`);
   }
 
-  void connectWithRetry(env.MONGODB_URI, logger, { signal: stopConnecting.signal });
+  void connectWithRetry(env.MONGODB_URI, logger, { signal: stopConnecting.signal })
+    .then(async () => {
+      if (stopConnecting.signal.aborted) return;
+      // A fresh database gets the default service categories and packages.
+      const counts = await ensureCatalogueDefaults();
+      logger.info(counts, 'Service catalogue ready');
+    })
+    .catch((error: unknown) => {
+      logger.error({ reason: describeError(error) }, 'Could not prepare the service catalogue');
+    });
 
   let shuttingDown = false;
   const shutdown = (signal: string) => {

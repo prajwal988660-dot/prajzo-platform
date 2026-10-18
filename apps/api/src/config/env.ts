@@ -56,6 +56,10 @@ const envSchema = z
           .min(1),
       )
       .optional(),
+    // Where contact-form notifications go. Defaults to the public contact email.
+    ADMIN_NOTIFY_EMAIL: z.email('must be an email address').optional(),
+    // Contact-form messages allowed per connection every 15 minutes (spam protection).
+    CONTACT_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {

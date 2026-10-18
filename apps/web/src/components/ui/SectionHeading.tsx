@@ -7,6 +7,8 @@ type SectionHeadingProps = {
   description?: ReactNode;
   align?: 'left' | 'center';
   as?: 'h1' | 'h2' | 'h3';
+  /** Set when a section is labelled by this heading (aria-labelledby). */
+  id?: string;
   className?: string;
 };
 
@@ -16,6 +18,7 @@ export function SectionHeading({
   description,
   align = 'left',
   as: Heading = 'h2',
+  id,
   className,
 }: SectionHeadingProps) {
   return (
@@ -26,6 +29,7 @@ export function SectionHeading({
         </p>
       )}
       <Heading
+        id={id}
         className={cx('text-3xl font-semibold tracking-tight sm:text-4xl', eyebrow ? 'mt-3' : null)}
       >
         {title}
