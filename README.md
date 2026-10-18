@@ -2,52 +2,70 @@
 
 Prajzo is a web development studio and website customization platform. Customers will be able to explore website categories and five live demo websites, customize a template in a visual builder, preview it on desktop, tablet and mobile, save it to their account, submit it as a project request, and follow the project's status. Prajzo's administrators review each request, confirm scope, price and delivery date, and move the project through a defined workflow.
 
+Private repository: https://github.com/prajwal988660-dot/prajzo-platform
+
 ## Status (17 October 2026)
 
-| Item | State |
+| Phase | State |
 |---|---|
-| Phase 0: discovery and plan | Done. Waiting for your approval. |
-| Platform code | Not started. Nothing has been installed. |
-| Earlier static marketing site | Still in this folder, unchanged. Runs at http://localhost:1234/ |
+| 0: Discovery and plan | Done and approved |
+| 1: Foundation | **Done. Waiting for your approval** (pull request `phase-1-foundation`) |
+| 2: Public website and service catalogue | Next, after your approval and your MongoDB Atlas connection string |
 
-Start with [docs/ROADMAP.md](docs/ROADMAP.md).
+Plan and progress: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/CHECKLIST.md](docs/CHECKLIST.md)
+
+## Quick start
+
+You need Node.js 24 and a MongoDB Atlas connection string. Setting up the free database takes about 10 minutes; see [docs/SETUP.md](docs/SETUP.md).
+
+```
+npm install
+npm run dev
+```
+
+| Address | What it is |
+|---|---|
+| http://localhost:5173 | The web app |
+| http://localhost:5173/dev/ui | Design-system gallery and API connection check (development only) |
+| http://localhost:4000/api/health/ready | API readiness, including the database |
+
+Before every commit, and at the end of every phase:
+
+```
+npm run check
+```
+
+This runs the type check, lint, format check, all tests and the production build. GitHub runs the same command on every pull request.
+
+## Repository layout
+
+| Path | What it is |
+|---|---|
+| `apps/web` | React + Vite web app: public site, demos, builder and dashboards (as phases land) |
+| `apps/api` | Express API with MongoDB |
+| `packages/shared` | Schemas and rules shared by the web app and the API |
+| `docs/` | Roadmap, checklist, architecture, decisions, environment, setup |
+| `assets/brand/` | Original logo files |
+| `legacy/static-site/` | The earlier single-file marketing site, kept unchanged |
+| `.github/workflows/ci.yml` | Continuous integration: `npm run check` on every pull request |
 
 ## Documents
 
 | File | Purpose |
 |---|---|
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Phases in order, what each delivers, approval gates, estimates, risks, open decisions |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Phases in order, what each delivers, approval gates, estimates, risks, decisions |
 | [docs/CHECKLIST.md](docs/CHECKLIST.md) | Task checklist, ticked only when work is finished and its tests have run |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the web app, API, database, templates and builder fit together; data model; API; security; testing |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the web app, API, database, templates and builder fit together |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Technical decisions and the reasons for them |
-| [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Environment variables and how secrets are handled |
-| [docs/SETUP.md](docs/SETUP.md) | Tools on this machine, what to install first, how to run things |
+| [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) | Environment variables and secrets |
+| [docs/SETUP.md](docs/SETUP.md) | Machine setup, the database, commands, troubleshooting |
 
-## What is in this folder today
+## The earlier static site
 
-This is the earlier static site, built before the platform plan. It stays exactly where it is until Phase 1. Then, with your approval, it gets a git baseline commit and moves to `legacy/static-site/` (see Q1 in the roadmap).
-
-| Path | What it is |
-|---|---|
-| `index.html` | Single-file marketing site: HTML, CSS and JavaScript, 3,465 lines |
-| `samples/` | 2 sample landing pages: `clinic-booking.html`, `invoicing-saas.html` |
-| `logo.png` | Transparent 800 × 147 crop of the logo, used by the site |
-| `Prajzo logo.png` | Original logo: 2752 × 1536 PNG, 3.8 MB, near-white (not transparent) background |
-| `hero-work.jpg`, `hero-work-800.jpg` | Unsplash photo by Christopher Gower; no longer used by the site |
-| `hero-bg.jpg`, `hero-bg-mobile.jpg` | Photos no longer used by the site; source not recorded |
-
-Known issues in the static site, recorded so nothing is lost. They won't be fixed unless you ask, because the platform replaces this site:
-
-- 4 of the 6 "View sample site" links return 404. `ceramics-store`, `fitness-app`, `contract-assistant` and `retreat-website` are not in `samples/`.
-- The sign-in popup is a front-end demo only. No account is created.
-- The proposal form needs a Web3Forms key that was never set, so it falls back to copying the brief.
-- The WhatsApp number (`15550100123`), the contact email (`hello@prajzo.com`) and the social links are placeholders.
-- A copy of the site is published as a private claude.ai artifact. Its last republish is still pending.
-
-## Running the static site
+The site that existed before this platform now lives in `legacy/static-site/`, exactly as it was. It is no longer developed. To view it:
 
 ```
-python -m http.server 1234 --directory C:\dev\mine\prajzo
+python -m http.server 1234 --directory C:\dev\mine\prajzo\legacy\static-site
 ```
 
-Then open http://localhost:1234/.
+Known issues there, kept for the record: 4 of its 6 "View sample site" links return 404; its sign-in popup is a front-end demo; its contact details and Web3Forms key are placeholders.

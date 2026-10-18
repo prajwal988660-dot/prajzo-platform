@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 17 October 2026
+Last updated: 17 October 2026 (end of Phase 1)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -16,31 +16,47 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [x] Write the roadmap with phases, gates, estimates and risks ([ROADMAP.md](ROADMAP.md))
 - [x] Write the decision log ([DECISIONS.md](DECISIONS.md)), environment variables ([ENVIRONMENT.md](ENVIRONMENT.md)) and setup guide ([SETUP.md](SETUP.md))
 - [x] Add the showcase-demo requirement to the roadmap: 5 demo routes, the Templates and Live Demos page, Customize This Design, one demo at a time
-- [ ] **(gate)** Your approval of the plan, plus answers to Q1–Q4
+- [x] **(gate)** Your approval of the plan, plus answers to Q1–Q4 (17 October 2026; see [ROADMAP.md](ROADMAP.md#open-decisions))
 
 ## Phase 1: Foundation
 
-- [ ] Git identity set; `git init`; `.gitignore`; baseline commit of the static site
-- [ ] Static site moved to `legacy/static-site/`; local static server restarted from there
-- [ ] Root `package.json` with npm workspaces and scripts: `dev`, `check`, `test`, `build`
-- [ ] Shared strict TypeScript 6.0 config; ESLint with typescript-eslint; Prettier
-- [ ] `packages/shared` skeleton with Zod
-- [ ] `apps/api`:
-  - [ ] Express 5 with settings validation, logging and security headers
-  - [ ] Error handler and 404 handling
-  - [ ] Health endpoints
-  - [ ] MongoDB connection with graceful shutdown
-- [ ] `apps/web`:
-  - [ ] Vite, React, Tailwind and React Router
-  - [ ] Design tokens taken from the logo
-  - [ ] Base UI components
-  - [ ] Header with mobile menu, footer, 404 page
-- [ ] Vite proxy `/api` → API in development; `npm run dev` starts both
-- [ ] Test setup: Vitest projects, in-memory MongoDB helper, Testing Library
-- [ ] First tests: health endpoints, settings validation, button and form-field components
-- [ ] `npm run check` passes; the app opens at http://localhost:5173
-- [ ] SETUP, ENVIRONMENT and this checklist updated
-- [ ] **(gate)** Approval for Phase 2
+- [x] Git identity set (this repository only); `git init`; `.gitattributes` (LF line endings) and `.gitignore`; baseline commit of the static site (`45c8d7c`)
+- [x] Private GitHub repository `prajwal988660-dot/prajzo-platform` created; Phase 1 work on branch `phase-1-foundation`
+- [x] Static site moved to `legacy/static-site/` (`2588cee`); local static server restarted from there and checked (200)
+- [x] Root `package.json` with npm workspaces and scripts: `dev`, `check`, `test`, `build`, `start`, `format`
+- [x] Shared strict TypeScript 6.0.3 config; ESLint 10 with type-aware typescript-eslint and React Hooks rules; Prettier
+- [x] `packages/shared` with Zod: API error format, health and readiness responses
+- [x] `apps/api`:
+  - [x] Express 5 with settings validation (refuses to start with a missing or invalid setting, never prints secret values)
+  - [x] Logging with request IDs and redaction
+  - [x] Security headers: content security policy, HSTS in production, `nosniff`, no `X-Powered-By`
+  - [x] Error handler (JSON errors, no internal details leaked) and JSON 404 for unknown API routes
+  - [x] Health endpoints `/api/health` and `/api/health/ready`
+  - [x] MongoDB connection with retry, credential-safe error logs and graceful shutdown
+  - [x] Serves the built web app in production; production bundle with esbuild
+- [x] `apps/web`:
+  - [x] Vite 8, React 19, Tailwind 4 and React Router 8
+  - [x] Design tokens taken from the logo; Inter and Sora fonts, self-hosted
+  - [x] Base UI components: button, button link, text field, text area, select, checkbox, card, badge, alert, spinner, empty state, section heading
+  - [x] Header with accessible mobile menu, footer, skip link, 404 page, crash page
+  - [x] Favicon and app icon cut from the logo's arrow mark
+  - [x] Development-only UI gallery at `/dev/ui` with a live API connection check (left out of production builds)
+- [x] Vite proxy `/api` → API in development; `npm run dev` starts both
+- [x] Test setup: Vitest projects, in-memory MongoDB helper, Testing Library
+- [x] Tests: 58 passing in 11 files (settings validation, health and readiness with a real in-memory database, error responses, production web serving, credential redaction, buttons, form fields, header and mobile menu, routes and 404, API client)
+- [x] `npm run check` passes (type check, lint, format, tests, production build)
+- [x] Checked by hand:
+  - [x] the app runs at http://localhost:5173 with the API connected to a database
+  - [x] screenshots at 1280 px and 390 px
+  - [x] production bundle smoke-tested
+- [x] CI workflow on GitHub runs `npm run check` for every pull request
+- [x] Atlas connection made reliable on Windows:
+  - [x] optional `DNS_SERVERS` setting, because Node 24 on this PC can't look up `mongodb+srv://` addresses (confirmed)
+  - [x] clear startup and connection messages for a wrong format, a leftover `<placeholder>`, a wrong password and a blocked IP
+- [x] README, SETUP, ENVIRONMENT, DECISIONS (D-021 to D-025), ROADMAP and this checklist updated
+- [x] **Your action:** create the free MongoDB Atlas cluster and put its connection string in `apps/api/.env` ([SETUP.md](SETUP.md), step 1). Connected on 18 October 2026; the app reports "API ready · database connected"
+- [ ] Recommended: change the Atlas database password, because it was shared in a chat (Atlas → Database Access → Edit → Edit Password), then update `apps/api/.env`
+- [ ] **(gate)** Approval for Phase 2: merge the `phase-1-foundation` pull request
 
 ## Phase 2: Public website and service catalogue
 
