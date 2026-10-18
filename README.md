@@ -4,13 +4,14 @@ Prajzo is a web development studio and website customization platform. Customers
 
 Private repository: https://github.com/prajwal988660-dot/prajzo-platform
 
-## Status (17 October 2026)
+## Status (18 October 2026)
 
 | Phase | State |
 |---|---|
 | 0: Discovery and plan | Done and approved |
-| 1: Foundation | **Done. Waiting for your approval** (pull request `phase-1-foundation`) |
-| 2: Public website and service catalogue | Next, after your approval and your MongoDB Atlas connection string |
+| 1: Foundation | Done and approved (merged 18 October 2026) |
+| 2: Public website and service catalogue | **Done. Waiting for your approval** (pull request `phase-2-public-site`) |
+| 3: Accounts and access control | Next, after your approval |
 
 Plan and progress: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/CHECKLIST.md](docs/CHECKLIST.md)
 

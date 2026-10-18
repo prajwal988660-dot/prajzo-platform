@@ -64,13 +64,14 @@ Run these from the repository root (`C:\dev\mine\prajzo`).
 | `npm run format` | Formats the code with Prettier |
 | `npm run build` | Production build: `apps/web/dist` and `apps/api/dist/server.js` |
 | `npm start` | Runs the production build. Needs production settings in the environment (`NODE_ENV=production` and the rest); see [ENVIRONMENT.md](ENVIRONMENT.md) |
+| `npm run test:e2e` | End-to-end tests in Chrome, desktop and phone sizes. Starts its own API with a throw-away database, so your Atlas data is never touched. Takes about 2 minutes |
+| `SCREENSHOTS=1 npm run test:e2e -- screenshots --project desktop` | Saves full-page screenshots of every page at 390, 768 and 1280 px in `test-results/screens/` |
+| `npm run seed -w @prajzo/api` | Rewrites the default categories and packages (prices) in your database from `catalogue.defaults.ts`. An empty database gets them automatically when the API starts |
 
 Planned commands, added in the phase that needs them:
 
 | Command | Phase |
 |---|---|
-| `npm run seed -w @prajzo/api` (load categories and packages) | 2 |
-| `npm run test:e2e` (Playwright end-to-end tests) | 2 |
 | `npm run admin:create -w @prajzo/api` (create an admin account) | 3 |
 | `npm run capture:previews` (template preview images) | 4 |
 

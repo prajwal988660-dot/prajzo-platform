@@ -201,3 +201,39 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Still to confirm:** the exact order of Phases 4–11, at the Phase 3 gate. The builder needs at least one template to customize, so the choice will be one of:
   - Portfolio demo, then builder, then the other demos (the original order)
   - project requests and the admin dashboard first, then the demos and builder
+
+---
+
+## Phase 2 decisions (18 October 2026)
+
+### D-026: Low starting prices
+
+- **Decision:** at your request ("make price in low range"), the packages start from:
+  - **₹2,999** for Quick Launch
+  - **₹7,999** for Professional Website
+  - **₹19,999** for Advanced Development
+- **How they're shown:** as "Starting from" prices. The final price is always confirmed in a written quote.
+- **Where they live:** in the database, loaded from `apps/api/src/modules/catalogue/catalogue.defaults.ts`. Admins will edit them in Phase 11; until then, change that file and run `npm run seed -w @prajzo/api`.
+- **Note:** at these prices, the delivery targets only work for projects whose content is ready. The quote stays the place to set the real price and date.
+
+### D-027: Contact details and the "Start a Project" button
+
+- **Decision:**
+  - The public contact details live in one place, `packages/shared/src/site.ts`: contact@prajzo.com, +91 98866 07720 (phone and WhatsApp), Instagram @prajzoo.
+  - Contact-form notifications go to the same email unless `ADMIN_NOTIFY_EMAIL` says otherwise.
+  - Until the Start a Project page exists (Phase 10), the header's "Start a Project" button opens the Contact page.
+- **Why:** the button is working and honest today. The Contact form is how projects start for now.
+
+### D-028: Contact form protection
+
+- **Decision:** the form has four protections:
+  - a hidden spam-trap field
+  - a limit of 5 messages per 15 minutes per connection
+  - server-side checks that the chosen website type and package really exist
+  - a saved consent time
+- **If the email fails:** the message is still saved and the visitor sees a real success, because it was stored. The email failure is logged.
+
+### D-029: Pages load on demand; browser tests in CI
+
+- **Decision:** every page except Home loads its code only when it's opened, which cut the first download from 526 KB to about 260 KB (before compression). A thin progress bar shows while a page loads.
+- **Testing:** Playwright end-to-end tests, including axe accessibility checks and a no-sideways-scrolling check, run on desktop and phone sizes in CI for every pull request.

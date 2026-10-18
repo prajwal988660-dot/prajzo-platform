@@ -1,6 +1,6 @@
 # Prajzo roadmap
 
-Last updated: 17 October 2026 (end of Phase 1)
+Last updated: 18 October 2026 (end of Phase 2)
 
 This document covers the order in which Prajzo gets built, what each phase delivers, and how we'll know each phase is done. Every phase ends with a short summary and a pause for your approval before the next one starts.
 
@@ -34,8 +34,8 @@ Estimates are in 4-hour working sessions. They're rough and will be recalibrated
 | # | Phase | At the end you can… | Sessions | Gate |
 |---|---|---|---|---|
 | 0 | Discovery and plan | Read this plan | 1 (done) | Your approval |
-| 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, awaiting approval) | Approval |
-| 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 4–5 | Approval |
+| 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, approved 18 Oct) | Approval |
+| 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 1 (done, awaiting approval) | Approval |
 | 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 3–4 | Approval |
 | 4 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
 | 5 | Website builder (core) | Click "Customize This Design", edit the portfolio, preview desktop/tablet/mobile, save it | 7–9 | Approval |
@@ -366,19 +366,23 @@ This phase needs your accounts, plus your approval for anything paid.
 | Q3: Git identity | Your GitHub account | Commits use "Prajwal S" and your GitHub no-reply address, set for this repository only |
 | Q4: Build order | Main website first, demos after | Phases 1–3 unchanged; the order of Phases 4–11 is confirmed at the Phase 3 gate (D-025) |
 
-### Needed now (before Phase 2 can be tested against your own database)
+### Answered on 18 October 2026
 
-- **Your MongoDB Atlas connection string** in `apps/api/.env`. Follow [SETUP.md, step 1](SETUP.md#1-set-up-the-free-mongodb-atlas-database-once-about-10-minutes); it takes about 10 minutes.
+| Question | Your answer |
+|---|---|
+| Development database | Your MongoDB Atlas free cluster, connected and working |
+| Contact details | contact@prajzo.com; +91 98866 07720 for phone and WhatsApp; Instagram @prajzoo |
+| Prices | "Low range": starting from ₹2,999, ₹7,999 and ₹19,999 (D-026) |
+| Hosting and domain | Hostinger, domain prajzo.com. Which Hostinger plan you have is still open (see below) |
 
 ### Needed later
 
 | When | Decision |
 |---|---|
-| Phase 2 | Real contact details: email, phone, WhatsApp number, city or address, social links. The static site's are placeholders. |
-| Phase 2 | Prices: keep "Request a quote" for now, or start with the ₹ prices from the static site as editable defaults |
 | Phase 4 | Confirm that demo form submissions are stored and then deleted after 7 days |
 | Phase 10 | Confirm the status workflow (who may move a project between which states) in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow) |
-| Phase 13 | Domain (is prajzo.com yours?), hosting, image storage, email provider, any paid plans |
+| Before going online | Your Hostinger plan type (Business or Cloud can run Prajzo; Single or Premium can't run Node.js apps; VPS needs manual setup), whether anything is live on prajzo.com today, and whether the contact@prajzo.com mailbox exists |
+| Phase 13 | Image storage, sending email through your provider, any paid plans |
 
 ## Later (not in this plan unless you approve it)
 
