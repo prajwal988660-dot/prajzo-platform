@@ -54,7 +54,8 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] optional `DNS_SERVERS` setting, because Node 24 on this PC can't look up `mongodb+srv://` addresses (confirmed)
   - [x] clear startup and connection messages for a wrong format, a leftover `<placeholder>`, a wrong password and a blocked IP
 - [x] README, SETUP, ENVIRONMENT, DECISIONS (D-021 to D-025), ROADMAP and this checklist updated
-- [ ] **Your action:** create the free MongoDB Atlas cluster and put its connection string in `apps/api/.env` ([SETUP.md](SETUP.md), step 1)
+- [x] **Your action:** create the free MongoDB Atlas cluster and put its connection string in `apps/api/.env` ([SETUP.md](SETUP.md), step 1). Connected on 18 October 2026; the app reports "API ready · database connected"
+- [ ] Recommended: change the Atlas database password, because it was shared in a chat (Atlas → Database Access → Edit → Edit Password), then update `apps/api/.env`
 - [ ] **(gate)** Approval for Phase 2: merge the `phase-1-foundation` pull request
 
 ## Phase 2: Public website and service catalogue
