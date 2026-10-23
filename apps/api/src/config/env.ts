@@ -35,6 +35,9 @@ const envSchema = z
       .min(32, 'must be at least 32 characters'),
     LOG_LEVEL: z.enum(logLevels).default('info'),
     TRUST_PROXY: z.stringbool().default(false),
+    // Serve the built web app from the API (one address for everything). Always on in
+    // production; local hosting (npm run host:local) turns it on in development too.
+    SERVE_WEB_APP: z.stringbool().optional(),
     WEB_DIST_DIR: z.string().optional(),
     // Optional: DNS servers for looking up mongodb+srv:// addresses, e.g. "1.1.1.1,8.8.8.8".
     // Works around a known Node.js-on-Windows problem ("querySrv ECONNREFUSED").
@@ -56,6 +59,10 @@ const envSchema = z
           .min(1),
       )
       .optional(),
+    // Where contact-form notifications go. Defaults to the public contact email.
+    ADMIN_NOTIFY_EMAIL: z.email('must be an email address').optional(),
+    // Contact-form messages allowed per connection every 15 minutes (spam protection).
+    CONTACT_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {

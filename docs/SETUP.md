@@ -64,28 +64,52 @@ Run these from the repository root (`C:\dev\mine\prajzo`).
 | `npm run format` | Formats the code with Prettier |
 | `npm run build` | Production build: `apps/web/dist` and `apps/api/dist/server.js` |
 | `npm start` | Runs the production build. Needs production settings in the environment (`NODE_ENV=production` and the rest); see [ENVIRONMENT.md](ENVIRONMENT.md) |
+| `npm run host:local` | Builds Prajzo and runs it in the background like a real server (see section 3). Run it again after code changes |
+| `npm run host:stop` | Stops the local host |
+| `npm run test:e2e` | End-to-end tests in Chrome, desktop and phone sizes. Starts its own API with a throw-away database, so your Atlas data is never touched. Takes about 2 minutes |
+| `SCREENSHOTS=1 npm run test:e2e -- screenshots --project desktop` | Saves full-page screenshots of every page at 390, 768 and 1280 px in `test-results/screens/` |
+| `npm run seed -w @prajzo/api` | Rewrites the default categories and packages (prices) in your database from `catalogue.defaults.ts`. An empty database gets them automatically when the API starts |
 
 Planned commands, added in the phase that needs them:
 
 | Command | Phase |
 |---|---|
-| `npm run seed -w @prajzo/api` (load categories and packages) | 2 |
-| `npm run test:e2e` (Playwright end-to-end tests) | 2 |
 | `npm run admin:create -w @prajzo/api` (create an admin account) | 3 |
 | `npm run capture:previews` (template preview images) | 4 |
 
-## 3. Troubleshooting
+## 3. Run Prajzo locally like a real server
+
+`npm run dev` is for working on the code. To see Prajzo the way visitors will, as one optimized site served from one address, host it locally:
+
+```
+npm run host:local
+```
+
+- It builds the site, then starts it in the **background** (no window). It keeps running after you close the terminal or Claude Code, until you stop it or restart the computer.
+- It prints the addresses to open:
+  - **On this computer:** http://localhost:8080
+  - **On your phone**, on the same Wi-Fi or hotspot: the `http://172.x.x.x:8080` style address it prints. That address can change when you reconnect, so run the command again to see the current one.
+- **After changing code**, run `npm run host:local` again. It rebuilds and restarts.
+- **Stop it** with `npm run host:stop`. It only stops the process that is really listening on port 8080, never an unrelated program.
+- **Logs:** `apps/api/logs/local-host.log` explains anything unusual. For example, if the database disconnects, it says why and what to do.
+- **Port:** 8080. To use another, set `LOCAL_HOST_PORT` for the command.
+- **On shared or public Wi-Fi**, other devices on that network can open the site while it runs. Run `npm run host:stop` when you're done.
+- It uses the same database as `npm run dev`: your Atlas database from `apps/api/.env`.
+
+## 4. Troubleshooting
 
 | You see | What to do |
 |---|---|
 | `The Prajzo API cannot start` followed by `MONGODB_URI is required` or `must be the full connection string` | Do step 1 above. The value must be one line with no spaces, starting with `mongodb+srv://` or `mongodb://` |
 | `querySrv ECONNREFUSED` in the API log | Node.js on Windows can't look up `mongodb+srv://` addresses on some PCs, including this one. Keep `DNS_SERVERS=1.1.1.1,8.8.8.8` in `apps/api/.env` (already set here), or use Atlas's `mongodb://` form of the string |
 | `Atlas rejected the username or password` | The string still contains `<db_username>` or `<db_password>`, or the password is wrong. Check the user under Security → Database Access; you can set a new password there (Edit → Edit Password) |
-| `Database connection failed; retrying in 10s` | In Atlas, check Network Access (your current IP address) and that the password in the string is right. The API keeps retrying, so it reconnects as soon as the setting is fixed |
+| The site says the database is disconnected, or the log says `Atlas did not answer` or `SSL alert number 80` | **Your internet address changed**, and Atlas only lets in addresses it knows. Under Atlas → Network Access, add your current address (**Add IP Address → Add Current IP Address**). You can pick a **temporary** entry that deletes itself after a day or a week. While it is disconnected, the pages still open, but the lists of services and the contact form answer at once with "temporarily unavailable. Please try again in a minute" (the contact form keeps what was typed). The site reconnects by itself within about a minute of the fix; nothing needs restarting. A phone hotspot changes address often, so this will repeat |
+| `Database connection failed; retrying in 10s` | The same causes: check Network Access first, then that the password in the string is right. The API keeps retrying, so it reconnects as soon as the setting is fixed |
+| `Port 8080 is already used by another program` | Something else is using port 8080. Close it, or set `LOCAL_HOST_PORT` to a different number |
 | `Port 5173 is already in use` or `Could not start the API on port 4000` | Another copy is already running. Close it, or find it with `Get-NetTCPConnection -LocalPort 5173` |
 | The `/dev/ui` page says **API not reachable** | `npm run dev` isn't running, or the API stopped; its message in the terminal says why |
 
-## 4. The legacy static site
+## 5. The legacy static site
 
 Not part of the platform, and kept unchanged. To view it:
 

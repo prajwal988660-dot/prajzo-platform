@@ -8,11 +8,16 @@
     "dev": "tsx watch --clear-screen=false src/server.ts",
     "build": "node scripts/build.mjs",
     "start": "node dist/server.js",
+    "host:local": "node scripts/host-local.mjs",
+    "host:stop": "node scripts/host-stop.mjs",
+    "seed": "tsx src/scripts/seed.ts",
+    "e2e:server": "tsx src/scripts/e2e-server.ts",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@prajzo/shared": "*",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
     "mongoose": "^9.11.2",
     "pino": "^10.4.0",

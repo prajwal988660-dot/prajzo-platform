@@ -1,12 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
-import express, { type Express } from 'express';
+import { siteContact } from '@prajzo/shared';
+import express, { Router, type Express } from 'express';
 import { pinoHttp } from 'pino-http';
 import type { Env } from './config/env';
 import type { Logger } from './lib/logger';
 import { apiNotFound, errorHandler } from './middleware/error-handler';
 import { securityHeaders } from './middleware/security-headers';
+import { catalogueRouter } from './modules/catalogue/catalogue.routes';
+import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
+import type { Mailer } from './services/mailer';
 import { serveWebApp } from './web/serve-web-app';
 
 export interface AppDependencies {
@@ -14,9 +18,10 @@ export interface AppDependencies {
   logger: Logger;
   /** Resolves true when the database answers; used by the readiness check. */
   checkDatabase: () => Promise<boolean>;
+  mailer: Mailer;
 }
 
-export function createApp({ env, logger, checkDatabase }: AppDependencies): Express {
+export function createApp({ env, logger, checkDatabase, mailer }: AppDependencies): Express {
   const app = express();
 
   app.disable('x-powered-by');
@@ -36,10 +41,21 @@ export function createApp({ env, logger, checkDatabase }: AppDependencies): Expr
   );
   app.use(express.json({ limit: '100kb' }));
 
+  const v1 = Router();
+  v1.use(catalogueRouter());
+  v1.use(
+    contactRouter({
+      mailer,
+      notifyEmail: env.ADMIN_NOTIFY_EMAIL ?? siteContact.email,
+      rateLimitMax: env.CONTACT_RATE_LIMIT_MAX,
+    }),
+  );
+
   app.use('/api', healthRouter({ checkDatabase }));
+  app.use('/api/v1', v1);
   app.use('/api', apiNotFound);
 
-  if (env.NODE_ENV === 'production') {
+  if (env.SERVE_WEB_APP ?? env.NODE_ENV === 'production') {
     serveWebApp(app, env.WEB_DIST_DIR ?? path.resolve(process.cwd(), '../web/dist'), logger);
   }
 

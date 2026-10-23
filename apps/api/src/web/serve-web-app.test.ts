@@ -61,4 +61,20 @@ describe('serving the built web app in production', () => {
     const response = await request(app).get('/');
     expect(response.headers['strict-transport-security']).toContain('max-age=15552000');
   });
+
+  it('serves the web app outside production only when asked (local hosting)', async () => {
+    const localHosting = testApp({
+      env: testEnv({ SERVE_WEB_APP: 'true', WEB_DIST_DIR: distDir }),
+      checkDatabase: () => Promise.resolve(true),
+    });
+    const home = await request(localHosting).get('/contact');
+    expect(home.status).toBe(200);
+    expect(home.text).toContain('<div id="root">');
+    // Plain http on your own computer: no HSTS and no forced https upgrade.
+    expect(home.headers['strict-transport-security']).toBeUndefined();
+    expect(home.headers['content-security-policy']).not.toContain('upgrade-insecure-requests');
+
+    const apiOnly = testApp({ env: testEnv(), checkDatabase: () => Promise.resolve(true) });
+    expect((await request(apiOnly).get('/contact')).status).toBe(404);
+  });
 });

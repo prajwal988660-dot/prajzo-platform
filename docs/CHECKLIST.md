@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 17 October 2026 (end of Phase 1)
+Last updated: 18 October 2026 (end of Phase 2)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -60,27 +60,50 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 ## Phase 2: Public website and service catalogue
 
-- [ ] Your real contact details and pricing choice (see open decisions)
-- [ ] Category, package and contact-message models; seed script (15 categories, 3 packages)
-- [ ] API endpoints:
-  - [ ] List categories
-  - [ ] List packages
-  - [ ] Submit a contact message: validated, rate-limited, stored, notification printed to the console
-- [ ] Home page:
-  - [ ] Header, hero, delivery highlights with their conditions
-  - [ ] Categories, how it works, customization feature
-  - [ ] Packages, why Prajzo, FAQ
-  - [ ] Final call to action, footer
-- [ ] Services page: 15 categories with icon, description, use cases, delivery category and a call to action
-- [ ] How It Works, Pricing and Plans, About Us and Contact Us pages
-- [ ] Privacy Policy and Terms and Conditions drafts, flagged for legal review
-- [ ] Loading, empty and error states for every section that uses the API
-- [ ] Tests:
-  - [ ] API: valid, invalid and rate-limited submissions
-  - [ ] Contact form component
-  - [ ] End to end: navigation and contact form
-- [ ] Responsive check at 390, 768 and 1280 px; keyboard and colour-contrast check
-- [ ] **(gate)** Approval for Phase 3
+- [x] Your contact details: contact@prajzo.com, +91 98866 07720 (phone and WhatsApp), Instagram @prajzoo
+- [x] Your pricing choice: low starting prices of ₹2,999, ₹7,999 and ₹19,999 (D-026)
+- [x] Category, package and contact-message models
+- [x] Default catalogue (15 categories, 3 packages):
+  - [x] loaded automatically into an empty database when the API starts
+  - [x] `npm run seed -w @prajzo/api` refreshes it
+- [x] API endpoints:
+  - [x] `GET /api/v1/categories` and `GET /api/v1/packages` (active items only, in order)
+  - [x] `POST /api/v1/contact`:
+    - [x] validated with the shared rules, including that the chosen website type and package exist
+    - [x] spam trap; 5 messages per 15 minutes per connection
+    - [x] saved with the consent time
+    - [x] notification printed to the console in development
+- [x] Home page:
+  - [x] Header, hero with a website-preview illustration, delivery highlights with their conditions
+  - [x] Categories, how it works, customization feature
+  - [x] Packages, why Prajzo, FAQ
+  - [x] Final call to action, footer
+- [x] Services page: 15 categories with icon, description, use cases, delivery category and a "Start a project" link
+- [x] How It Works, Pricing and Plans, About Us and Contact Us pages
+- [x] Contact page:
+  - [x] form with browser and server validation
+  - [x] pre-selection from Services and Pricing links
+  - [x] success shown only after the server saves the message; errors kept with the typed text
+  - [x] direct contact options
+- [x] Privacy Policy and Terms and Conditions (written for India's DPDP Act 2023; **have a lawyer review them before launch**)
+- [x] Header "Start a Project" button (opens Contact until Phase 10), floating WhatsApp button, footer with contact details
+- [x] Loading, empty and error states (with "Try again") for every section that uses the API
+- [x] Each page's code loads only when it is opened; slim loading bar during page changes
+- [x] Tests: 110 unit, API and component tests, plus 38 end-to-end runs (19 tests × desktop and phone):
+  - [x] API: catalogue order, inactive items, defaults not overwriting edits, valid, invalid and unknown choices, spam trap, failed email, rate limit
+  - [x] Contact form: missing details, cleaned-up data sent, server field errors, network failure (never a false success), pre-selection
+  - [x] End to end: navigation (desktop and mobile menu), contact form, Get a quote → Contact, footer, 404, no sideways scrolling
+  - [x] Accessibility (axe, WCAG 2.2 AA rules): no serious or critical problems on any of the 9 pages, on desktop or phone
+- [x] Screenshots checked at 390, 768 and 1280 px
+- [x] CI runs the end-to-end tests on every pull request
+- [x] Local hosting (D-030), requested on 18 October:
+  - [x] `npm run host:local` builds, then runs the website and API together in the background on http://localhost:8080 and prints your phone-friendly network address
+  - [x] `npm run host:stop` stops only the process that really listens on that port; a stale saved process number pointing at another program is ignored and left alone (checked with a decoy program)
+  - [x] second start reports "already running"; restart replaces the old copy; log is kept under 5 MB
+  - [x] the log explains a lost database connection (usually a changed internet address) in one line, and recognises Atlas's "SSL alert number 80" rejection
+  - [x] tests for the production-style serving and the connection messages
+  - [x] while the database is unreachable, database-backed requests answer at once with a clear 503 "temporarily unavailable" message instead of hanging for 10 seconds; failed contact attempts during an outage don't use up the visitor's message allowance
+- [ ] **(gate)** Approval for Phase 3: merge the `phase-2-public-site` pull request
 
 ## Phase 3: Accounts and access control
 

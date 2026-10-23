@@ -8,19 +8,28 @@ export type NavItem = {
 /** Main navigation, in the order the brief asks for. Pages switch on as their phase is completed. */
 export const primaryNavigation: NavItem[] = [
   { label: 'Home', to: '/', available: true },
-  { label: 'Services', to: '/services', available: false }, // Phase 2
-  { label: 'Templates', to: '/templates', available: false }, // Phase 4
-  { label: 'How It Works', to: '/how-it-works', available: false }, // Phase 2
-  { label: 'Pricing', to: '/pricing', available: false }, // Phase 2
-  { label: 'Projects', to: '/projects', available: false }, // Phase 4
-  { label: 'Contact', to: '/contact', available: false }, // Phase 2
+  { label: 'Services', to: '/services', available: true },
+  { label: 'Templates', to: '/templates', available: false }, // template phases
+  { label: 'How It Works', to: '/how-it-works', available: true },
+  { label: 'Pricing', to: '/pricing', available: true },
+  { label: 'Projects', to: '/projects', available: false }, // template phases
+  { label: 'Contact', to: '/contact', available: true },
 ];
 
-/** The "Start a Project" button in the header (Phase 10). */
+/**
+ * The header's "Start a Project" button. Until the dedicated Start a Project page exists
+ * (Phase 10), it opens the contact form, which is how projects start today.
+ */
 export const headerCallToAction: NavItem = {
   label: 'Start a Project',
-  to: '/start',
-  available: false,
+  to: '/contact',
+  available: true,
 };
+
+/** Legal pages, linked from the footer. */
+export const footerLegalLinks: NavItem[] = [
+  { label: 'Privacy Policy', to: '/privacy', available: true },
+  { label: 'Terms and Conditions', to: '/terms', available: true },
+];
 
 export const visibleNavigation = primaryNavigation.filter((item) => item.available);

@@ -3,6 +3,7 @@ import { createApp } from '../app';
 import { parseEnv, type Env } from '../config/env';
 import { connectDatabase, disconnectDatabase, pingDatabase } from '../db/connection';
 import { createLogger } from '../lib/logger';
+import { createCaptureMailer, type Mailer } from '../services/mailer';
 
 export function testEnv(overrides: Record<string, string> = {}): Env {
   return parseEnv({
@@ -15,13 +16,14 @@ export function testEnv(overrides: Record<string, string> = {}): Env {
 }
 
 export function testApp(
-  options: { env?: Env; checkDatabase?: () => Promise<boolean> } = {},
+  options: { env?: Env; checkDatabase?: () => Promise<boolean>; mailer?: Mailer } = {},
 ): ReturnType<typeof createApp> {
   const env = options.env ?? testEnv();
   return createApp({
     env,
     logger: createLogger({ NODE_ENV: 'test', LOG_LEVEL: 'silent' }),
     checkDatabase: options.checkDatabase ?? (() => pingDatabase()),
+    mailer: options.mailer ?? createCaptureMailer(),
   });
 }
 

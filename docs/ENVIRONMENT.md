@@ -22,6 +22,7 @@ Secrets and settings live in environment variables, never in code.
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
 | `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+| `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
 | `DNS_SERVERS` | `1.1.1.1,8.8.8.8` | No | DNS servers for looking up `mongodb+srv://` addresses. Only needed when the API log shows `querySrv ECONNREFUSED` (a known Node.js-on-Windows problem; set on this PC) |
 
 On this machine `apps/api/.env` already exists, with a generated `SESSION_SECRET`. `MONGODB_URI` stays empty until you add your Atlas connection string ([SETUP.md](SETUP.md), step 1).
@@ -38,13 +39,17 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 | Phase | Variables | Purpose |
 |---|---|---|
-| 2 | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM`, `ADMIN_NOTIFY_EMAIL` | Contact notifications. Development prints emails to the API console. |
+| 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where contact-form notifications go. In development they are printed to the API console, not sent |
+| 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
+| Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
 | 3 | `SESSION_TTL_HOURS`, `ADMIN_SESSION_TTL_HOURS` | Session lifetimes (sensible defaults built in) |
 | 4 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
 | 5 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development |
 | 13 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Real email through your provider |
 | 13 | `STORAGE_DRIVER` (`s3`), `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `PUBLIC_ASSET_BASE_URL` | Cloud image storage (or `CLOUDINARY_URL` if Cloudinary is chosen) |
 | 13 | `TRUST_PROXY` (`true`) | Correct client IPs behind the host's proxy, needed for rate limits and secure cookies |
+
+`LOCAL_HOST_PORT` (default `8080`) is read by the `npm run host:local` and `npm run host:stop` commands, not by the API. Set it in the terminal if port 8080 is taken.
 
 ## Production checklist (Phase 13)
 
