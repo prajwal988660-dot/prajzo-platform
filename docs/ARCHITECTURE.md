@@ -273,7 +273,7 @@ Every configuration stores `schemaVersion` and the template's `version`. When a 
 | `templates` | key (matches a template definition), title, summary, description, features[], categoryKeys[], previewImage, status (`draft` / `published` / `archived`), featured, sortOrder | key unique; admins edit this catalogue entry, while the design lives in code |
 | `packages` | key, name, targetDelivery (label, hours), scope[], priceMode (`quote` / `fixed` / `from`), priceAmountPaise, active, sortOrder | key unique; prices stay "Request a quote" until set |
 | `configurations` | ownerId, name, templateKey, templateVersion, schemaVersion, config, timestamps | { ownerId, updatedAt } |
-| `projectRequests` | reference, customerId, source (`builder` / `start-form`), configurationId, configSnapshot, categoryKey, templateKey, requestedPackage, features[], integrations[], notes, contact, status, statusHistory[], quote, confirmedDeliveryDate, revisions (included / used), adminNotes[], timestamps | reference unique; { customerId, createdAt }; { status, updatedAt }. adminNotes are never sent to customers |
+| `projectRequests` | reference, customerId, source (`start-form` / `builder`), title, categoryKey, categoryTitle, packageKey, packageName, description, features[], integrations[], preferredDate, contactPreference, contact (name, email, phone), notes, status, statusHistory[] (from, to, by, userId, note, at), timestamps. Added in Phase 5: quote, confirmedDeliveryDate, revisions, adminNotes[]. Added in Phase 14: configurationId, configSnapshot, templateKey | reference unique; { customerId, createdAt }; { status, updatedAt }. adminNotes are never sent to customers |
 | `assets` | ownerId, storageKey, url, mimeType, bytes, width, height, sha256, createdAt | { ownerId, createdAt } |
 | `counters` | `_id` (e.g. `projectRequest:2026`), seq | atomic increment produces reference numbers |
 | `contactMessages` | name, email, phone, message, status (`new` / `read` / `archived`), createdAt | { status, createdAt } |
@@ -304,7 +304,7 @@ All routes are under `/api/v1` except the health checks. List endpoints take `?p
 | Signed in | `PATCH /me`, `POST /me/password` | Profile; change password (ends other sessions) |
 | Customer (own records) | `GET`, `POST /configurations`; `GET`, `PATCH`, `DELETE /configurations/:id`; `POST /configurations/:id/duplicate` | Saved designs |
 | Customer | `POST /uploads` | Image upload |
-| Customer (own records) | `GET`, `POST /project-requests`; `GET /project-requests/:reference`; `POST /project-requests/:reference/actions` | Project requests and allowed customer actions |
+| Customer (own records) | `GET`, `POST /project-requests`; `GET /project-requests/:reference`; `POST /project-requests/:reference/actions` | Project requests. Built in Phase 4: send, list, read and `cancel` (while early). Accepting or declining a quote, answering a question and asking for a revision arrive in Phase 5. Each project says which actions are allowed now (`allowedActions`) |
 | Admin | `GET /admin/overview` | Real counts and recent activity |
 | Admin | `GET /admin/project-requests`; `GET`, `PATCH /admin/project-requests/:reference`; `POST …/status`; `POST …/notes` | Review, quote, date, status, notes |
 | Admin | `GET /admin/customers`, `GET /admin/customers/:id` | Customers |

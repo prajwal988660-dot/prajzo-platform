@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 23 October 2026 (Option A order chosen; code-protection add-on)
+Last updated: 23 October 2026 (end of Phase 4)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -153,23 +153,25 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 ## Phase 4: Project requests and customer dashboard
 
-- [ ] Shared rules: the project-request form schema; status list, labels and the table of allowed changes (tested row by row)
-- [ ] Database: project requests, and a counter for reference numbers (`PRZ-2026-0001`) that stay unique even when requests arrive together
-- [ ] API: create; list your own (paginated); read your own (someone else's is "not found"); cancel while it's early
-- [ ] Start a Project page: explains the steps; the form for signed-in customers; sign-in first for visitors, then back to the form
-- [ ] Confirmation to the customer and notification to Prajzo (printed to the console until Phase 7)
-- [ ] Customer dashboard: latest projects on the account page; My Projects; Project details with the status timeline and cancel
-- [ ] Admin overview: real project-request counts
-- [ ] The header's "Start a Project" button and the Services buttons open the new page
-- [ ] Tests:
-  - [ ] Ownership; fields customers can't set (price, date, status); refused status changes
-  - [ ] Reference numbers unique under simultaneous requests
-  - [ ] Form validation, error and success states
-  - [ ] End to end: sign up → start a project → My Projects → details → cancel
-  - [ ] Accessibility (axe) on the new pages
-- [ ] Responsive check at 390, 768 and 1280 px
-- [ ] Docs updated; summary with the tests that ran
-- [ ] **(gate)** Approval for Phase 5, including your confirmation of the status workflow ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow))
+- [x] Shared rules (the browser and the server use the same ones): the Start a Project form, the 11 statuses with plain-language meanings, and the table of allowed status changes, every possible change checked against a separately written copy of the table
+- [x] Database: project requests, and a counter for reference numbers (`PRZ-2026-0001`) that stay unique even when requests arrive together (checked with 40 at once)
+- [x] API: send a request; list your own (a page at a time); read your own (someone else's, or a made-up reference, gets the same "not found"); cancel while it's early (Request Received, Awaiting Customer Information or Quote Sent)
+- [x] Start a Project page: explains the steps; a form for signed-in customers; visitors sign in or create an account first and come straight back to the form, with their chosen service or package kept
+- [x] Confirmation to the customer and notification to Prajzo (printed to the API log until Phase 7); a failed email never fails or delays the request
+- [x] Customer dashboard: latest projects on the account page; My Projects (a page at a time); Project page with what was asked for, the status and what happens next, the timeline, and cancel with a question first
+- [x] Admin overview: real project-request counts
+- [x] Every "Start a Project" button (header, home, services, pricing, call to action) opens the new page; the Contact page is now for questions
+- [x] Privacy Policy and Terms brought up to date (accounts, project requests, the sign-in cookie)
+- [x] Fixed on the way: a signed-in customer no longer sees a flash of "Sign in to send your project" while the server is still being asked; form boxes no longer stretch when a neighbouring field has a hint
+- [x] Tests (all run):
+  - [x] Shared rules, 68 in total: every status change, the form rules (field by field, and all problems at once), India-time dates, page numbers
+  - [x] Server, 196 in total (47 new for projects): ownership; fields customers can't set are dropped; who may send one (visitor 401, administrator 403, disabled account 401, other websites 403); per-customer hourly limit; reference numbers unique with 40 simultaneous calls and with 12 customers at once; reference numbers restart each year in India time; cancelling allowed in exactly 3 statuses and refused in the other 8; two cancellations at once, one wins; a failing email doesn't fail the request; nothing internal in any response
+  - [x] Website, 188 in total: the Start a Project page for a visitor, an administrator and a customer (validation, exact request sent, double click sends once, server messages beside fields, down-time keeps what was typed, reference shown); My projects (paging, empty, error, retry); Project page (details, timeline in India time, cancel flow, conflicts); the account page's project list
+  - [x] Real browser, on desktop and phone: send, email, follow and cancel a project, with a reload in between; a form with mistakes sends nothing; a visitor signs up and is brought back to the form; one customer can't see another's project on the page or in the API; the administrator overview counts requests. That is 14 checks for these journeys (7 on desktop, 7 on phone), plus 14 for the site's pages and 44 accessibility checks (axe) on every page including the new ones, empty and with error messages. The whole browser suite runs again on GitHub
+  - [x] Looked at by eye at 390, 768 and 1280 px (form, errors, list, project page, cancel question, cancelled project, account page)
+- [x] Docs updated; summary with the tests that ran
+- [ ] **Your action:** confirm the status workflow ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow)): who may move a project from which status to which. Phase 5 builds on it
+- [ ] **(gate)** Approval for Phase 5
 
 ## Phase 5: Admin dashboard
 

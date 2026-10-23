@@ -345,3 +345,50 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - disabling text selection (hurts accessibility)
   - showing demos as images (defeats a live demo)
 - **Idea for later:** the same password gate could protect a customer's project preview while it's being built (see the "Later" list in the roadmap).
+
+---
+
+## Phase 4 decisions (23 October 2026)
+
+### D-038: Start a Project is its own page, and needs an account
+
+- **Decision:**
+  - `/start-project` is open to everyone to read. The form is for signed-in customers.
+  - A visitor is asked to create a free account or sign in, and is brought straight back to the form with their chosen service or package kept.
+  - The Contact page stays for questions, with no account needed.
+  - Administrators aren't offered the form; they use a customer account to try it.
+- **Why:** a project belongs to an account so the customer can follow it, read a quote and reply, and so the server can make sure nobody else sees it.
+- **Cost:** one extra step for a first-time customer, about a minute. Someone who'd rather not register can still send a message.
+- **Also changed:** the Contact page's heading is now "Talk to us", since "Start a project" has its own page.
+
+### D-039: Reference numbers, and what a request keeps
+
+- **Decision:**
+  - References look like `PRZ-2026-0001` and restart each year (by India time). The next number is taken from a counter in the database in one step, so two requests at the same moment can never get the same number.
+  - A number is used up even if the request then fails, so there can be gaps, but never duplicates. Past 9999 the number simply gets longer (`PRZ-2026-10000`).
+  - A request keeps a copy of the customer's name, email and phone, and of the type and package names as they were when it was sent, so it stays readable if the account or the catalogue changes later.
+  - A customer can't set the status, owner, reference, price or delivery date: those fields in a request are dropped.
+- **Why:** the reference is what customer and studio quote to each other, so it must be short, unique and never reused.
+
+### D-040: What a customer can do to a project in Phase 4
+
+- **Decision:**
+  - Only one thing: **cancel**, and only while the status is Request Received, Awaiting Customer Information or Quote Sent.
+  - The server decides what is allowed and tells the app (`allowedActions`), so the rule lives in one place and a button only shows when it will work.
+  - Cancelling is a single database step that fails if the status changed in the meantime; two cancellations at once cannot both succeed.
+  - One customer can send at most 10 requests an hour (`PROJECT_REQUEST_RATE_LIMIT_MAX`).
+- **Why:** accepting a quote, answering a question and asking for a revision need an admin to send the quote or the question first, so they are built and tested together in Phase 5 (D-036).
+- **Still open:** the rest of the status table ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow)) is a proposal. Please confirm it before Phase 5.
+
+### D-041: Emails about a request
+
+- **Decision:**
+  - Each new request sends a **confirmation to the customer** (the reference number, a link to the project, what happens next, no promised timings) and a **notification to Prajzo** (everything needed to start the review).
+  - They go through the mailer, so until real email is set up in Phase 7 they are printed in the API log.
+  - A failed email never fails or delays the request, and the website never says "we've emailed you".
+- **Why:** the request is the important thing and it is already saved; an email problem shouldn't lose the customer's work.
+
+### D-042: The policies follow the product
+
+- **Decision:** the Privacy Policy and Terms are updated whenever what the site collects changes. The Privacy Policy now covers accounts (name, email, phone, a password stored only in scrambled form, and sign-in times), project requests, and the one sign-in cookie.
+- **Needs a lawyer:** the draft keeps requests that don't go ahead for up to 24 months (like contact messages) and accounts until deletion is requested. Please have these periods confirmed with the rest of the policy.

@@ -131,6 +131,7 @@ npm run host:local
 | "Too many attempts. Please wait a few minutes" when signing in | The sign-in limit (10 failed tries per 15 minutes per connection or email address) was reached. Wait 15 minutes. This protects accounts from password guessing |
 | `This command asks you questions … run it yourself in a terminal window` | `admin:create` must run in a real terminal so it can hide the password. Run it from a terminal window, not through another tool |
 | Right-click does nothing on http://localhost:8080 | That is the right-click protection (D-037), which production builds have. It is off in `npm run dev`. To turn it off for a build, set `VITE_PROTECT_CONTENT=false` and build again |
+| "You've sent a lot of project requests in the last hour" | One customer account sent 10 project requests in an hour (spam protection). Wait an hour, or raise `PROJECT_REQUEST_RATE_LIMIT_MAX` in `apps/api/.env` while testing |
 | `Port 8080 is already used by another program` | Something else is using port 8080. Close it, or set `LOCAL_HOST_PORT` to a different number |
 | `Port 5173 is already in use` or `Could not start the API on port 4000` | Another copy is already running. Close it, or find it with `Get-NetTCPConnection -LocalPort 5173` |
 | The `/dev/ui` page says **API not reachable** | `npm run dev` isn't running, or the API stopped; its message in the terminal says why |
