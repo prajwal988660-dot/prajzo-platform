@@ -237,3 +237,13 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 
 - **Decision:** every page except Home loads its code only when it's opened, which cut the first download from 526 KB to about 260 KB (before compression). A thin progress bar shows while a page loads.
 - **Testing:** Playwright end-to-end tests, including axe accessibility checks and a no-sideways-scrolling check, run on desktop and phone sizes in CI for every pull request.
+
+### D-030: Local hosting before online hosting
+
+- **Decision:** at your request ("host locally first"), Prajzo can run on your own computer the way a real server does:
+  - `npm run host:local` builds it and starts one background Node process that serves the website and the API together on port 8080.
+  - `npm run host:stop` stops it.
+  - `SERVE_WEB_APP=true` (set by that command) makes the API serve the built website outside production. Production behaves as before.
+- **Safety:** the saved process number is trusted only if that process is really the one listening on the port. After a restart of the computer an old number may belong to another program, and `host:stop` must never end that program.
+- **Why on the same address:** the same setup is what Hostinger will run, so problems with the built site, cookies and routing show up here first.
+- **Known limit:** your Atlas database only accepts internet addresses it knows. A phone hotspot changes address often, so the site will sometimes show "database disconnected" until the new address is added. The log says so. See [SETUP.md](SETUP.md), section 4.

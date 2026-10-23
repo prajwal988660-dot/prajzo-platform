@@ -30,6 +30,8 @@ npm run dev
 | http://localhost:5173/dev/ui | Design-system gallery and API connection check (development only) |
 | http://localhost:4000/api/health/ready | API readiness, including the database |
 
+To see Prajzo the way visitors will, hosted on your own computer as one optimized site, run `npm run host:local` and open http://localhost:8080 (stop it with `npm run host:stop`). Details are in [docs/SETUP.md](docs/SETUP.md).
+
 Before every commit, and at the end of every phase:
 
 ```

@@ -96,6 +96,12 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] Accessibility (axe, WCAG 2.2 AA rules): no serious or critical problems on any of the 9 pages, on desktop or phone
 - [x] Screenshots checked at 390, 768 and 1280 px
 - [x] CI runs the end-to-end tests on every pull request
+- [x] Local hosting (D-030), requested on 18 October:
+  - [x] `npm run host:local` builds, then runs the website and API together in the background on http://localhost:8080 and prints your phone-friendly network address
+  - [x] `npm run host:stop` stops only the process that really listens on that port; a stale saved process number pointing at another program is ignored and left alone (checked with a decoy program)
+  - [x] second start reports "already running"; restart replaces the old copy; log is kept under 5 MB
+  - [x] the log explains a lost database connection (usually a changed internet address) in one line, and recognises Atlas's "SSL alert number 80" rejection
+  - [x] tests for the production-style serving and the connection messages
 - [ ] **(gate)** Approval for Phase 3: merge the `phase-2-public-site` pull request
 
 ## Phase 3: Accounts and access control
