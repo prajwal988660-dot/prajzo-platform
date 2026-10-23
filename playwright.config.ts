@@ -55,7 +55,12 @@ export default defineConfig({
     {
       command: `npm run dev -w @prajzo/web -- --port ${webPort}`,
       url: `http://localhost:${webPort}`,
-      env: { VITE_API_PROXY_TARGET: `http://localhost:${apiPort}` },
+      env: {
+        VITE_API_PROXY_TARGET: `http://localhost:${apiPort}`,
+        // The same switch a production build uses for right-click blocking (D-037), so
+        // e2e/content-protection.spec.ts can test it.
+        VITE_PROTECT_CONTENT: 'true',
+      },
       reuseExistingServer: !isCI,
       timeout: 120_000,
     },

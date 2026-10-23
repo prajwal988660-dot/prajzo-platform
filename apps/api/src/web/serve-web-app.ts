@@ -27,7 +27,8 @@ export function serveWebApp(app: Express, distDir: string, logger: Logger): void
 
   // Every other page is handled by the web app's router (including its "not found" page).
   app.get('/{*path}', (_req, res) => {
-    res.set('Cache-Control', 'no-cache');
+    // A staging password has already set a stricter header (private, no-store); keep it.
+    if (!res.getHeader('Cache-Control')) res.set('Cache-Control', 'no-cache');
     res.sendFile(indexFile);
   });
 }

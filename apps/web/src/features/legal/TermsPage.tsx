@@ -6,7 +6,7 @@ import { LegalPage } from './LegalPage';
 export function TermsPage() {
   usePageTitle('Terms and Conditions');
   return (
-    <LegalPage eyebrow="Legal" title="Terms and Conditions" updated="18 October 2026">
+    <LegalPage eyebrow="Legal" title="Terms and Conditions" updated="23 October 2026">
       <section>
         <h2>About these terms</h2>
         <p>
@@ -67,6 +67,15 @@ export function TermsPage() {
           When your project is fully paid, the website content and files we created for you are
           yours. Third-party parts, such as fonts, plugins and stock images, remain under their own
           licences. We may show your finished website in our portfolio unless you ask us not to.
+        </p>
+      </section>
+
+      <section>
+        <h2>Previews, drafts and demos</h2>
+        <p>
+          Until your project is fully paid, every preview, draft, demo and sample website we show
+          you is provided only so that you can judge our work. It stays ours. You agree not to copy,
+          reuse, publish or share its code, designs or content, or to try to extract them.
         </p>
       </section>
 
