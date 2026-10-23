@@ -2,7 +2,7 @@
 
 This file records each important technical decision: what was decided, why, and what else was considered. New decisions are added at the end. A changed decision is not deleted; it is marked **Replaced by D-0xx**.
 
-D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which is still to be confirmed before Phase 5 (see D-036). D-021 onwards were made during Phase 1.
+D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which you confirmed on 23 October 2026 ("workflow OK"). D-021 onwards were made during Phase 1.
 
 ---
 
@@ -144,7 +144,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 ### D-020: Project status workflow
 
 - **Decision:** the 11 statuses and the transition table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), enforced on the server, with a history entry (who and when) for every change.
-- **Status:** proposed; to be confirmed with you before Phase 5. Phase 4 uses only its first status and the cancellation rows (D-036).
+- **Status:** **confirmed** by you on 23 October 2026 ("workflow OK"). Phase 4 used its first status and the cancellation rows; Phase 5 builds the rest. Small additions made while building Phase 5 are recorded in D-043.
 
 ---
 

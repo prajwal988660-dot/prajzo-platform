@@ -339,7 +339,7 @@ The workflow also enforces these rules:
 
 - Customers can never set a price, a delivery date or an admin-only status.
 - Accepting a quote is the customer's own decision. It doesn't approve anything on the admin's behalf.
-- These transitions are a proposal, to be confirmed with you before Phase 5. Phase 4 uses only the first status and the cancellation rows.
+- These transitions were **confirmed** by the owner on 23 October 2026. When an admin makes one, some rows also need something from them: a quote (to Quote Sent), a confirmed delivery date (to In Development), or a note. The notes are shown to the customer in their timeline. See D-043 for the notes that were added to the three rows marked below.
 
 ## 9. Security and privacy
 

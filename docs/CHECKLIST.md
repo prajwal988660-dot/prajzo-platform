@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 23 October 2026 (end of Phase 4)
+Last updated: 23 October 2026 (Phase 5 started)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -175,21 +175,36 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 ## Phase 5: Admin dashboard
 
-- [ ] Overview with real counts by status and recent activity
-- [ ] Project requests:
-  - [ ] Filter, search, pagination
-  - [ ] Details with the customer's full request
-  - [ ] Scope, quote and confirmed delivery date
-  - [ ] Status changes with notes; internal notes; status history
-- [ ] The customer's side of the workflow, shown only when the workflow allows it: accept or decline a quote, answer a question, request a revision
-- [ ] Customers list and details
-- [ ] Categories management; packages and prices management
-- [ ] Inbox for contact messages: read, handled, archive
-- [ ] Audit log of admin actions; status-change emails (printed to the console until Phase 7)
+- [x] The status workflow confirmed by you (23 October)
+- [ ] Shared rules: requirements per status change (a note when asking the customer for information, recording an acceptance, or requesting a revision for them), quotes, timeline entries, every admin and customer request and response
+- [ ] Project requests, admin side:
+  - [ ] List with filter by status, search by reference, name, email or title, and paging
+  - [ ] Details: the customer's full request, the customer, quotes (every version), confirmed delivery date, revisions, internal notes, the whole timeline
+  - [ ] Status changes with the quote, delivery date or note each one needs; only the changes the workflow allows are offered
+  - [ ] Delivery date set or changed at any stage before the end, shown in the timeline
+  - [ ] Internal notes that customers never see
+- [ ] The customer's side of the workflow, each button shown only when the workflow allows it:
+  - [ ] Read the quote; accept it (names the version they saw) or decline it
+  - [ ] Answer a question from Prajzo
+  - [ ] Ask for a revision (counted against the revisions the quote includes); say it looks good
+  - [ ] See the confirmed delivery date and the revisions used
+- [ ] Emails (printed to the API log until Phase 7): to the customer on every status change and date change; to Prajzo on everything the customer does
+- [ ] Overview: projects by status, what needs doing now, recent activity
+- [ ] Customers: list with search, and details with their projects
+- [ ] Inbox for contact messages: new, read, archived; reply from your own email app
+- [ ] Catalogue: edit, add, switch off and reorder categories and packages; prices
+- [ ] Activity log: admin actions and what customers do to their projects
+- [ ] Admin area: navigation, a page for each of the above, usable on a phone
 - [ ] Tests:
-  - [ ] Every admin endpoint refuses non-admins
-  - [ ] Every status transition, allowed and refused, with history recorded
-  - [ ] End to end: an admin takes a project from "Request Received" to "Completed", with the customer accepting the quote
+  - [ ] Every admin endpoint refuses visitors (401) and customers (403): the test finds the routes itself, so a new one can't be missed
+  - [ ] Every status change, allowed and refused, by an admin and by a customer, with the history recorded (who, when, from, to)
+  - [ ] Quotes, delivery dates, revisions, notes, customer actions, concurrency, ownership
+  - [ ] Pages: every admin page and the customer's new buttons, with success, error and empty states
+  - [ ] End to end: an admin takes a project from "Request Received" to "Completed", with the customer accepting the quote on the way
+  - [ ] Accessibility (axe) on every new page
+- [ ] Looked at by eye at 390, 768 and 1280 px
+- [ ] Docs updated; summary with the tests that ran
+- [ ] **Your action:** create your administrator account ([SETUP.md](SETUP.md), section 3) to try the admin area
 - [ ] **(gate)** Approval for Phase 6
 
 ## Phase 6: Hardening and quality

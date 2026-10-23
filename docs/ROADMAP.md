@@ -216,11 +216,11 @@ Inspected the folder, the assets, the installed tools and current package versio
   - status changes with notes
   - internal admin notes, never shown to customers
   - the full status history
-- **The customer's side of the workflow** (built here because it can only be tested together with the admin side): accept or decline a quote, answer a question from Prajzo, request a revision. Project details gain the quote, the confirmed delivery date and the revisions, and each button appears only when the workflow allows it.
+- **The customer's side of the workflow** (built here because it can only be tested together with the admin side): accept or decline a quote, answer a question from Prajzo, request a revision, or say it looks good. Project details gain the quote, the confirmed delivery date and the revisions, and each button appears only when the workflow allows it.
 - **Customers:** list and details.
 - **Category, package and price management.**
 - **Inbox for contact messages:** read, mark handled, archive.
-- **Audit trail:** a log of admin actions, plus emails to customers on status changes (printed to the console until Phase 7).
+- **Audit trail:** a log of admin actions and of what customers do to their projects, plus emails to customers on status changes and to Prajzo on what customers do (printed to the console until Phase 7).
 - **Moved to Phase 8:** template management and the inbox for demo submissions, because they need templates and demos to exist.
 
 **Done when:**
@@ -411,13 +411,13 @@ Every demo must:
 |---|---|---|
 | What to build next | "Go with option A": the main website first | Phases renumbered into build order (D-036) |
 | Protecting the website's and demos' code | "Disable right-click and CSS assets on staging, minify, bundle, password-protected staging … for our website and the demo site" | Staging password, a build that checks itself, right-click and image-drag blocking, a Terms clause; and a plain statement of what none of it can do (D-037) |
+| Project status workflow | "Workflow OK" (23 October): the table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), as proposed | Phase 5 builds the rest of it (D-020, D-043) |
 | Approval of Phases 2 and 3 | "Continue" and "go with option A". Pull requests #2 and #3 are still open on GitHub for you to merge | Work continues stacked on them |
 
 ### Decisions still needed
 
 | When | Decision |
 |---|---|
-| Before Phase 5 | Confirm the status workflow (who may move a project from which state to which) in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow). Phase 4 uses only its first status and the cancellation rows |
 | Before Phase 7 | Your Hostinger plan type (Business or Cloud can run Prajzo; Single or Premium can't run Node.js apps; VPS needs manual setup), whether anything is live on prajzo.com today, and whether the contact@prajzo.com mailbox exists |
 | Phase 7 | Email provider, any paid plans |
 | Phase 8 | Confirm that demo form submissions are stored and then deleted after 7 days |
