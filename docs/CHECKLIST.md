@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 23 October 2026 (end of Phase 3)
+Last updated: 23 October 2026 (Option A order chosen; code-protection add-on)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -134,9 +134,91 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] accessibility (axe) on 14 pages you can open without signing in (including the administrator sign-in and the not-found page), the signed-in pages, and pages showing error messages
 - [x] 269 automated tests pass locally; browser tests passed 90 of 90 once after the last change (two repeat runs were cut short by low computer memory)
 - [ ] **Your action:** create your administrator account: `npm run admin:create -w @prajzo/api` in a terminal ([SETUP.md](SETUP.md), section 3)
-- [ ] **(gate)** Approval for Phase 4: merge the `phase-3-accounts` pull request, and confirm the order of Phases 4–11
+- [x] Order of the next phases chosen: Option A, the main website first (23 October 2026, [D-036](DECISIONS.md))
+- [ ] **(gate)** Approval for Phase 4: merge pull requests #2 (Phase 2) and #3 (Phase 3). Work on the next phases continues meanwhile, stacked on them
 
-## Phase 4: Template engine + Demo 1 (Portfolio, `/demo/portfolio`)
+## Add-on: protecting the website's code (requested 23 October 2026, [D-037](DECISIONS.md))
+
+- [ ] Staging password: when `STAGING_PASSWORD` is set, every page, file and API request asks for a username and password; only `/api/health` stays open; search engines are told not to index; nothing is stored by shared caches; wrong guesses are rate-limited; the setting is validated at startup
+- [ ] The production build is minified and bundled with content-hashed files, with no source maps and no development-only code; every build checks this and fails if it isn't true
+- [ ] Right-click and image dragging are blocked on the website and the demos, but never in form fields; text can still be selected and copied; one switch (`VITE_PROTECT_CONTENT`)
+- [ ] Terms: previews, drafts and demos stay Prajzo's until a project is fully paid
+- [ ] Tests:
+  - [ ] Staging password: refused without it (pages, CSS, scripts, API), accepted with it, health check open, wrong guesses limited, not cached, not indexed
+  - [ ] Build check: catches a source map, development code and unminified files
+  - [ ] Right-click blocked on content and allowed in form fields (unit tests and a real browser)
+  - [ ] Checked by hand on the real production build
+- [ ] The limits are written down: a visitor can still view the source, use developer tools and save files
+- [ ] **(gate)** Your approval (merging the pull request)
+
+## Phase 4: Project requests and customer dashboard
+
+- [ ] Shared rules: the project-request form schema; status list, labels and the table of allowed changes (tested row by row)
+- [ ] Database: project requests, and a counter for reference numbers (`PRZ-2026-0001`) that stay unique even when requests arrive together
+- [ ] API: create; list your own (paginated); read your own (someone else's is "not found"); cancel while it's early
+- [ ] Start a Project page: explains the steps; the form for signed-in customers; sign-in first for visitors, then back to the form
+- [ ] Confirmation to the customer and notification to Prajzo (printed to the console until Phase 7)
+- [ ] Customer dashboard: latest projects on the account page; My Projects; Project details with the status timeline and cancel
+- [ ] Admin overview: real project-request counts
+- [ ] The header's "Start a Project" button and the Services buttons open the new page
+- [ ] Tests:
+  - [ ] Ownership; fields customers can't set (price, date, status); refused status changes
+  - [ ] Reference numbers unique under simultaneous requests
+  - [ ] Form validation, error and success states
+  - [ ] End to end: sign up → start a project → My Projects → details → cancel
+  - [ ] Accessibility (axe) on the new pages
+- [ ] Responsive check at 390, 768 and 1280 px
+- [ ] Docs updated; summary with the tests that ran
+- [ ] **(gate)** Approval for Phase 5, including your confirmation of the status workflow ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow))
+
+## Phase 5: Admin dashboard
+
+- [ ] Overview with real counts by status and recent activity
+- [ ] Project requests:
+  - [ ] Filter, search, pagination
+  - [ ] Details with the customer's full request
+  - [ ] Scope, quote and confirmed delivery date
+  - [ ] Status changes with notes; internal notes; status history
+- [ ] The customer's side of the workflow, shown only when the workflow allows it: accept or decline a quote, answer a question, request a revision
+- [ ] Customers list and details
+- [ ] Categories management; packages and prices management
+- [ ] Inbox for contact messages: read, handled, archive
+- [ ] Audit log of admin actions; status-change emails (printed to the console until Phase 7)
+- [ ] Tests:
+  - [ ] Every admin endpoint refuses non-admins
+  - [ ] Every status transition, allowed and refused, with history recorded
+  - [ ] End to end: an admin takes a project from "Request Received" to "Completed", with the customer accepting the quote
+- [ ] **(gate)** Approval for Phase 6
+
+## Phase 6: Hardening and quality
+
+- [ ] Security review:
+  - [ ] Security headers and content security policy
+  - [ ] Cookies and sessions
+  - [ ] Rate limits
+  - [ ] `npm audit`
+- [ ] Code protection checked on the real production build: no source maps, no development code, the staging password covers every file, right-click blocking leaves form fields working
+- [ ] Full end-to-end suite green
+- [ ] Every page checked at 390, 768 and 1280 px
+- [ ] Automated accessibility checks (axe) plus a manual keyboard pass
+- [ ] Performance: code splitting, image sizes, Lighthouse check
+- [ ] SEO titles and descriptions, Open Graph images, favicons
+- [ ] Error logging; database backup and restore rehearsed
+- [ ] **(gate)** Approval for Phase 7
+
+## Phase 7: Deployment
+
+- [ ] Your choices and accounts: domain, hosting, MongoDB Atlas, email provider
+- [ ] Production settings documented; secrets set only on the host
+- [ ] Staging site deployed behind the staging password and checked on the real host
+- [ ] Production build deployed; HTTPS working; health checks passing; no staging password on the live site
+- [ ] Email domain records (SPF, DKIM) verified; account and project emails really sent
+- [ ] Backups scheduled; monitoring and alerts on
+- [ ] Live smoke test passed on the real address
+- [ ] Known limitations and remaining manual tasks listed
+- [ ] **(gate)** Approval for Phase 8: the main website is online
+
+## Phase 8: Template engine + Demo 1 (Portfolio, `/demo/portfolio`)
 
 - [ ] Website configuration schema and its validation, shared by web and API
 - [ ] Template definition format with pages, sections, variants, design options and a default configuration
@@ -152,6 +234,8 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] Templates and Live Demos page, showing the preview, category, description, features and "View Live Demo"
 - [ ] Template Details page and Our Projects page
 - [ ] Template catalogue model and public API; preview-image capture script
+- [ ] For admins (moved here from the admin dashboard phase): template management and the demo-submissions inbox
+- [ ] Demo bar says "for evaluation only"; the code protections of [D-037](DECISIONS.md) apply
 - [ ] Home: the featured templates and demo projects sections switch on; the "Explore Templates" button appears
 - [ ] Tests:
   - [ ] Configuration validation (unit)
@@ -160,9 +244,9 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [ ] End to end: Templates → View Live Demo → contact form
 - [ ] Responsive check at 390, 768 and 1280 px; keyboard check
 - [ ] Summary with the tests that ran
-- [ ] **(gate)** Demo approval before Phase 5
+- [ ] **(gate)** Demo approval before Phase 9
 
-## Phase 5: Website builder (core)
+## Phase 9: Website builder (core)
 
 - [ ] `/build` wizard steps 1–8:
   - [ ] Category, template, pages
@@ -182,6 +266,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [ ] Signed-in users only; JPEG, PNG or WebP up to 5 MB
   - [ ] File content checked and re-encoded on the server
   - [ ] Local storage driver for development
+- [ ] Builder deployed to the live site; production image storage (cloud bucket) chosen and set up
 - [ ] "Customize This Design" button live on Templates, Template Details and `/demo/portfolio`; it loads the portfolio defaults
 - [ ] Home: the "Build Your Website" button appears
 - [ ] Tests:
@@ -189,9 +274,9 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [ ] Invalid configuration and unknown template are rejected
   - [ ] Ownership rules
   - [ ] Upload type and size limits
-- [ ] **(gate)** Approval for Phase 6
+- [ ] **(gate)** Approval for Phase 10
 
-## Phase 6: Demo 2 (Business, `/demo/business`)
+## Phase 10: Demo 2 (Business, `/demo/business`)
 
 - [ ] Your approval of the design brief
 - [ ] Template definition and default content: fictional, with testimonials labelled as demonstration content
@@ -208,7 +293,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
-## Phase 7: Demo 3 (College and Event, `/demo/event`)
+## Phase 11: Demo 3 (College and Event, `/demo/event`)
 
 - [ ] Your approval of the design brief
 - [ ] Template definition and default content: a fictional college and event
@@ -227,7 +312,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
-## Phase 8: Demo 4 (Product Catalogue, `/demo/catalogue`)
+## Phase 12: Demo 4 (Product Catalogue, `/demo/catalogue`)
 
 - [ ] Your approval of the design brief
 - [ ] Template definition and default content, with sample products labelled as demonstration content
@@ -245,7 +330,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
-## Phase 9: Demo 5 (Forms and Quick Solutions, `/demo/forms`)
+## Phase 13: Demo 5 (Forms and Quick Solutions, `/demo/forms`)
 
 - [ ] Your approval of the design brief
 - [ ] Contact, registration, enquiry and feedback forms with validation
@@ -261,68 +346,11 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] **(gate)** Demo approval
 - [ ] The Templates page and the Customize flow tested end to end across all 5 demos
 
-## Phase 10: Project requests and customer dashboard
+## Phase 14: Submit a design as a project
 
-- [ ] Builder step 9: review summary → confirm → project request
-- [ ] Server re-validates the configuration, stores a frozen snapshot, issues a unique reference number, records "Request Received"
-- [ ] Start a Project page for custom work
-- [ ] Confirmation emails to the customer and to Prajzo
-- [ ] Customer dashboard:
-  - [ ] Welcome section
-  - [ ] Saved configurations and a new-project button
-  - [ ] My Projects
-  - [ ] Project details with status timeline, quote, confirmed date and revisions
-  - [ ] Account settings
-- [ ] Customer actions: accept or decline a quote, provide information, request a revision (workflow rules enforced on the server)
-- [ ] Tests:
-  - [ ] Ownership
-  - [ ] Refused fields: price, date and status
-  - [ ] Invalid status changes
-  - [ ] Reference numbers unique when requests arrive at the same moment
-  - [ ] End to end: customize → submit → My Projects
-- [ ] **(gate)** Approval for Phase 11
-
-## Phase 11: Admin dashboard
-
-- [ ] Overview with real counts by status and recent activity
-- [ ] Project requests:
-  - [ ] Filter, search, pagination
-  - [ ] Details with a read-only render of the design
-  - [ ] Scope, quote and confirmed delivery date
-  - [ ] Status changes with notes; internal notes; status history
-- [ ] Customers list and details
-- [ ] Templates management: publish, featured, order, text, categories, preview image
-- [ ] Categories management; packages and prices management
-- [ ] Inbox for contact messages and demo submissions
-- [ ] Audit log of admin actions; status-change emails
-- [ ] Tests:
-  - [ ] Every admin endpoint refuses non-admins
-  - [ ] Every status transition, allowed and refused, with history recorded
-  - [ ] End to end: an admin takes a project from "Request Received" to "Completed"
-- [ ] **(gate)** Approval for Phase 12
-
-## Phase 12: Hardening and quality
-
-- [ ] Security review:
-  - [ ] Security headers and content security policy
-  - [ ] Cookies and sessions
-  - [ ] Rate limits
-  - [ ] Uploads
-  - [ ] `npm audit`
-- [ ] Full end-to-end suite green
-- [ ] Every page checked at 390, 768 and 1280 px
-- [ ] Automated accessibility checks (axe) plus a manual keyboard pass
-- [ ] Performance: code splitting, image sizes, Lighthouse check
-- [ ] SEO titles and descriptions, Open Graph images, favicons
-- [ ] Error logging; database backup and restore rehearsed
-- [ ] **(gate)** Approval for Phase 13
-
-## Phase 13: Deployment
-
-- [ ] Your choices and accounts: domain, hosting, MongoDB Atlas, image storage, email provider
-- [ ] Production settings documented; secrets set only on the host
-- [ ] Production build deployed; HTTPS working; health checks passing
-- [ ] Email domain records (SPF, DKIM) verified
-- [ ] Backups scheduled; monitoring and alerts on
-- [ ] Live smoke test passed on the real address
+- [ ] Builder step 9: review summary → confirm → project request (source "builder")
+- [ ] The server re-validates the configuration (it must be the customer's own) and stores a frozen copy
+- [ ] Saved designs on the dashboard get a "Submit as a project" button
+- [ ] Admin project details show the design rendered read-only
+- [ ] Tests: ownership; end to end: customize → submit → My Projects
 - [ ] Known limitations and remaining manual tasks listed

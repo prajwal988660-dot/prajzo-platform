@@ -26,7 +26,15 @@ Secrets and settings live in environment variables, never in code.
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
+| `STAGING_PASSWORD` | (unset) | No | Set it only on a staging site. Every page, file and API request then asks for a username and password. At least 12 characters. Leave it unset on the live site (D-037) |
+| `STAGING_USER` | `preview` | No | The username that goes with `STAGING_PASSWORD`: letters, digits, dots, dashes and underscores |
 | `DNS_SERVERS` | `1.1.1.1,8.8.8.8` | No | DNS servers for looking up `mongodb+srv://` addresses. Only needed when the API log shows `querySrv ECONNREFUSED` (a known Node.js-on-Windows problem; set on this PC) |
+
+One more setting is read when the web app is **built**, not by the API:
+
+| Variable | Example | Required | Notes |
+|---|---|---|---|
+| `VITE_PROTECT_CONTENT` | (unset) | No | Unset: right-click and image-drag blocking are on in production builds and off in development. `true` forces them on, `false` turns them off (D-037). It is only an on/off switch, not a secret |
 
 On this machine `apps/api/.env` already exists, with a generated `SESSION_SECRET`. `MONGODB_URI` stays empty until you add your Atlas connection string ([SETUP.md](SETUP.md), step 1).
 
@@ -45,15 +53,15 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where contact-form notifications go. In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
 | Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
-| 4 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
-| 5 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development |
-| 13 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Real email through your provider |
-| 13 | `STORAGE_DRIVER` (`s3`), `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `PUBLIC_ASSET_BASE_URL` | Cloud image storage (or `CLOUDINARY_URL` if Cloudinary is chosen) |
-| 13 | `TRUST_PROXY` (`true`) | Correct client IPs behind the host's proxy, needed for rate limits and secure cookies |
+| 8 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
+| 9 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development (with the builder) |
+| 7 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Real email through your provider |
+| 9 (live site) | `STORAGE_DRIVER` (`s3`), `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `PUBLIC_ASSET_BASE_URL` | Cloud image storage (or `CLOUDINARY_URL` if Cloudinary is chosen) |
+| 7 | `TRUST_PROXY` (`true`) | Correct client IPs behind the host's proxy, needed for rate limits and secure cookies |
 
 `LOCAL_HOST_PORT` (default `8080`) is read by the `npm run host:local` and `npm run host:stop` commands, not by the API. Set it in the terminal if port 8080 is taken.
 
-## Production checklist (Phase 13)
+## Production checklist (Phase 7)
 
 - `NODE_ENV=production`
 - `APP_ORIGIN` set to your real address, for example `https://prajzo.com`
@@ -61,6 +69,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - `MONGODB_URI` for the Atlas production cluster, with its own database user and a strong password
 - SMTP and storage credentials from your providers
 - `TRUST_PROXY=true`
+- `STAGING_PASSWORD` **not** set (it belongs only on the staging site)
 
 ## Things that are not environment variables
 

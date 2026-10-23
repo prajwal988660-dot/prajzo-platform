@@ -42,7 +42,7 @@ export async function isActivePackage(key: string): Promise<boolean> {
 
 /**
  * Adds any missing default categories and packages. Existing records are left alone, so later
- * edits (by an admin, in Phase 11) are never overwritten, unless `overwrite` is set, which the
+ * edits (by an admin, in Phase 5) are never overwritten, unless `overwrite` is set, which the
  * development seed script uses to refresh the defaults.
  */
 export async function ensureCatalogueDefaults({ overwrite = false } = {}): Promise<{

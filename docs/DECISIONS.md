@@ -2,7 +2,7 @@
 
 This file records each important technical decision: what was decided, why, and what else was considered. New decisions are added at the end. A changed decision is not deleted; it is marked **Replaced by D-0xx**.
 
-D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which is still to be confirmed before Phase 10. D-021 onwards were made during Phase 1.
+D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which is still to be confirmed before Phase 5 (see D-036). D-021 onwards were made during Phase 1.
 
 ---
 
@@ -90,7 +90,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - images are re-encoded with sharp, which also strips location data
   - files get random names
   - SVG is refused
-- **Storage:** behind one interface, with local disk in development and a cloud bucket in production (chosen in Phase 13).
+- **Storage:** behind one interface, with local disk in development and a cloud bucket in production (chosen in Phase 9, with the builder).
 - **Why:** this blocks disguised files and script-carrying images, and keeps storage costs predictable.
 
 ### D-013: Email
@@ -144,7 +144,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 ### D-020: Project status workflow
 
 - **Decision:** the 11 statuses and the transition table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), enforced on the server, with a history entry (who and when) for every change.
-- **Status:** proposed; to be confirmed with you before Phase 10.
+- **Status:** proposed; to be confirmed with you before Phase 5. Phase 4 uses only its first status and the cancellation rows (D-036).
 
 ---
 
@@ -198,9 +198,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 ### D-025: Build order, main website first (replaces D-008)
 
 - **Decision:** your answer to Q4 was to build the main website first and the demos after. Phases 1–3 (foundation, public website, accounts) come first, as already planned.
-- **Still to confirm:** the exact order of Phases 4–11, at the Phase 3 gate. The builder needs at least one template to customize, so the choice will be one of:
-  - Portfolio demo, then builder, then the other demos (the original order)
-  - project requests and the admin dashboard first, then the demos and builder
+- **Resolved on 23 October 2026:** you chose to finish and launch the main website first (D-036).
 
 ---
 
@@ -213,7 +211,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - **₹7,999** for Professional Website
   - **₹19,999** for Advanced Development
 - **How they're shown:** as "Starting from" prices. The final price is always confirmed in a written quote.
-- **Where they live:** in the database, loaded from `apps/api/src/modules/catalogue/catalogue.defaults.ts`. Admins will edit them in Phase 11; until then, change that file and run `npm run seed -w @prajzo/api`.
+- **Where they live:** in the database, loaded from `apps/api/src/modules/catalogue/catalogue.defaults.ts`. Admins will edit them in Phase 5; until then, change that file and run `npm run seed -w @prajzo/api`.
 - **Note:** at these prices, the delivery targets only work for projects whose content is ready. The quote stays the place to set the real price and date.
 
 ### D-027: Contact details and the "Start a Project" button
@@ -221,7 +219,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Decision:**
   - The public contact details live in one place, `packages/shared/src/site.ts`: contact@prajzo.com, +91 98866 07720 (phone and WhatsApp), Instagram @prajzoo.
   - Contact-form notifications go to the same email unless `ADMIN_NOTIFY_EMAIL` says otherwise.
-  - Until the Start a Project page exists (Phase 10), the header's "Start a Project" button opens the Contact page.
+  - Until the Start a Project page exists (Phase 4), the header's "Start a Project" button opens the Contact page.
 - **Why:** the button is working and honest today. The Contact form is how projects start for now.
 
 ### D-028: Contact form protection
@@ -296,3 +294,54 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - The browser tests run against a throw-away server with a test administrator whose password is invented fresh for every run, never written to a file, and a test-only route to read the "emails" it sent.
   - One copy of the MongoDB driver is installed for the whole project (`overrides` in `package.json`), because the session library and Mongoose each brought their own and their types disagreed.
 - **Why:** end-to-end tests can follow a real password-reset link without any real email, and a single driver version avoids subtle differences between copies.
+
+---
+
+## Plan decisions (23 October 2026)
+
+### D-036: Build order, Option A (completes D-025)
+
+- **Decision:** on 23 October 2026 you chose to finish and launch the main website first ("go with option A"). The order is now:
+  1. project requests and the customer dashboard (Phase 4)
+  2. the admin dashboard (Phase 5)
+  3. hardening (Phase 6)
+  4. deployment, so the main website is online (Phase 7)
+  5. then the template engine and Portfolio demo (8), the builder (9), the other four demos (10–13) and submitting a design as a project (14)
+- **Renumbering:** phases are numbered in build order, so "next" always means the next number. The numbers used in earlier versions of these documents map like this:
+
+| Earlier number | Now |
+|---|---|
+| 4: template engine and Portfolio demo | 8 |
+| 5: builder | 9 |
+| 6–9: demos 2 to 5 | 10–13 |
+| 10: project requests and customer dashboard | 4 (its "submit a builder design" part is the new Phase 14) |
+| 11: admin dashboard | 5 |
+| 12: hardening | 6 |
+| 13: deployment | 7 |
+
+- **Adjustments that follow from the new order:**
+  - The customer's actions on a quote (accept, decline, answer, ask for a revision) move to the admin phase, because they can only be tested end to end once an admin can send a quote. Phase 4 has the one action that works from the start: cancelling an early request. No button appears before what it does can work.
+  - Template management and the demo-submissions inbox move to Phase 8, where the first template and demo appear.
+  - Production image storage is set up with the builder (Phase 9), not at the first deployment.
+  - The status workflow (D-020) must be confirmed before Phase 5. Phase 4 uses only its first status and the cancellation rows.
+- **Why:** the main website can take real projects and enquiries sooner, and the demos and the builder, the largest and riskiest pieces, follow once there is a live site.
+- **Cost:** the builder and the demos arrive later. Everything the project phases show has to work without them, so the "Saved designs" area of the dashboard stays an honest empty state until Phase 9.
+
+### D-037: Protecting the website's and the demos' code
+
+- **Your request (23 October):** disable right-click, minify and bundle the code, and use a password-protected staging deployment, so that clients can't simply copy the raw HTML and CSS from the browser's developer tools. For the website and for the demo site.
+- **What can't be done:** hide front-end code from a visitor who can load the page. The browser has to receive the HTML, CSS and scripts to draw the page, so "View source", the developer tools, saving the page, or a script that downloads it will always work, and blocking right-click or keyboard shortcuts doesn't change that. Anything described below reduces casual copying; none of it makes copying impossible.
+- **Decision:**
+  1. **Staging password (real protection).** When `STAGING_PASSWORD` is set, every request except `/api/health` needs the username (`STAGING_USER`, default `preview`) and that password (HTTP Basic authentication): pages, CSS, scripts, images and the API alike, so outsiders get nothing to copy. Responses tell search engines not to index them and shared caches not to store them. Wrong guesses are rate-limited. It is set only on staging; the live site has none.
+  2. **A production build that checks itself (real hygiene).** Files are minified and bundled with content-hashed names, with no source maps and no development-only code. Every build runs a check and fails if any of that stops being true.
+  3. **Right-click and image-drag blocking (a speed bump).** On the website and the demos. It is on in production builds and off in development, and it never applies to form fields, so paste and spelling help keep working. Text can still be selected and copied. `VITE_PROTECT_CONTENT=false` at build time turns it off; `true` forces it on.
+  4. **Terms (real protection, in law).** Previews, drafts and demos remain Prajzo's until a project is fully paid, and may not be copied or reused. This needs the lawyer's review together with the rest of the Terms.
+  5. **Delivery.** A customer gets the full code and files only after payment (the Terms' Ownership section already says so).
+- **Demos:** every demo built in Phases 8 and 10–13 follows these rules, says "for evaluation only" in its demo bar, and gets the same checks.
+- **Costs:** blocking right-click removes "Open in new tab", "Copy link" and "Save image" from the context menu, and the keyboard's menu key; people can still use Ctrl/Cmd+click and the middle mouse button. Staging pages aren't cached by the browser, so staging loads a little slower.
+- **Considered and not done:**
+  - obfuscating the JavaScript (it slows the site and gains very little)
+  - blocking F12 and Ctrl+U, or detecting open developer tools (unreliable, hostile to visitors, and in the way of assistive tools)
+  - disabling text selection (hurts accessibility)
+  - showing demos as images (defeats a live demo)
+- **Idea for later:** the same password gate could protect a customer's project preview while it's being built (see the "Later" list in the roadmap).

@@ -11,8 +11,10 @@ Private repository: https://github.com/prajwal988660-dot/prajzo-platform
 | 0: Discovery and plan | Done and approved |
 | 1: Foundation | Done and approved (merged 18 October 2026) |
 | 2: Public website and service catalogue | Done (pull request #2, open for your approval) |
-| 3: Accounts and access control | **Done. Waiting for your approval** (pull request `phase-3-accounts`) |
-| 4 onwards | Order to be confirmed with you: see the roadmap |
+| 3: Accounts and access control | Done (pull request #3, open for your approval) |
+| 4: Project requests and customer dashboard | Next |
+| 5–7: Admin dashboard, hardening, going live | After Phase 4. The main website goes online at the end of Phase 7 |
+| 8–14: Template engine, builder, five demos, submitting designs | After the main website is live |
 
 Plan and progress: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/CHECKLIST.md](docs/CHECKLIST.md)
 

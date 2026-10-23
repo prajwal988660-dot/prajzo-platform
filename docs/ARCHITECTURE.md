@@ -158,10 +158,10 @@ This is the heart of Prajzo, and it's why the five demos and the builder share o
   - A signed-in customer clicks Save, which sends `POST` or `PATCH /api/v1/configurations`. The API validates the configuration again against the template definition and stores it under the customer's account.
   - A visitor without an account keeps the draft in this browser only, and is offered sign-up to keep it.
 
-### 4.3 Submitting and running a project (Phases 10–11)
+### 4.3 Submitting and running a project (Phases 4, 5 and 14)
 
-1. The customer reviews the summary and confirms. The browser sends `POST /api/v1/project-requests` with the ID of the saved configuration, plus notes, the requested delivery category and the integrations they need.
-2. The API takes the configuration **from the database, not from the browser**. It validates the configuration again and stores a frozen copy with the request. It then creates a reference number (for example `PRZ-2026-0001`), records "Request Received" in the status history and sends confirmation emails.
+1. **From the Start a Project form (Phase 4):** the customer fills in the form (project name, category, package, description, features, integrations, a preferred date, how to be contacted, notes) and the browser sends `POST /api/v1/project-requests`. **From a saved design (Phase 14):** the customer reviews the summary and confirms, and the browser sends the same request with the ID of the saved configuration.
+2. The API validates the input again and checks that the category and package exist. For a saved design it takes the configuration **from the database, not from the browser**, validates it again and stores a frozen copy with the request. It then creates a reference number (for example `PRZ-2026-0001`), records "Request Received" in the status history and sends the confirmation emails.
 3. The admin opens the request and sees the design rendered read-only by the same renderer. The admin sets scope, quote and the confirmed delivery date, and moves the status along the allowed transitions (section 8).
 4. The customer sees every change in their dashboard and can take only the actions the workflow allows them.
 
@@ -169,7 +169,7 @@ This is the heart of Prajzo, and it's why the five demos and the builder share o
 
 ### 5.1 Configuration (one website design)
 
-Proposed shape. The exact types are written in Phase 4.
+Proposed shape. The exact types are written in Phase 8.
 
 ```ts
 type WebsiteConfig = {
@@ -339,7 +339,7 @@ The workflow also enforces these rules:
 
 - Customers can never set a price, a delivery date or an admin-only status.
 - Accepting a quote is the customer's own decision. It doesn't approve anything on the admin's behalf.
-- These transitions are a proposal, to be confirmed with you before Phase 10.
+- These transitions are a proposal, to be confirmed with you before Phase 5. Phase 4 uses only the first status and the cancellation rows.
 
 ## 9. Security and privacy
 
@@ -381,13 +381,14 @@ The workflow also enforces these rules:
   - demo submissions are deleted after 7 days
   - admin notes stay internal
   - Privacy and Terms are drafts until a lawyer reviews them
+- **Protecting the front-end code:** nothing can hide HTML, CSS and scripts from a visitor who can load the page (D-037). We reduce casual copying instead: a password in front of everything on staging, minified production files with no source maps (checked on every build), right-click and image-drag blocking, and Terms that keep previews and demos Prajzo's until paid.
 - **Honest limits:** passing tests doesn't make the platform "fully secure". Online payments are out of scope. Get a professional security review before handling payments or sensitive data.
 
 ## 10. Uploads and email
 
 - **File storage:** one interface, `put`, `get`, `delete` and `url`.
   - Development: the local disk driver (`apps/api/storage/`, git-ignored).
-  - Production: an S3-compatible bucket (for example Cloudflare R2) or Cloudinary, chosen in Phase 13.
+  - Production: an S3-compatible bucket (for example Cloudflare R2) or Cloudinary, chosen in Phase 9 with the builder.
 - **Email:** one interface, `send`.
   - Development and tests: a console mailer, plus a capturing mailer in tests.
   - Production: SMTP through a provider you pick, with SPF and DKIM on your domain.
@@ -419,7 +420,7 @@ Tests use an in-memory MongoDB that is created and thrown away for each test fil
 | Test | Vite build or dev server | In-process | In-memory MongoDB | Captured | Temporary folder |
 | Production | Built files served by the API | Node (one service) | MongoDB Atlas | SMTP provider | Cloud bucket |
 
-Production is set up in Phase 13. That includes HTTPS from the host, a health check on `/api/health/ready`, daily database backups (Atlas), error logging, and your domain with email records. Development and production settings are separate, and production secrets are only ever set on the host.
+Production is set up in Phase 7. That includes HTTPS from the host, a health check on `/api/health/ready`, daily database backups (Atlas), error logging, and your domain with email records. Development and production settings are separate, and production secrets are only ever set on the host.
 
 ## 13. Design system
 

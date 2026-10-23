@@ -1,6 +1,6 @@
 # Prajzo roadmap
 
-Last updated: 23 October 2026 (end of Phase 3)
+Last updated: 23 October 2026 (build order chosen: Option A)
 
 This document covers the order in which Prajzo gets built, what each phase delivers, and how we'll know each phase is done. Every phase ends with a short summary and a pause for your approval before the next one starts.
 
@@ -29,7 +29,9 @@ This document covers the order in which Prajzo gets built, what each phase deliv
 
 ## Phases at a glance
 
-Estimates are in 4-hour working sessions. They're rough and will be recalibrated after Phase 1.
+Estimates are in 4-hour working sessions. They're rough: Phases 1–3 each took about one session, which was faster than first estimated, but the phases ahead are larger.
+
+**Build order (chosen 23 October 2026, Option A, [D-036](DECISIONS.md)):** the main website first, then the template engine, builder and demos. Phases 4–7 finish the main website and put it online. Phases 8–14 add the demos and the builder.
 
 | # | Phase | At the end you can… | Sessions | Gate |
 |---|---|---|---|---|
@@ -37,50 +39,54 @@ Estimates are in 4-hour working sessions. They're rough and will be recalibrated
 | 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, approved 18 Oct) | Approval |
 | 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 1 (done, awaiting approval) | Approval |
 | 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 1 (done, awaiting approval) | Approval |
-| 4 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
-| 5 | Website builder (core) | Click "Customize This Design", edit the portfolio, preview desktop/tablet/mobile, save it | 7–9 | Approval |
-| 6 | Demo 2: Business | Open `/demo/business` and customize it | 3–4 | **Demo approval** |
-| 7 | Demo 3: College and Event | Open `/demo/event`, register for the demo event, customize it | 3–4 | **Demo approval** |
-| 8 | Demo 4: Product Catalogue | Open `/demo/catalogue`, filter products, request a quote, customize it | 3–4 | **Demo approval** |
-| 9 | Demo 5: Forms and Quick Solutions | Open `/demo/forms`, submit each form, customize it | 2–3 | **Demo approval** |
-| 10 | Project requests and customer dashboard | Submit a design as a project, get a reference number, follow its status | 4–5 | Approval |
-| 11 | Admin dashboard | Review requests, send quotes, set delivery dates, change statuses, manage templates, categories and prices | 5–6 | Approval |
-| 12 | Hardening and quality | Run the full test suite; security, accessibility, performance and SEO passes done | 3–4 | Approval |
-| 13 | Deployment | Prajzo live on your domain (needs your hosting, database, email and storage accounts) | 2–3 | Approval |
+| 4 | Project requests and customer dashboard | Send a project from the Start a Project form, get a reference number, follow it in My Projects, cancel it while it's early | 4–5 | Approval |
+| 5 | Admin dashboard | Review requests, send quotes, set delivery dates, change statuses, read contact messages; customers accept quotes and ask for revisions | 5–6 | Approval |
+| 6 | Hardening and quality | Run the full test suite; security, accessibility, performance, SEO and code-protection passes done | 3–4 | Approval |
+| 7 | Deployment | **The main website live on your domain** (needs your hosting, email and domain accounts) | 2–3 | Approval |
+| 8 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
+| 9 | Website builder (core) | Click "Customize This Design", edit the portfolio, preview desktop/tablet/mobile, save it | 7–9 | Approval |
+| 10 | Demo 2: Business | Open `/demo/business` and customize it | 3–4 | **Demo approval** |
+| 11 | Demo 3: College and Event | Open `/demo/event`, register for the demo event, customize it | 3–4 | **Demo approval** |
+| 12 | Demo 4: Product Catalogue | Open `/demo/catalogue`, filter products, request a quote, customize it | 3–4 | **Demo approval** |
+| 13 | Demo 5: Forms and Quick Solutions | Open `/demo/forms`, submit each form, customize it | 2–3 | **Demo approval** |
+| 14 | Submit a design as a project | Customize a template, submit it, follow it in My Projects | 1 | Approval |
 
-Total: about 46–60 sessions. At one session a day, five days a week, that is roughly 9–12 weeks, not counting time spent waiting for approvals.
+Remaining: Phases 4–7 (main website online) about 14–18 sessions, Phases 8–14 (builder and demos) about 24–31. That is roughly 38–49 sessions, or 8–10 weeks at one session a day, five days a week, not counting time spent waiting for approvals.
+
+**Not a numbered phase:** the protection of the website's code (D-037), added on request on 23 October 2026. See the checklist.
 
 ## Why the builder comes right after the first demo
 
-Every demo needs a working "Customize This Design" button, and that button opens the builder. If all five demos came first, they would sit unfinished until the builder existed. We would also learn late whether the template format actually works for editing, after five templates had been built on it.
+Once the main website is live, the demos and the builder come next. Every demo needs a working "Customize This Design" button, and that button opens the builder. If all five demos came first, they would sit unfinished until the builder existed. We would also learn late whether the template format actually works for editing, after five templates had been built on it.
 
 So the order is:
 
-1. **Phase 4** builds the template engine and the Portfolio demo.
-2. **Phase 5** builds the builder against that real template.
-3. **Phases 6–9** each deliver one demo completely, including its builder integration, before you approve it.
+1. **Phase 8** builds the template engine and the Portfolio demo.
+2. **Phase 9** builds the builder against that real template.
+3. **Phases 10–13** each deliver one demo completely, including its builder integration, before you approve it.
+4. **Phase 14** lets customers submit a design as a project.
 
-If you'd rather see all five demos before the builder, say so and Phases 5–9 will be reordered (decision Q4).
+If you'd rather see all five demos before the builder, say so and Phases 9–13 will be reordered (decision Q4).
 
-**Update (17 October 2026):** you chose to build the main website first and the demos after (D-025). Phases 1–3 stay as they are. The order of Phases 4–11 is confirmed with you at the Phase 3 gate.
+**Update (23 October 2026):** you chose Option A (D-036): project requests, the admin dashboard, hardening and going live come before the demos and the builder. Phases are numbered in build order; D-036 lists the numbers used in earlier versions of these documents.
 
 ## Which phase builds which page
 
 | Page | Phase | | Page | Phase |
 |---|---|---|---|---|
-| Custom 404 | 1 | | Build Your Website | 5 |
-| Home | 2 (template and builder sections in 4–5) | | Saved Configurations | 5 |
-| Services | 2 | | Start a Project | 10 |
-| How It Works | 2 | | My Projects | 10 |
-| Pricing and Plans | 2 | | Project Details and Status | 10 |
-| About Us | 2 | | Customer Dashboard | 3 (shell), 10 (complete) |
-| Contact Us | 2 | | Admin Dashboard | 3 (shell), 11 (complete) |
-| Privacy Policy | 2 | | Admin Project Management | 11 |
-| Terms and Conditions | 2 | | Admin Template Management | 11 |
-| Customer Registration | 3 | | Live Demos `/demo/*` | 4, 6, 7, 8, 9 |
-| Customer Login | 3 | | Templates and Live Demos | 4 (grows to 5 demos in 6–9) |
-| Admin Login | 3 | | Template Details | 4 |
-| | | | Our Projects | 4 (grows in 6–9) |
+| Custom 404 | 1 | | Build Your Website | 9 |
+| Home | 2 (template and builder sections in 8–9) | | Saved Configurations | 9 |
+| Services | 2 | | Start a Project | 4 |
+| How It Works | 2 | | My Projects | 4 |
+| Pricing and Plans | 2 | | Project Details and Status | 4 (quote and revisions in 5) |
+| About Us | 2 | | Customer Dashboard | 3 (shell), 4 (complete) |
+| Contact Us | 2 | | Admin Dashboard | 3 (shell), 5 (complete) |
+| Privacy Policy | 2 | | Admin Project Management | 5 |
+| Terms and Conditions | 2 | | Admin Template Management | 8 |
+| Customer Registration | 3 | | Live Demos `/demo/*` | 8, 10, 11, 12, 13 |
+| Customer Login | 3 | | Templates and Live Demos | 8 (grows to 5 demos in 10–13) |
+| Admin Login | 3 | | Template Details | 8 |
+| | | | Our Projects | 8 (grows in 10–13) |
 
 ## Phase details
 
@@ -125,11 +131,11 @@ Inspected the folder, the assets, the installed tools and current package versio
 - **Pages:** Home, Services, How It Works, Pricing and Plans, About Us, Contact Us, Privacy Policy, Terms and Conditions.
 - **Home page:**
   - Sections: header; hero ("Your Idea. Your Design. Our Development."); delivery highlights with their conditions; categories; how it works; the customization feature; packages; why Prajzo; FAQ; final call to action; footer.
-  - The featured templates and demo projects sections switch on in Phase 4.
-  - The hero buttons "Explore Templates" and "Build Your Website" switch on in Phases 4 and 5. Until then the hero shows a working "Contact us" button.
+  - The featured templates and demo projects sections switch on in Phase 8.
+  - The hero buttons "Explore Templates" and "Build Your Website" switch on in Phases 8 and 9. Until then the hero shows a working "Contact us" button.
 - **Services page:**
   - Each category shows its icon, description, use cases and delivery category.
-  - Each category has a button: "Start a project" (goes to Contact until Phase 10), plus "View templates" once a template exists for that category.
+  - Each category has a button: "Start a project" (goes to Contact until Phase 4), plus "View templates" once a template exists for that category.
 - **Pricing page:** prices come from the database and show "Request a quote" until you set them.
 - **Contact form:**
   - validated in the browser and again on the server
@@ -172,7 +178,85 @@ Inspected the folder, the assets, the installed tools and current package versio
   - the admin setup script
 - an end-to-end test registers, logs in, opens the dashboard and logs out
 
-### Phase 4: Template engine + Demo 1 (Portfolio)
+### Phase 4: Project requests and customer dashboard
+
+**Goal:** customers can send Prajzo a project and follow it.
+
+- **Start a Project page** (`/start-project`):
+  - Open to everyone. It explains the steps. Signed-in customers get the form; visitors are asked to sign in or create an account first, then come straight back to the form.
+  - The form asks for: a project name, the type of website (the 15 categories), a package or "not sure", a description of the idea, features and integrations from checklists, a preferred date (a wish, not a promise), how you'd like to be contacted, and notes. It is validated in the browser and again on the server.
+- **On submission, the server:**
+  - re-checks everything, and that the chosen category and package really exist
+  - creates the project request with a reference number (for example `PRZ-2026-0001`) and the status "Request Received"
+  - records the first entry of the status history
+  - sends a confirmation to the customer and a notification to Prajzo (printed to the API console until real email is set up in Phase 7)
+- **Customer dashboard:**
+  - the account page shows a welcome, the latest projects and a "Start a project" button
+  - **My Projects:** every project, newest first, with its reference number and status
+  - **Project details:** what was requested, the current status, a timeline of status changes, and what happens next at this status
+  - **Cancel** a project while it is still early (Request Received, Awaiting Customer Information or Quote Sent)
+- **Admin overview:** real counts of project requests. The review screens come in Phase 5.
+- **Navigation:** the header's "Start a Project" button and the Services page buttons open the new page (until now they open Contact).
+- **Not yet, and no buttons for them:** the quote, the confirmed delivery date, revisions and the customer's actions on a quote need the admin side, so they arrive in Phase 5. Submitting a builder design is Phase 14.
+
+**Done when:**
+
+- tests prove that customers see only their own projects and can't set a price, a delivery date or a status
+- invalid status changes are refused
+- reference numbers stay unique even when many requests arrive at the same moment
+- an end-to-end test passes: sign up → start a project → My Projects → details → cancel
+
+### Phase 5: Admin dashboard
+
+- **Overview:** real counts by status and recent activity.
+- **Project requests:**
+  - filter, search and pagination
+  - details with the customer's full request
+  - scope, quote and confirmed delivery date
+  - status changes with notes
+  - internal admin notes, never shown to customers
+  - the full status history
+- **The customer's side of the workflow** (built here because it can only be tested together with the admin side): accept or decline a quote, answer a question from Prajzo, request a revision. Project details gain the quote, the confirmed delivery date and the revisions, and each button appears only when the workflow allows it.
+- **Customers:** list and details.
+- **Category, package and price management.**
+- **Inbox for contact messages:** read, mark handled, archive.
+- **Audit trail:** a log of admin actions, plus emails to customers on status changes (printed to the console until Phase 7).
+- **Moved to Phase 8:** template management and the inbox for demo submissions, because they need templates and demos to exist.
+
+**Done when:**
+
+- every admin API refuses non-admins (tested)
+- every allowed and refused status change is tested, and each one is recorded with who made it and when
+- an end-to-end admin test moves a project from "Request Received" to "Completed", with the customer accepting the quote on the way
+
+### Phase 6: Hardening and quality
+
+- **Security review:**
+  - security headers and the content security policy
+  - session settings and rate limits
+  - a dependency audit
+- **Code protection** (D-037): confirm on the real production build that there are no source maps and no development code, that the staging password covers every file, and that right-click blocking leaves form fields working.
+- **Testing:** the full end-to-end suite, and responsive checks of every page at 3 widths.
+- **Accessibility:** automated checks plus a keyboard pass, including what right-click blocking does to keyboard users.
+- **Performance:** code splitting and image sizes.
+- **Discoverability:** SEO titles and descriptions, social previews, favicons.
+- **Operations:** error logging, and a rehearsal of a database backup and restore.
+
+### Phase 7: Deployment
+
+This phase needs your accounts, plus your approval for anything paid.
+
+- **Production settings.**
+- **Hosting:** the recommendation is one Node service that serves both the API and the built site.
+- **Staging first:** the site goes up first at a private address (for example `staging.prajzo.com`) behind the staging password (D-037). You, and anyone you give the password to, can try the real thing; nobody else can even fetch its CSS. When it passes the smoke test, the live domain is switched over and the staging password is removed from the live site.
+- **Database:** MongoDB Atlas.
+- **Email:** a provider set up with your domain's SPF and DKIM records, so account emails, project confirmations and status updates really are sent.
+- **Domain, HTTPS and backups.**
+- **Monitoring and health checks.**
+- **A live smoke test.** Prajzo is called "live" only after this test passes on the real address.
+- **Not yet at this point:** image storage for uploads comes with the builder (Phase 9).
+
+### Phase 8: Template engine + Demo 1 (Portfolio)
 
 **Goal:** the first complete showcase demo, built on the shared template engine that every later demo and the builder use.
 
@@ -192,6 +276,8 @@ Inspected the folder, the assets, the installed tools and current package versio
 - **Template Details page:** `/templates/portfolio`.
 - **Our Projects page:** the demo presented as a case study, labelled as a demonstration project.
 - **Preview images:** screenshots of the real demo, made by a script, so they never drift from what the demo actually shows.
+- **For admins** (moved here from the admin dashboard phase, D-036): template management (publish or hide, featured, order, text, categories, preview image; the designs themselves stay in code) and an inbox for demo submissions.
+- **Protected like the rest of the site** (D-037): the demo bar says the demo is for evaluation only, and the right-click and image-drag blocking and the staging password apply to it as to every other page.
 
 **Done when:**
 
@@ -201,9 +287,9 @@ Inspected the folder, the assets, the installed tools and current package versio
 - the configuration validation has unit tests
 - an end-to-end test goes Templates → View Live Demo → contact form
 
-**Stop here:** a summary and the tests run, then your approval before Phase 5.
+**Stop here:** a summary and the tests run, then your approval before Phase 9.
 
-### Phase 5: Website builder (core)
+### Phase 9: Website builder (core)
 
 **Goal:** the core feature. Customize a template and see the result immediately.
 
@@ -224,8 +310,9 @@ Inspected the folder, the assets, the installed tools and current package versio
   - Visitors without an account keep a draft in this browser only, with a clear prompt to sign up to keep it.
 - **Safety and states:** a warning before leaving with unsaved changes; loading, empty and error states throughout.
 - **Image upload** (signed-in customers only): JPEG, PNG or WebP up to 5 MB, checked and re-encoded on the server.
+- **Going online:** the builder is deployed to the live site, and the image storage it needs in production (a cloud bucket) is chosen and set up here, not at the first deployment.
 - **"Customize This Design" goes live** on the Templates page, Template Details and the Portfolio demo. It opens the builder with the Portfolio template and its default configuration loaded.
-- **Not yet:** Step 9 (submit as a project) comes in Phase 10, so there is no submit button until then.
+- **Not yet:** Step 9 (submit as a project) comes in Phase 14, so there is no submit button until then.
 
 **Done when:**
 
@@ -234,7 +321,7 @@ Inspected the folder, the assets, the installed tools and current package versio
 - one customer can't read another customer's configuration
 - uploads reject the wrong file types and files that are too large
 
-### Phases 6–9: Showcase demos 2 to 5
+### Phases 10–13: Showcase demos 2 to 5
 
 Each demo phase delivers, for one demo:
 
@@ -248,10 +335,10 @@ Each demo phase delivers, for one demo:
 
 | Phase | Demo | Route | Must include |
 |---|---|---|---|
-| 6 | Business | `/demo/business` | Navigation; hero; company introduction; services; feature highlights; projects or gallery; testimonials labelled as demonstration content; contact form; footer; working calls to action |
-| 7 | College and Event | `/demo/event` | Event banner; date, time and location; schedule; event categories; guidelines; registration form with validation (saved; confirmation only after the server confirms); contact information; footer |
-| 8 | Product Catalogue | `/demo/catalogue` | Hero; category filters; product cards; product details; enquiry or quotation request; WhatsApp enquiry (in the demo it shows the message it would send; on a customer's own site it opens WhatsApp to their number); sample products labelled; no payments |
-| 9 | Forms and Quick Solutions | `/demo/forms` | Contact, registration, enquiry and feedback forms with validation, success and error states, saved on the server |
+| 10 | Business | `/demo/business` | Navigation; hero; company introduction; services; feature highlights; projects or gallery; testimonials labelled as demonstration content; contact form; footer; working calls to action |
+| 11 | College and Event | `/demo/event` | Event banner; date, time and location; schedule; event categories; guidelines; registration form with validation (saved; confirmation only after the server confirms); contact information; footer |
+| 12 | Product Catalogue | `/demo/catalogue` | Hero; category filters; product cards; product details; enquiry or quotation request; WhatsApp enquiry (in the demo it shows the message it would send; on a customer's own site it opens WhatsApp to their number); sample products labelled; no payments |
+| 13 | Forms and Quick Solutions | `/demo/forms` | Contact, registration, enquiry and feedback forms with validation, success and error states, saved on the server |
 
 Every demo must:
 
@@ -259,81 +346,23 @@ Every demo must:
 - be responsive and keyboard-friendly
 - use clearly fictional content
 - have no broken links
+- show the "for evaluation only" note in its demo bar and carry the code protections of D-037
 - have its full "Customize This Design" path tested end to end
 
-### Phase 10: Project requests and customer dashboard
+### Phase 14: Submit a design as a project
 
 - **Builder step 9:** a review summary, then confirm. The summary covers category, template, pages and sections, design, content, features, integrations, notes and the requested delivery category.
 - **On submission, the server:**
-  - re-checks the saved configuration
+  - re-checks the saved configuration (it must belong to this customer)
   - freezes a copy of it
-  - creates a project request with a reference number (for example `PRZ-2026-0001`) and the status "Request Received"
-- **Start a Project page:** for custom work that doesn't start from a template.
-- **Confirmation emails** to the customer and to Prajzo.
-- **Customer dashboard:**
-  - a welcome section
-  - saved configurations and a new-project button
-  - My Projects, with reference numbers and statuses
-  - project details: confirmed scope, quote, confirmed delivery date once set, status timeline and revisions
-  - account settings
-- **Customer actions,** limited to what the workflow allows: accept or decline a quote, provide requested information, request a revision.
+  - creates the project request exactly as in Phase 4, with source "builder"
+- **Customer dashboard:** saved designs get a "Submit as a project" button.
+- **Admin:** project details show the design rendered read-only, by the same renderer as the demos.
 
 **Done when:**
 
-- tests prove that customers:
-  - see only their own records
-  - can't set prices, delivery dates or admin-only statuses
-- invalid status changes are refused
-- reference numbers stay unique even when two requests arrive at the same moment
+- a customer can't submit someone else's design (tested)
 - an end-to-end test passes: customize → submit → My Projects
-
-### Phase 11: Admin dashboard
-
-- **Overview:** real counts by status and recent activity.
-- **Project requests:**
-  - filter, search and pagination
-  - details with the customer's design rendered read-only
-  - scope, quote and confirmed delivery date
-  - status changes with notes
-  - internal admin notes, never shown to customers
-  - the full status history
-- **Customers:** list and details.
-- **Template management:** publish or hide, featured, order, text, categories and preview image. Template designs stay in code.
-- **Category, package and price management.**
-- **Inbox** for contact messages and demo submissions.
-- **Audit trail:** a log of admin actions, plus emails to customers on status changes.
-
-**Done when:**
-
-- every admin API refuses non-admins (tested)
-- every allowed and refused status change is tested, and each one is recorded with who made it and when
-- an end-to-end admin test moves a project from "Request Received" to "Completed"
-
-### Phase 12: Hardening and quality
-
-- **Security review:**
-  - security headers and the content security policy
-  - session settings and rate limits
-  - the upload path
-  - a dependency audit
-- **Testing:** the full end-to-end suite, and responsive checks of every page at 3 widths.
-- **Accessibility:** automated checks plus a keyboard pass.
-- **Performance:** code splitting and image sizes.
-- **Discoverability:** SEO titles and descriptions, social previews, favicons.
-- **Operations:** error logging, and a rehearsal of a database backup and restore.
-
-### Phase 13: Deployment
-
-This phase needs your accounts, plus your approval for anything paid.
-
-- **Production settings.**
-- **Hosting:** the recommendation is one Node service that serves both the API and the built site.
-- **Database:** MongoDB Atlas.
-- **Image storage.**
-- **Email:** a provider set up with your domain's SPF and DKIM records.
-- **Domain, HTTPS and backups.**
-- **Monitoring and health checks.**
-- **A live smoke test.** Prajzo is called "live" only after this test passes on the real address.
 
 ## Risks and how we handle them
 
@@ -341,7 +370,7 @@ This phase needs your accounts, plus your approval for anything paid.
 |---|---|---|
 | The scope is large for 4 hours a day | Slips, half-finished features | Small phases with approval gates; each phase finishes completely; extras go on a "later" list |
 | Builder complexity | The biggest single piece of work | Predefined templates and sections only (no drag-and-drop); editors generated from the template definition; built against a real template early |
-| Template format changes after customers save designs | Saved designs break | Version numbers on configurations and templates, with upgrade functions; the format settles during Phases 4–9, before launch |
+| Template format changes after customers save designs | Saved designs break | Version numbers on configurations and templates, with upgrade functions; the format settles during Phases 8–13, before the builder opens to customers |
 | Five demos look generic | A weak showcase | A design brief per demo, approved by you before coding |
 | Preview differs from the real site on mobile | Customers are surprised | The preview runs in a real frame at device width, using the same renderer |
 | Unsafe uploads; storage costs | Security, money | Images only; size limits; server-side checks and re-encoding; signed-in users only |
@@ -352,7 +381,8 @@ This phase needs your accounts, plus your approval for anything paid.
 | Native modules on Windows (argon2, sharp) | Install failures | Both ship prebuilt Windows binaries; checked at install time; fallbacks exist |
 | No MongoDB on this machine yet | The API can't run | Install it locally or use Atlas (Q2); tests use in-memory MongoDB either way |
 | Email deliverability | Missed notifications | Console email in development; a real provider plus SPF/DKIM before launch |
-| Free hosting sleeps when idle | Slow first visit | A small paid instance is recommended for launch (your call in Phase 13) |
+| Free hosting sleeps when idle | Slow first visit | A small paid instance is recommended for launch (your call in Phase 7) |
+| Someone copies the site's or a demo's code | Lost work and revenue | Nothing can hide front-end code from a visitor, so we reduce casual copying (minified files, no source maps, right-click blocking), keep staging behind a password, hand over full code only after payment, and say so in the Terms (D-037) |
 | A working session ends mid-task | Lost context | Docs and checklist kept current; a commit at every green step |
 
 ## Open decisions
@@ -364,7 +394,7 @@ This phase needs your accounts, plus your approval for anything paid.
 | Q1: Existing site and repository | Continue in this folder | Baseline commit, then the static site moved to `legacy/static-site/` (D-002); new private GitHub repo `prajzo-platform` (D-023) |
 | Q2: Development database | The free database | MongoDB Atlas free cluster; setup steps in [SETUP.md](SETUP.md) (D-024) |
 | Q3: Git identity | Your GitHub account | Commits use "Prajwal S" and your GitHub no-reply address, set for this repository only |
-| Q4: Build order | Main website first, demos after | Phases 1–3 unchanged; the order of Phases 4–11 is confirmed at the Phase 3 gate (D-025) |
+| Q4: Build order | Main website first, demos after | Phases 1–3 unchanged; the rest was confirmed on 23 October 2026 as Option A (D-036) |
 
 ### Answered on 18 October 2026
 
@@ -374,30 +404,24 @@ This phase needs your accounts, plus your approval for anything paid.
 | Contact details | contact@prajzo.com; +91 98866 07720 for phone and WhatsApp; Instagram @prajzoo |
 | Prices | "Low range": starting from ₹2,999, ₹7,999 and ₹19,999 (D-026) |
 | Hosting and domain | Hostinger, domain prajzo.com. Which Hostinger plan you have is still open (see below) |
-| Approval of Phase 2 | "Continue the project building", on 23 October. Pull request #2 (including local hosting) is still open on GitHub for you to merge |
 
-### Needed now: the order of what comes next (asked at the Phase 3 gate)
+### Answered on 23 October 2026
 
-You said "main website first, then the demos" (D-025). Phases 1–3 are done, so here are the two ways to continue. Both build the same things; only the order differs.
+| Question | Your answer | What was done |
+|---|---|---|
+| What to build next | "Go with option A": the main website first | Phases renumbered into build order (D-036) |
+| Protecting the website's and demos' code | "Disable right-click and CSS assets on staging, minify, bundle, password-protected staging … for our website and the demo site" | Staging password, a build that checks itself, right-click and image-drag blocking, a Terms clause; and a plain statement of what none of it can do (D-037) |
+| Approval of Phases 2 and 3 | "Continue" and "go with option A". Pull requests #2 and #3 are still open on GitHub for you to merge | Work continues stacked on them |
 
-**Option A (recommended): finish and launch the main website first.** It matches what you asked for, and Prajzo can start taking real enquiries and projects sooner.
-
-1. **Project requests and customer dashboard:** a "Start a Project" form for signed-in customers, reference numbers, "My Projects" with the status and a timeline (this is the old Phase 10, without the design-submission part).
-2. **Admin dashboard:** read and answer contact messages, review project requests, send quotes, set delivery dates, change statuses, manage prices (the old Phase 11).
-3. **Hardening:** security, accessibility, speed and search-engine review (Phase 12).
-4. **Go live on Hostinger** (Phase 13). From here the main website is online.
-5. **Then the template engine, the five demos and the website builder**, one demo at a time with your approval after each, and finally "submit your design as a project".
-
-**Option B: the original order.** Template engine and Portfolio demo, then the builder, the other four demos, then project requests, admin, hardening and going live. The website goes online last.
-
-### Needed later
+### Decisions still needed
 
 | When | Decision |
 |---|---|
-| Phase 4 | Confirm that demo form submissions are stored and then deleted after 7 days |
-| Phase 10 | Confirm the status workflow (who may move a project between which states) in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow) |
-| Before going online | Your Hostinger plan type (Business or Cloud can run Prajzo; Single or Premium can't run Node.js apps; VPS needs manual setup), whether anything is live on prajzo.com today, and whether the contact@prajzo.com mailbox exists |
-| Phase 13 | Image storage, sending email through your provider, any paid plans |
+| Before Phase 5 | Confirm the status workflow (who may move a project from which state to which) in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow). Phase 4 uses only its first status and the cancellation rows |
+| Before Phase 7 | Your Hostinger plan type (Business or Cloud can run Prajzo; Single or Premium can't run Node.js apps; VPS needs manual setup), whether anything is live on prajzo.com today, and whether the contact@prajzo.com mailbox exists |
+| Phase 7 | Email provider, any paid plans |
+| Phase 8 | Confirm that demo form submissions are stored and then deleted after 7 days |
+| Phase 9 | Image storage for the builder's uploads |
 
 ## Later (not in this plan unless you approve it)
 
@@ -408,3 +432,4 @@ You said "main website first, then the demos" (D-025). Phases 1–3 are done, so
 - Multiple admin roles
 - Two-factor sign-in for admins
 - Real client case studies on Our Projects
+- Password-protected preview links for customers' projects in progress, so a customer can review the work without being able to download it (reuses the staging password code from D-037)

@@ -75,7 +75,7 @@ Planned commands, added in the phase that needs them:
 
 | Command | Phase |
 |---|---|
-| `npm run capture:previews` (template preview images) | 4 |
+| `npm run capture:previews` (template preview images) | 8 |
 
 ## 3. Create your administrator account (once)
 
@@ -130,11 +130,36 @@ npm run host:local
 | `Database connection failed; retrying in 10s` | The same causes: check Network Access first, then that the password in the string is right. The API keeps retrying, so it reconnects as soon as the setting is fixed |
 | "Too many attempts. Please wait a few minutes" when signing in | The sign-in limit (10 failed tries per 15 minutes per connection or email address) was reached. Wait 15 minutes. This protects accounts from password guessing |
 | `This command asks you questions … run it yourself in a terminal window` | `admin:create` must run in a real terminal so it can hide the password. Run it from a terminal window, not through another tool |
+| Right-click does nothing on http://localhost:8080 | That is the right-click protection (D-037), which production builds have. It is off in `npm run dev`. To turn it off for a build, set `VITE_PROTECT_CONTENT=false` and build again |
 | `Port 8080 is already used by another program` | Something else is using port 8080. Close it, or set `LOCAL_HOST_PORT` to a different number |
 | `Port 5173 is already in use` or `Could not start the API on port 4000` | Another copy is already running. Close it, or find it with `Get-NetTCPConnection -LocalPort 5173` |
 | The `/dev/ui` page says **API not reachable** | `npm run dev` isn't running, or the API stopped; its message in the terminal says why |
 
-## 6. The legacy static site
+## 6. Password-protect a site (staging)
+
+To keep a copy of Prajzo private, for example on a staging address while you test it, or on your own computer while you show it to someone, give it a password. Every page, CSS and script file, image and API request then asks for a username and password, so people without them can't see or copy anything.
+
+1. Open `apps/api/.env` (on a host, the settings page of your hosting) and add two lines:
+
+   ```
+   STAGING_PASSWORD=choose-a-long-password-here
+   STAGING_USER=preview
+   ```
+
+   The password needs at least 12 characters. The user name is optional (`preview` if you leave it out).
+
+2. Restart the site (`npm run host:local` on your computer).
+3. Open the site. The browser asks for the username and password.
+
+To turn the protection off, delete both lines and restart. **Never set it on the live site.** Give the password only to people you want to let in, over a private channel, and change it when they no longer need access.
+
+What this does **not** do: someone who has the password can still use the browser's developer tools and save the page. A password keeps outsiders out; it doesn't stop a person you let in from copying. For that, the Terms say previews and demos stay yours until a project is paid ([D-037](DECISIONS.md)).
+
+`/api/health` stays open without a password, so uptime monitors keep working.
+
+Right-click blocking is separate: it is on in production builds, such as the site on port 8080, and off when you run `npm run dev`. See [ENVIRONMENT.md](ENVIRONMENT.md) for `VITE_PROTECT_CONTENT`.
+
+## 7. The legacy static site
 
 Not part of the platform, and kept unchanged. To view it:
 
