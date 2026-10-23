@@ -1,8 +1,12 @@
 import type { RouteObject } from 'react-router';
+import { AdminLayout } from '../features/admin/AdminLayout';
+import { GuestOnly, RequireAdmin, RequireCustomer } from '../features/auth/guards';
 import { HomePage } from '../features/marketing/HomePage';
 import { NotFoundPage } from '../features/system/NotFoundPage';
+import { AuthRoot } from './AuthRoot';
 import { RootLayout } from './RootLayout';
 import { RouteErrorPage } from './RouteErrorPage';
+import { StartupScreen } from './StartupScreen';
 
 /**
  * Pages other than Home are loaded only when they are opened, so the first visit downloads
@@ -45,7 +49,49 @@ const lazyPages: RouteObject[] = [
     path: 'terms',
     lazy: async () => ({ Component: (await import('../features/legal/TermsPage')).TermsPage }),
   },
+  {
+    path: 'reset-password',
+    lazy: async () => ({
+      Component: (await import('../features/auth/ResetPasswordPage')).ResetPasswordPage,
+    }),
+  },
 ];
+
+/** Sign in, sign up and "forgot password": only for people who are not signed in. */
+const guestPages: RouteObject = {
+  element: <GuestOnly />,
+  children: [
+    {
+      path: 'login',
+      lazy: async () => ({ Component: (await import('../features/auth/LoginPage')).LoginPage }),
+    },
+    {
+      path: 'register',
+      lazy: async () => ({
+        Component: (await import('../features/auth/RegisterPage')).RegisterPage,
+      }),
+    },
+    {
+      path: 'forgot-password',
+      lazy: async () => ({
+        Component: (await import('../features/auth/ForgotPasswordPage')).ForgotPasswordPage,
+      }),
+    },
+  ],
+};
+
+/** Pages for signed-in customers. */
+const customerPages: RouteObject = {
+  element: <RequireCustomer />,
+  children: [
+    {
+      path: 'account',
+      lazy: async () => ({
+        Component: (await import('../features/account/AccountPage')).AccountPage,
+      }),
+    },
+  ],
+};
 
 /** Development-only pages; they are left out of production builds entirely. */
 const developmentRoutes: RouteObject[] = import.meta.env.DEV
@@ -61,16 +107,53 @@ const developmentRoutes: RouteObject[] = import.meta.env.DEV
 
 export const routes: RouteObject[] = [
   {
-    element: <RootLayout />,
+    element: <AuthRoot />,
+    HydrateFallback: StartupScreen,
     errorElement: <RouteErrorPage />,
     children: [
       {
-        // Errors inside a page are shown inside the normal header and footer.
+        // The public website: marketing header and footer.
+        element: <RootLayout />,
         errorElement: <RouteErrorPage />,
         children: [
-          { index: true, element: <HomePage /> },
-          ...lazyPages,
-          ...developmentRoutes,
+          {
+            // Errors inside a page are shown inside the normal header and footer.
+            errorElement: <RouteErrorPage />,
+            children: [
+              { index: true, element: <HomePage /> },
+              ...lazyPages,
+              guestPages,
+              customerPages,
+              ...developmentRoutes,
+              { path: '*', element: <NotFoundPage /> },
+            ],
+          },
+        ],
+      },
+      {
+        // The administration area: its own plain frame.
+        path: 'admin',
+        element: <AdminLayout />,
+        errorElement: <RouteErrorPage />,
+        children: [
+          {
+            path: 'login',
+            lazy: async () => ({
+              Component: (await import('../features/auth/AdminLoginPage')).AdminLoginPage,
+            }),
+          },
+          {
+            element: <RequireAdmin />,
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminDashboardPage'))
+                    .AdminDashboardPage,
+                }),
+              },
+            ],
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

@@ -63,6 +63,11 @@ const envSchema = z
     ADMIN_NOTIFY_EMAIL: z.email('must be an email address').optional(),
     // Contact-form messages allowed per connection every 15 minutes (spam protection).
     CONTACT_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
+    // Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes.
+    AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
+    // How long a customer stays signed in without visiting, and the (shorter) idle limit for admins.
+    SESSION_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(14),
+    ADMIN_SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(72).default(8),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {

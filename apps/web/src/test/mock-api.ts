@@ -75,10 +75,50 @@ export const samplePackages: ServicePackage[] = [
   },
 ];
 
-/** The catalogue endpoints, answering with the sample data. */
+/**
+ * The endpoints every page needs: the service catalogue (sample data), and "who is signed in"
+ * (nobody). Tests add or replace routes on top of these.
+ */
 export function catalogueRoutes(): Record<string, Handler> {
   return {
     'GET /api/v1/categories': () => jsonResponse(200, { items: sampleCategories }),
     'GET /api/v1/packages': () => jsonResponse(200, { items: samplePackages }),
+    'GET /api/v1/auth/me': () => jsonResponse(200, { user: null }),
   };
+}
+
+/** The addresses the page has asked for so far, as plain text. */
+export function requestedUrls(fetchMock: ReturnType<typeof mockApi>): string[] {
+  return fetchMock.mock.calls.map(([input]) => {
+    if (typeof input === 'string') return input;
+    return input instanceof URL ? input.href : input.url;
+  });
+}
+
+/** The JSON a page sent in a request, for tests to inspect. */
+export function jsonBody(init: RequestInit | undefined): unknown {
+  return typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined;
+}
+
+export const sampleCustomer = {
+  id: 'user-1',
+  email: 'asha@example.com',
+  name: 'Asha Rao',
+  phone: '+91 98866 07720',
+  role: 'customer' as const,
+};
+
+export const sampleAdmin = {
+  id: 'admin-1',
+  email: 'boss@example.com',
+  name: 'Prajzo Admin',
+  phone: null,
+  role: 'admin' as const,
+};
+
+/** Makes `GET /auth/me` report this person as signed in. */
+export function signedInAs(
+  user: typeof sampleCustomer | typeof sampleAdmin,
+): Record<string, Handler> {
+  return { 'GET /api/v1/auth/me': () => jsonResponse(200, { user }) };
 }

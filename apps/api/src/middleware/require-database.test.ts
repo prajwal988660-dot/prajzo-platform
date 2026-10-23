@@ -34,6 +34,39 @@ describe('requireDatabase', () => {
     }
   });
 
+  it('lets a visitor who is not signed in carry on, and fails fast for those who are', async () => {
+    const visitor = await request(app).get('/api/v1/auth/me');
+    expect(visitor.status).toBe(200); // no session cookie means no database is needed
+    expect(visitor.body).toEqual({ user: null });
+
+    const signedIn = await request(app)
+      .get('/api/v1/auth/me')
+      .set('Cookie', 'prajzo.sid=s%3Aabc.def');
+    expect(signedIn.status).toBe(503);
+  });
+
+  it('answers sign-in, sign-up and account routes with the same clear 503, without counting attempts', async () => {
+    const paths = [
+      ['post', '/api/v1/auth/login'],
+      ['post', '/api/v1/auth/admin/login'],
+      ['post', '/api/v1/auth/register'],
+      ['post', '/api/v1/auth/password/forgot'],
+      ['post', '/api/v1/auth/password/reset'],
+      ['patch', '/api/v1/me'],
+      ['get', '/api/v1/admin/overview'],
+    ] as const;
+    for (let round = 0; round < 3; round += 1) {
+      for (const [method, path] of paths) {
+        const response = await request(app)[method](path).send({});
+        expect(response.status, `${method} ${path}`).toBe(503);
+      }
+    }
+  });
+
+  it('signing out without a session needs nothing', async () => {
+    expect((await request(app).post('/api/v1/auth/logout')).status).toBe(204);
+  });
+
   it('keeps answering unknown routes with 404 and the health check with its own status', async () => {
     expect((await request(app).get('/api/v1/does-not-exist')).status).toBe(404);
     expect((await request(app).get('/api/health')).status).toBe(200);
