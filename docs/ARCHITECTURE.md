@@ -298,8 +298,10 @@ All routes are under `/api/v1` except the health checks. List endpoints take `?p
 | Anyone | `GET /templates`, `GET /templates/:key` | Published templates |
 | Anyone | `POST /contact` | Contact message (rate-limited) |
 | Anyone | `POST /demo-submissions` | Form submissions from live demos (rate-limited, auto-deleted) |
-| Anyone | `POST /auth/register`, `POST /auth/login`, `POST /auth/password/forgot`, `POST /auth/password/reset` | Accounts (rate-limited) |
-| Signed in | `POST /auth/logout`, `GET /auth/me`, `PATCH /me`, `POST /me/password` | Session and profile |
+| Anyone | `POST /auth/register`, `POST /auth/login`, `POST /auth/admin/login`, `POST /auth/password/forgot`, `POST /auth/password/reset` | Accounts (rate-limited). Customers and administrators each have their own sign-in |
+| Anyone | `GET /auth/me` | Who is signed in: `{ user: null }` (status 200) for visitors, so the website needs no special case |
+| Anyone | `POST /auth/logout` | Ends the session (also fine when there is none) |
+| Signed in | `PATCH /me`, `POST /me/password` | Profile; change password (ends other sessions) |
 | Customer (own records) | `GET`, `POST /configurations`; `GET`, `PATCH`, `DELETE /configurations/:id`; `POST /configurations/:id/duplicate` | Saved designs |
 | Customer | `POST /uploads` | Image upload |
 | Customer (own records) | `GET`, `POST /project-requests`; `GET /project-requests/:reference`; `POST /project-requests/:reference/actions` | Project requests and allowed customer actions |
