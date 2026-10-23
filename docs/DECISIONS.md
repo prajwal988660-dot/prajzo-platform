@@ -267,7 +267,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 
 - **Decision:**
   - Passwords are stored only as **argon2id** hashes (64 MiB memory, 3 passes, 4 lanes).
-  - Customers choose 10–128 characters, with a mix of characters, and not one of a short list of very common passwords. Administrators need 12 or more.
+  - Customers choose 10–128 characters, with at least 5 different ones (so "aaaaaaaaaa" is refused), and not one of a short list of very common passwords. There are deliberately no "must contain a capital, a number and a symbol" rules. Administrators need 12 or more.
   - Spaces are allowed, and passwords are never trimmed.
   - Signing in doesn't re-apply these rules, so older passwords still work.
   - Unknown emails take the same time as wrong passwords (a decoy hash is checked).

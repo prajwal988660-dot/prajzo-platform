@@ -109,14 +109,14 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 - [x] Accounts:
   - [x] user model with `customer` and `admin` roles; passwords stored only as argon2id hashes (64 MiB, 3 passes, 4 lanes)
-  - [x] password rules: 10–128 characters, no very common passwords, a mix of characters; administrators need 12 or more
+  - [x] password rules: 10–128 characters, at least 5 different characters, not one of a list of very common passwords; administrators need 12 or more. There are no "must contain a capital, number and symbol" rules
   - [x] register (consent to Terms and Privacy recorded), sign in, sign out, "who am I"
   - [x] profile (name, phone), change password (needs the current one; signs out other devices)
   - [x] forgot and reset password: emailed link, single-use, expires in 1 hour, only a hash of it is stored, all devices signed out after a reset (the email is printed in the API log until real email sending is set up)
 - [x] Sessions stored in MongoDB; cookie `prajzo.sid` is HttpOnly, SameSite=Lax, Secure in production; a new session ID at every sign-in; 14 days for customers, 8 hours for administrators
 - [x] Server-side protection:
   - [x] every private route checks the person on the server, fresh from the database each time, so disabling an account or changing a role takes effect at once
-  - [x] a customer asking for admin data gets 403; a visitor gets 401
+  - [x] a customer asking for admin data gets 403; a visitor gets 401 (while the database is unreachable, every private request instead gets an instant 503 "temporarily unavailable")
   - [x] requests that change data must come from this website (blocks forged requests from other sites)
   - [x] rate limits on sign-in (per connection and per email address), sign-up and password reset
   - [x] "wrong password" and "unknown email" give the identical answer and take similar time
@@ -131,7 +131,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] server: duplicate email, wrong password, unknown email, disabled account, session ID changes, cookie flags, expired session, sign-out, profile, password change, password reset (single use, expiry, hashed), rate limits, forged requests, admin access rules, admin setup flow
   - [x] website: forms, error messages, redirects, guards, sign-out, header, account and admin pages
   - [x] browser: register → sign out → sign in; reload; wrong password; return to the page you wanted; duplicate email; change name; change password; full password-reset by email link; admin sign-in and sign-out; customer turned away from admin; HttpOnly cookie; forged request refused
-  - [x] accessibility (axe) on 14 public pages, the signed-in pages and pages showing error messages
+  - [x] accessibility (axe) on 14 pages you can open without signing in (including the administrator sign-in and the not-found page), the signed-in pages, and pages showing error messages
 - [x] 269 automated tests pass locally; browser tests passed 90 of 90 once after the last change (two repeat runs were cut short by low computer memory)
 - [ ] **Your action:** create your administrator account: `npm run admin:create -w @prajzo/api` in a terminal ([SETUP.md](SETUP.md), section 3)
 - [ ] **(gate)** Approval for Phase 4: merge the `phase-3-accounts` pull request, and confirm the order of Phases 4–11
