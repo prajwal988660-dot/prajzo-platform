@@ -102,6 +102,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] second start reports "already running"; restart replaces the old copy; log is kept under 5 MB
   - [x] the log explains a lost database connection (usually a changed internet address) in one line, and recognises Atlas's "SSL alert number 80" rejection
   - [x] tests for the production-style serving and the connection messages
+  - [x] while the database is unreachable, database-backed requests answer at once with a clear 503 "temporarily unavailable" message instead of hanging for 10 seconds; failed contact attempts during an outage don't use up the visitor's message allowance
 - [ ] **(gate)** Approval for Phase 3: merge the `phase-2-public-site` pull request
 
 ## Phase 3: Accounts and access control

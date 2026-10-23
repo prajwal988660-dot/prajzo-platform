@@ -93,6 +93,32 @@ describe('Contact page', () => {
     expect(screen.getByLabelText(/Your name/)).toHaveValue('Asha Rao');
   });
 
+  it('tells the visitor when the site is temporarily unavailable, and keeps their message', async () => {
+    mockApi({
+      ...catalogueRoutes(),
+      'POST /api/v1/contact': () =>
+        jsonResponse(503, {
+          error: {
+            code: 'SERVICE_UNAVAILABLE',
+            message:
+              'This part of the site is temporarily unavailable. Please try again in a minute, or message us on WhatsApp.',
+          },
+        }),
+    });
+    const user = userEvent.setup();
+    renderContact();
+
+    await fillRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Send message' }));
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent("Your message wasn't sent");
+    expect(alert).toHaveTextContent('temporarily unavailable');
+    expect(alert).toHaveTextContent('message us on WhatsApp');
+    expect(screen.queryByText('Message sent')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Your name/)).toHaveValue('Asha Rao');
+  });
+
   it('never claims success when the server cannot be reached', async () => {
     const fetchMock = mockApi(catalogueRoutes());
     const user = userEvent.setup();

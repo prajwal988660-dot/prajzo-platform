@@ -2,6 +2,7 @@ import { contactRequestSchema, type ContactResponse } from '@prajzo/shared';
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { AppError } from '../../lib/errors';
+import { requireDatabase } from '../../middleware/require-database';
 import { describeError } from '../../db/connection';
 import type { Mailer } from '../../services/mailer';
 import { isActiveCategory, isActivePackage } from '../catalogue/catalogue.service';
@@ -34,7 +35,8 @@ export function contactRouter({ mailer, notifyEmail, rateLimitMax }: ContactRout
     },
   });
 
-  router.post('/contact', limiter, async (req, res) => {
+  // requireDatabase comes first, so attempts during an outage don't use up the visitor's quota.
+  router.post('/contact', requireDatabase, limiter, async (req, res) => {
     const input = contactRequestSchema.parse(req.body);
 
     const fields: Record<string, string> = {};
