@@ -32,6 +32,20 @@ export async function listPackages(): Promise<ServicePackage[]> {
   );
 }
 
+/** The title of an active category, or null when there is no such category. */
+export async function findActiveCategoryTitle(key: string): Promise<string | null> {
+  const category = await CategoryModel.findOne({ key, active: true }).select('title').lean();
+  return category?.title ?? null;
+}
+
+/** The name of an active package, or null when there is no such package. */
+export async function findActivePackageName(key: string): Promise<string | null> {
+  const servicePackage = await ServicePackageModel.findOne({ key, active: true })
+    .select('name')
+    .lean();
+  return servicePackage?.name ?? null;
+}
+
 export async function isActiveCategory(key: string): Promise<boolean> {
   return (await CategoryModel.exists({ key, active: true })) !== null;
 }

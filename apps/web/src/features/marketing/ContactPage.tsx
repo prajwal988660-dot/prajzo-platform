@@ -34,10 +34,17 @@ export function ContactPage() {
 
   return (
     <>
-      <PageIntro eyebrow="Contact us" title="Start a project">
+      <PageIntro eyebrow="Contact us" title="Talk to us">
         <p>
-          Tell us about your idea. We'll reply with questions or a quote that includes the scope,
-          price and delivery date.
+          Have a question, or want to chat before you decide? Send us a message and we&apos;ll
+          reply. Ready to tell us about a project?{' '}
+          <Link
+            to="/start-project"
+            className="font-medium text-brand-indigo underline underline-offset-2"
+          >
+            Start a project
+          </Link>
+          .
         </p>
       </PageIntro>
 

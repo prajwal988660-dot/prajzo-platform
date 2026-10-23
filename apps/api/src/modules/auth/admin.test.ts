@@ -89,6 +89,7 @@ describe('who can see the admin overview', () => {
     expect(adminOverviewSchema.parse(response.body)).toEqual({
       customers: 2, // administrators are not counted as customers
       contactMessages: { total: 3, unread: 2 },
+      projectRequests: { total: 0, received: 0 },
     });
   });
 

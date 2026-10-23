@@ -6,13 +6,16 @@ import {
   jsonBody,
   jsonResponse,
   mockApi,
+  noProjects,
+  projectList,
   sampleCustomer,
+  sampleProjectSummary,
   signedInAs,
 } from '../../test/mock-api';
 import { renderApp } from '../../test/render-app';
 
 async function openAccount(extra: Parameters<typeof mockApi>[0] = {}) {
-  mockApi({ ...catalogueRoutes(), ...signedInAs(sampleCustomer), ...extra });
+  mockApi({ ...catalogueRoutes(), ...noProjects, ...signedInAs(sampleCustomer), ...extra });
   const user = userEvent.setup();
   renderApp('/account');
   await screen.findByRole('heading', { level: 1, name: 'Welcome, Asha' });
@@ -24,11 +27,99 @@ describe('Account page', () => {
     await openAccount();
 
     expect(screen.getByRole('heading', { name: 'No saved designs yet' })).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'No projects yet' })).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'No projects yet' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Start a project' })).toHaveAttribute(
       'href',
-      '/contact',
+      '/start-project',
     );
+  });
+
+  describe('your projects', () => {
+    it('shows the latest ones with their status, each linking to its page', async () => {
+      await openAccount({
+        'GET /api/v1/project-requests?limit=3': () =>
+          jsonResponse(
+            200,
+            projectList(
+              [
+                sampleProjectSummary({
+                  reference: 'PRZ-2026-0002',
+                  title: 'Shop website',
+                  status: 'quote-sent',
+                }),
+                sampleProjectSummary({ reference: 'PRZ-2026-0001', title: 'Studio website' }),
+              ],
+              2,
+              1,
+              3,
+            ),
+          ),
+      });
+
+      const shop = await screen.findByRole('link', { name: /Shop website/ });
+      expect(shop).toHaveAttribute('href', '/account/projects/PRZ-2026-0002');
+      expect(within(shop).getByText('Quote Sent')).toBeVisible();
+      expect(within(shop).getByText('PRZ-2026-0002')).toBeVisible();
+      expect(screen.getByRole('link', { name: /Studio website/ })).toHaveAttribute(
+        'href',
+        '/account/projects/PRZ-2026-0001',
+      );
+      // All of them are on show, so the link is simply "My projects".
+      expect(screen.getByRole('link', { name: 'My projects' })).toHaveAttribute(
+        'href',
+        '/account/projects',
+      );
+      expect(screen.getByRole('link', { name: 'Start a project' })).toHaveAttribute(
+        'href',
+        '/start-project',
+      );
+    });
+
+    it('says how many there are when only the latest few are shown', async () => {
+      await openAccount({
+        'GET /api/v1/project-requests?limit=3': () =>
+          jsonResponse(
+            200,
+            projectList(
+              [
+                sampleProjectSummary({ reference: 'PRZ-2026-0005' }),
+                sampleProjectSummary({ reference: 'PRZ-2026-0004' }),
+                sampleProjectSummary({ reference: 'PRZ-2026-0003' }),
+              ],
+              5,
+              1,
+              3,
+            ),
+          ),
+      });
+
+      expect(await screen.findByRole('link', { name: 'See all 5 projects' })).toHaveAttribute(
+        'href',
+        '/account/projects',
+      );
+    });
+
+    it('says so when they could not be loaded, and tries again on request', async () => {
+      let calls = 0;
+      const user = await openAccount({
+        'GET /api/v1/project-requests?limit=3': () => {
+          calls += 1;
+          return calls === 1
+            ? jsonResponse(503, {
+                error: {
+                  code: 'SERVICE_UNAVAILABLE',
+                  message: 'This part of the site is temporarily unavailable.',
+                },
+              })
+            : jsonResponse(200, projectList([sampleProjectSummary()], 1, 1, 3));
+        },
+      });
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('temporarily unavailable');
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      expect(await screen.findByRole('link', { name: /Website for my studio/ })).toBeVisible();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('shows the email as read-only and the saved name and phone', async () => {
@@ -60,7 +151,11 @@ describe('Account page', () => {
   });
 
   it('refuses an empty name before sending anything', async () => {
-    const fetchMock = mockApi({ ...catalogueRoutes(), ...signedInAs(sampleCustomer) });
+    const fetchMock = mockApi({
+      ...catalogueRoutes(),
+      ...noProjects,
+      ...signedInAs(sampleCustomer),
+    });
     const user = userEvent.setup();
     renderApp('/account');
     await screen.findByRole('heading', { level: 1, name: 'Welcome, Asha' });

@@ -1,4 +1,4 @@
-import type { Category, ServicePackage } from '@prajzo/shared';
+import type { Category, ProjectDetail, ProjectSummary, ServicePackage } from '@prajzo/shared';
 import { vi } from 'vitest';
 
 type Handler = (init: RequestInit | undefined) => Response | Promise<Response>;
@@ -122,3 +122,48 @@ export function signedInAs(
 ): Record<string, Handler> {
   return { 'GET /api/v1/auth/me': () => jsonResponse(200, { user }) };
 }
+
+/** A project as it appears in a list. */
+export function sampleProjectSummary(overrides: Partial<ProjectSummary> = {}): ProjectSummary {
+  return {
+    reference: 'PRZ-2026-0001',
+    title: 'Website for my studio',
+    status: 'received',
+    categoryTitle: 'Business Websites',
+    createdAt: '2026-10-23T13:30:00.000Z',
+    updatedAt: '2026-10-23T13:30:00.000Z',
+    ...overrides,
+  };
+}
+
+/** A whole project, as its owner sees it. */
+export function sampleProject(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
+  return {
+    ...sampleProjectSummary(),
+    categoryKey: 'business-websites',
+    packageKey: 'professional-website',
+    packageName: 'Professional Website',
+    description: 'A simple five-page website for my photography studio, with a gallery.',
+    features: ['gallery', 'contact-form'],
+    integrations: ['google-maps'],
+    preferredDate: '2026-12-01',
+    contactPreference: 'whatsapp',
+    phone: '+91 98866 07720',
+    notes: 'Please message after 5 pm.',
+    history: [
+      { from: null, to: 'received', by: 'customer', note: null, at: '2026-10-23T13:30:00.000Z' },
+    ],
+    allowedActions: ['cancel'],
+    ...overrides,
+  };
+}
+
+/** A page of projects, in the shape the API sends. */
+export function projectList(items: ProjectSummary[], total = items.length, page = 1, limit = 10) {
+  return { items, page, limit, total };
+}
+
+/** The account page asks for the latest three projects; this answers "none yet". */
+export const noProjects: Record<string, Handler> = {
+  'GET /api/v1/project-requests?limit=3': () => jsonResponse(200, projectList([], 0, 1, 3)),
+};

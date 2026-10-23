@@ -11,11 +11,12 @@ import {
   type SessionResponse,
   type UserRole,
 } from '@prajzo/shared';
-import { Router, type Request, type RequestHandler, type Response } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import type { Env } from '../../config/env';
 import { AppError } from '../../lib/errors';
 import type { Logger } from '../../lib/logger';
+import { noStore } from '../../middleware/no-store';
 import { requireDatabase } from '../../middleware/require-database';
 import type { Mailer } from '../../services/mailer';
 import {
@@ -64,11 +65,6 @@ function limiter(
     handler: (_req, _res, next) => next(tooManyAttempts()),
   });
 }
-
-const noStore: RequestHandler = (_req, res, next) => {
-  res.set('Cache-Control', 'no-store');
-  next();
-};
 
 const ok = (message: string): OkResponse => ({ ok: true, message });
 

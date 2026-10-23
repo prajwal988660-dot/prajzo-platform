@@ -51,7 +51,7 @@ export function PackageCard({ servicePackage, highlighted = false }: PackageCard
       </ul>
 
       <ButtonLink
-        to={`/contact?package=${encodeURIComponent(servicePackage.key)}`}
+        to={`/start-project?package=${encodeURIComponent(servicePackage.key)}`}
         variant={highlighted ? 'primary' : 'secondary'}
         className="mt-8 w-full"
       >

@@ -6,6 +6,13 @@ export const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? '';
 export const strongPassword = 'a-long-passphrase-9';
 export const newPassword = 'another-long-passphrase-4';
 
+/** A valid project request, for tests that need a project to exist. */
+export const projectDraft = {
+  title: 'Website for my studio',
+  categoryKey: 'business-websites',
+  description: 'A simple five-page website for my photography studio, with a gallery.',
+};
+
 /** An email address nobody else in this run uses (tests run in parallel, on desktop and phone). */
 export function uniqueEmail(label: string, projectName: string): string {
   const suffix = Math.random().toString(36).slice(2, 8);
@@ -67,4 +74,17 @@ export async function lastEmailTo(request: APIRequestContext, email: string) {
   const last = emails.at(-1);
   if (!last) throw new Error(`No email was sent to ${email}`);
   return last;
+}
+
+/** Sends a project request through the API as the signed-in customer; returns its reference number. */
+export async function sendProjectQuietly(
+  page: Page,
+  overrides: Record<string, unknown> = {},
+): Promise<string> {
+  const response = await page.request.post('/api/v1/project-requests', {
+    data: { ...projectDraft, ...overrides },
+  });
+  expect(response.status(), await response.text()).toBe(201);
+  const body = (await response.json()) as { project: { reference: string } };
+  return body.project.reference;
 }

@@ -147,7 +147,7 @@ function Hero() {
             bring your digital vision to life.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <ButtonLink to="/contact" size="lg">
+            <ButtonLink to="/start-project" size="lg">
               Start a Project <ArrowRight aria-hidden="true" className="size-4" />
             </ButtonLink>
             <ButtonLink to="/services" variant="secondary" size="lg">

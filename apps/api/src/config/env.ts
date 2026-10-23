@@ -77,6 +77,8 @@ const envSchema = z
     ADMIN_NOTIFY_EMAIL: z.email('must be an email address').optional(),
     // Contact-form messages allowed per connection every 15 minutes (spam protection).
     CONTACT_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
+    // Project requests one customer may send per hour (spam protection).
+    PROJECT_REQUEST_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
     // Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes.
     AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
     // How long a customer stays signed in without visiting, and the (shorter) idle limit for admins.

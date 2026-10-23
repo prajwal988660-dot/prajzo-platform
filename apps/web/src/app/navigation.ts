@@ -17,12 +17,12 @@ export const primaryNavigation: NavItem[] = [
 ];
 
 /**
- * The header's "Start a Project" button. Until the dedicated Start a Project page exists
- * (Phase 4), it opens the contact form, which is how projects start today.
+ * The header's "Start a Project" button. It opens the Start a Project page; the Contact page
+ * stays for questions.
  */
 export const headerCallToAction: NavItem = {
   label: 'Start a Project',
-  to: '/contact',
+  to: '/start-project',
   available: true,
 };
 

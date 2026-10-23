@@ -7,6 +7,16 @@ describe('safeNextPath', () => {
     expect(safeNextPath('/pricing?plan=pro#top', '/')).toBe('/pricing?plan=pro#top');
   });
 
+  it('keeps the places people go back to after signing in to start or follow a project', () => {
+    expect(safeNextPath('/start-project', '/')).toBe('/start-project');
+    expect(safeNextPath('/start-project?type=business-websites&package=quick-launch', '/')).toBe(
+      '/start-project?type=business-websites&package=quick-launch',
+    );
+    expect(safeNextPath('/account/projects/PRZ-2026-0001', '/')).toBe(
+      '/account/projects/PRZ-2026-0001',
+    );
+  });
+
   it('falls back when nothing is given', () => {
     expect(safeNextPath(null, '/account')).toBe('/account');
     expect(safeNextPath('', '/account')).toBe('/account');

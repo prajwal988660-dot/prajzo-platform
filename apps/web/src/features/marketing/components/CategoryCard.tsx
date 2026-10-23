@@ -46,7 +46,7 @@ export function CategoryCard({ category, detailed = false, className }: Category
 
       <div className="mt-auto pt-5">
         <Link
-          to={`/contact?type=${encodeURIComponent(category.key)}`}
+          to={`/start-project?type=${encodeURIComponent(category.key)}`}
           className="inline-flex items-center gap-1.5 rounded text-sm font-semibold text-brand-indigo hover:underline focus-visible:outline-2 focus-visible:outline-brand-blue"
         >
           Start a project

@@ -22,7 +22,7 @@ export function CallToActionBand({
           <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h2>
           <p className="mx-auto mt-4 max-w-xl text-lg leading-8 text-indigo-100">{text}</p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <ButtonLink to="/contact" variant="secondary" size="lg">
+            <ButtonLink to="/start-project" variant="secondary" size="lg">
               Start a Project <ArrowRight aria-hidden="true" className="size-4" />
             </ButtonLink>
             <a

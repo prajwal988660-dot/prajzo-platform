@@ -105,7 +105,7 @@ export function TextField({
 }: TextFieldProps) {
   const { fieldId, hintId, errorId, describedBy } = useFieldIds(id, hint, error);
   return (
-    <div className={cx('grid gap-1.5', className)}>
+    <div className={cx('grid content-start gap-1.5', className)}>
       <FieldLabel htmlFor={fieldId} required={required}>
         {label}
       </FieldLabel>
@@ -169,7 +169,7 @@ export function TextAreaField({
 }: TextAreaFieldProps) {
   const { fieldId, hintId, errorId, describedBy } = useFieldIds(id, hint, error);
   return (
-    <div className={cx('grid gap-1.5', className)}>
+    <div className={cx('grid content-start gap-1.5', className)}>
       <FieldLabel htmlFor={fieldId} required={required}>
         {label}
       </FieldLabel>
@@ -201,7 +201,7 @@ export function SelectField({
 }: SelectFieldProps) {
   const { fieldId, hintId, errorId, describedBy } = useFieldIds(id, hint, error);
   return (
-    <div className={cx('grid gap-1.5', className)}>
+    <div className={cx('grid content-start gap-1.5', className)}>
       <FieldLabel htmlFor={fieldId} required={required}>
         {label}
       </FieldLabel>
@@ -241,5 +241,34 @@ export function CheckboxField({ id, label, hint, error, className, ...props }: C
       </div>
       <FieldMessages hint={hint} hintId={hintId} error={error} errorId={errorId} indent />
     </div>
+  );
+}
+
+/**
+ * A titled group of related controls, such as a list of checkboxes. Screen readers announce the
+ * title before each control in the group.
+ */
+export function FieldGroup({
+  legend,
+  hint,
+  children,
+  className,
+}: {
+  legend: ReactNode;
+  hint?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  const hintId = useId();
+  return (
+    <fieldset aria-describedby={hint ? hintId : undefined} className={cx('grid gap-3', className)}>
+      <legend className="text-sm font-medium text-ink">{legend}</legend>
+      {hint && (
+        <p id={hintId} className="-mt-1 text-sm text-slate-600">
+          {hint}
+        </p>
+      )}
+      <div className="grid gap-3 sm:grid-cols-2">{children}</div>
+    </fieldset>
   );
 }

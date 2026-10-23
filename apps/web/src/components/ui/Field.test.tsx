@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { CheckboxField, SelectField, TextAreaField, TextField } from './Field';
+import { CheckboxField, FieldGroup, SelectField, TextAreaField, TextField } from './Field';
 
 describe('TextField', () => {
   it('connects the label to the input', async () => {
@@ -60,5 +60,28 @@ describe('other fields', () => {
     await userEvent.click(checkbox);
     expect(checkbox).toBeChecked();
     expect(checkbox).toHaveAccessibleDescription('Tick this box to continue');
+  });
+});
+
+describe('FieldGroup', () => {
+  it('names the group for screen readers and reads out its hint', () => {
+    render(
+      <FieldGroup legend="Features" hint="Tick anything that applies.">
+        <CheckboxField label="Gallery" value="gallery" />
+        <CheckboxField label="Blog" value="blog" />
+      </FieldGroup>,
+    );
+    const group = screen.getByRole('group', { name: 'Features' });
+    expect(group).toHaveAccessibleDescription('Tick anything that applies.');
+    expect(within(group).getAllByRole('checkbox')).toHaveLength(2);
+  });
+
+  it('works without a hint', () => {
+    render(
+      <FieldGroup legend="Features">
+        <CheckboxField label="Gallery" />
+      </FieldGroup>,
+    );
+    expect(screen.getByRole('group', { name: 'Features' })).not.toHaveAttribute('aria-describedby');
   });
 });

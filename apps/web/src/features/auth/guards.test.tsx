@@ -12,7 +12,11 @@ import {
 } from '../../test/mock-api';
 import { currentAddress, renderApp } from '../../test/render-app';
 
-const overview = { customers: 12, contactMessages: { total: 30, unread: 4 } };
+const overview = {
+  customers: 12,
+  contactMessages: { total: 30, unread: 4 },
+  projectRequests: { total: 9, received: 3 },
+};
 const adminRoutes = { 'GET /api/v1/admin/overview': () => jsonResponse(200, overview) };
 
 describe('pages for signed-in customers', () => {
@@ -118,6 +122,8 @@ describe('the administration area', () => {
     expect(customers.nextElementSibling).toHaveTextContent('12');
     expect(screen.getByText('New messages').nextElementSibling).toHaveTextContent('4');
     expect(screen.getByText('All messages').nextElementSibling).toHaveTextContent('30');
+    expect(screen.getByText('New project requests').nextElementSibling).toHaveTextContent('3');
+    expect(screen.getByText('All project requests').nextElementSibling).toHaveTextContent('9');
     expect(screen.getByText(/Signed in as Prajzo Admin/)).toBeVisible();
   });
 

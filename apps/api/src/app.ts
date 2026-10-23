@@ -13,6 +13,7 @@ import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
+import { projectRequestRouter } from './modules/projects/project-request.routes';
 import type { Mailer } from './services/mailer';
 import { serveWebApp } from './web/serve-web-app';
 
@@ -57,6 +58,16 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   v1.use('/auth', accounts.auth);
   v1.use('/me', accounts.me);
   v1.use('/admin', accounts.admin);
+  v1.use(
+    '/project-requests',
+    projectRequestRouter({
+      sessions: accounts.sessions,
+      mailer,
+      notifyEmail: env.ADMIN_NOTIFY_EMAIL ?? siteContact.email,
+      appOrigin: env.APP_ORIGIN,
+      rateLimitMax: env.PROJECT_REQUEST_RATE_LIMIT_MAX,
+    }),
+  );
   v1.use(catalogueRouter());
   v1.use(
     contactRouter({

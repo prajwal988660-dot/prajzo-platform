@@ -18,6 +18,7 @@ export function currentUser(locals: Record<string, unknown>): UserDocument {
  */
 export function createGuards(sessions: Sessions): {
   requireUser: RequestHandler;
+  requireCustomer: RequestHandler;
   requireAdmin: RequestHandler;
 } {
   async function signedInUser(req: Request): Promise<UserDocument> {
@@ -35,6 +36,16 @@ export function createGuards(sessions: Sessions): {
     next();
   };
 
+  /** For things only customers do, such as sending a project request. Admins are refused. */
+  const requireCustomer: RequestHandler = async (req, res, next) => {
+    const user = await signedInUser(req);
+    if (user.role !== 'customer') {
+      throw new AppError(403, 'FORBIDDEN', 'This is only available to customer accounts.');
+    }
+    res.locals.user = user;
+    next();
+  };
+
   const requireAdmin: RequestHandler = async (req, res, next) => {
     const user = await signedInUser(req);
     if (user.role !== 'admin') {
@@ -44,5 +55,5 @@ export function createGuards(sessions: Sessions): {
     next();
   };
 
-  return { requireUser, requireAdmin };
+  return { requireUser, requireCustomer, requireAdmin };
 }
