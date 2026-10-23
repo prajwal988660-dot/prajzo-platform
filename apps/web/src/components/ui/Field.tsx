@@ -1,5 +1,5 @@
-import { CircleAlert } from 'lucide-react';
-import { useId, type ComponentProps, type ReactNode } from 'react';
+import { CircleAlert, Eye, EyeOff } from 'lucide-react';
+import { useId, useState, type ComponentProps, type ReactNode } from 'react';
 import { cx } from '../../lib/cx';
 
 type FieldBaseProps = {
@@ -87,7 +87,11 @@ function FieldLabel({
   );
 }
 
-export type TextFieldProps = FieldBaseProps & Omit<ComponentProps<'input'>, 'id'>;
+export type TextFieldProps = FieldBaseProps &
+  Omit<ComponentProps<'input'>, 'id'> & {
+    /** A control shown inside the right edge of the field (for example "show password"). */
+    suffix?: ReactNode;
+  };
 
 export function TextField({
   id,
@@ -96,6 +100,7 @@ export function TextField({
   error,
   required,
   className,
+  suffix,
   ...props
 }: TextFieldProps) {
   const { fieldId, hintId, errorId, describedBy } = useFieldIds(id, hint, error);
@@ -104,16 +109,49 @@ export function TextField({
       <FieldLabel htmlFor={fieldId} required={required}>
         {label}
       </FieldLabel>
-      <input
-        id={fieldId}
-        aria-required={required || undefined}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy}
-        className={controlClasses(Boolean(error))}
-        {...props}
-      />
+      <div className="relative">
+        <input
+          id={fieldId}
+          aria-required={required || undefined}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          className={cx(controlClasses(Boolean(error)), suffix ? 'pr-12' : null)}
+          {...props}
+        />
+        {suffix && <div className="absolute inset-y-0 right-1.5 flex items-center">{suffix}</div>}
+      </div>
       <FieldMessages hint={hint} hintId={hintId} error={error} errorId={errorId} />
     </div>
+  );
+}
+
+export type PasswordFieldProps = Omit<TextFieldProps, 'type' | 'suffix'>;
+
+/** A password field with a button to show or hide what is typed (helpful on phones). */
+export function PasswordField(props: PasswordFieldProps) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <TextField
+      {...props}
+      type={visible ? 'text' : 'password'}
+      autoCapitalize="none"
+      spellCheck={false}
+      suffix={
+        <button
+          type="button"
+          aria-pressed={visible}
+          onClick={() => setVisible((shown) => !shown)}
+          className="grid size-9 place-items-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-brand-blue"
+        >
+          {visible ? (
+            <EyeOff aria-hidden="true" className="size-5" />
+          ) : (
+            <Eye aria-hidden="true" className="size-5" />
+          )}
+          <span className="sr-only">{visible ? 'Hide password' : 'Show password'}</span>
+        </button>
+      }
+    />
   );
 }
 

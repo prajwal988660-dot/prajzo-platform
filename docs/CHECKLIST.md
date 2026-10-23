@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 18 October 2026 (end of Phase 2)
+Last updated: 23 October 2026 (end of Phase 3)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -107,22 +107,34 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 ## Phase 3: Accounts and access control
 
-- [ ] User model with `customer` and `admin` roles; passwords hashed with argon2id
-- [ ] Register, log in, log out, "who am I"; sessions stored in MongoDB with an httpOnly cookie
-- [ ] Password reset by email (printed to the console in development); change password; profile
-- [ ] Server guards for signed-in users, admins and record ownership; matching page guards in the app
-- [ ] Rate limits on login, registration and password reset
-- [ ] `npm run admin:create` setup script; no public admin registration
-- [ ] Pages: Customer Registration, Customer Login, Admin Login
-- [ ] Shells for the customer and admin dashboards, with honest empty states
-- [ ] Tests:
-  - [ ] Duplicate email and wrong password
-  - [ ] Rate limits
-  - [ ] Expired session and logout
-  - [ ] A customer calling admin APIs is refused
-  - [ ] The admin setup script
-  - [ ] End to end: register → log in → dashboard → log out
-- [ ] **(gate)** Approval for Phase 4
+- [x] Accounts:
+  - [x] user model with `customer` and `admin` roles; passwords stored only as argon2id hashes (64 MiB, 3 passes, 4 lanes)
+  - [x] password rules: 10–128 characters, at least 5 different characters, not one of a list of very common passwords; administrators need 12 or more. There are no "must contain a capital, number and symbol" rules
+  - [x] register (consent to Terms and Privacy recorded), sign in, sign out, "who am I"
+  - [x] profile (name, phone), change password (needs the current one; signs out other devices)
+  - [x] forgot and reset password: emailed link, single-use, expires in 1 hour, only a hash of it is stored, all devices signed out after a reset (the email is printed in the API log until real email sending is set up)
+- [x] Sessions stored in MongoDB; cookie `prajzo.sid` is HttpOnly, SameSite=Lax, Secure in production; a new session ID at every sign-in; 14 days for customers, 8 hours for administrators
+- [x] Server-side protection:
+  - [x] every private route checks the person on the server, fresh from the database each time, so disabling an account or changing a role takes effect at once
+  - [x] a customer asking for admin data gets 403; a visitor gets 401 (while the database is unreachable, every private request instead gets an instant 503 "temporarily unavailable")
+  - [x] requests that change data must come from this website (blocks forged requests from other sites)
+  - [x] rate limits on sign-in (per connection and per email address), sign-up and password reset
+  - [x] "wrong password" and "unknown email" give the identical answer and take similar time
+- [x] Administrators:
+  - [x] sign in on their own page (`/admin/login`) with their own endpoint; customers and administrators cannot use each other's sign-in
+  - [x] no web sign-up for administrators; `npm run admin:create` asks in your own terminal, hides the password, and also resets a forgotten administrator password
+- [x] Pages: Customer Registration, Customer Login, Forgot and Reset Password, Admin Login, Customer Dashboard (details, password, honest empty lists), Admin Dashboard (real counts)
+- [x] Page guards in the website (convenience only; the server is what protects): signed-out visitors go to sign-in and come back; customers are turned away from admin pages; admins are sent to their area; unsafe "next" addresses are ignored
+- [x] Header shows Sign in, or My account and Sign out; sign-out failures are reported instead of pretending
+- [x] While the database is unreachable, visitors who aren't signed in browse normally; sign-in routes answer at once with "temporarily unavailable"
+- [x] Tests (all run):
+  - [x] server: duplicate email, wrong password, unknown email, disabled account, session ID changes, cookie flags, expired session, sign-out, profile, password change, password reset (single use, expiry, hashed), rate limits, forged requests, admin access rules, admin setup flow
+  - [x] website: forms, error messages, redirects, guards, sign-out, header, account and admin pages
+  - [x] browser: register → sign out → sign in; reload; wrong password; return to the page you wanted; duplicate email; change name; change password; full password-reset by email link; admin sign-in and sign-out; customer turned away from admin; HttpOnly cookie; forged request refused
+  - [x] accessibility (axe) on 14 pages you can open without signing in (including the administrator sign-in and the not-found page), the signed-in pages, and pages showing error messages
+- [x] 269 automated tests pass locally; browser tests passed 90 of 90 once after the last change (two repeat runs were cut short by low computer memory)
+- [ ] **Your action:** create your administrator account: `npm run admin:create -w @prajzo/api` in a terminal ([SETUP.md](SETUP.md), section 3)
+- [ ] **(gate)** Approval for Phase 4: merge the `phase-3-accounts` pull request, and confirm the order of Phases 4–11
 
 ## Phase 4: Template engine + Demo 1 (Portfolio, `/demo/portfolio`)
 

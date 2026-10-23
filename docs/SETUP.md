@@ -64,20 +64,43 @@ Run these from the repository root (`C:\dev\mine\prajzo`).
 | `npm run format` | Formats the code with Prettier |
 | `npm run build` | Production build: `apps/web/dist` and `apps/api/dist/server.js` |
 | `npm start` | Runs the production build. Needs production settings in the environment (`NODE_ENV=production` and the rest); see [ENVIRONMENT.md](ENVIRONMENT.md) |
-| `npm run host:local` | Builds Prajzo and runs it in the background like a real server (see section 3). Run it again after code changes |
+| `npm run host:local` | Builds Prajzo and runs it in the background like a real server (see section 4). Run it again after code changes |
 | `npm run host:stop` | Stops the local host |
 | `npm run test:e2e` | End-to-end tests in Chrome, desktop and phone sizes. Starts its own API with a throw-away database, so your Atlas data is never touched. Takes about 2 minutes |
 | `SCREENSHOTS=1 npm run test:e2e -- screenshots --project desktop` | Saves full-page screenshots of every page at 390, 768 and 1280 px in `test-results/screens/` |
+| `npm run admin:create -w @prajzo/api` | Creates your administrator account, or sets a new password for one (see section 3) |
 | `npm run seed -w @prajzo/api` | Rewrites the default categories and packages (prices) in your database from `catalogue.defaults.ts`. An empty database gets them automatically when the API starts |
 
 Planned commands, added in the phase that needs them:
 
 | Command | Phase |
 |---|---|
-| `npm run admin:create -w @prajzo/api` (create an admin account) | 3 |
 | `npm run capture:previews` (template preview images) | 4 |
 
-## 3. Run Prajzo locally like a real server
+## 3. Create your administrator account (once)
+
+Administrators can't be created on the website; there is no sign-up page for them, on purpose. You create yours in your own terminal:
+
+1. Open a terminal in `C:\dev\mine\prajzo` (in Cursor or VS Code: **Terminal → New Terminal**).
+2. Make sure your database connection works (the API connected earlier, and your internet address is allowed in Atlas).
+3. Run:
+
+   ```
+   npm run admin:create -w @prajzo/api
+   ```
+
+4. Answer the questions:
+   - **Administrator email address:** the one you'll sign in with (it must not be a customer account's email).
+   - **Name:** how you'd like to be addressed.
+   - **New password (at least 12 characters):** you won't see anything as you type. That's normal; it is hiding the password. A few random words work well.
+   - **Type the password again.**
+5. It says `Administrator … has been created`. Sign in at **http://localhost:8080/admin/login** (or http://localhost:5173/admin/login while `npm run dev` runs).
+
+**Forgot the administrator password?** Run the same command with the same email. It asks whether to set a new password. (There is deliberately no emailed reset link for administrators.)
+
+Never type this password into a chat or a file. The command must run in a real terminal window, not through another program.
+
+## 4. Run Prajzo locally like a real server
 
 `npm run dev` is for working on the code. To see Prajzo the way visitors will, as one optimized site served from one address, host it locally:
 
@@ -96,7 +119,7 @@ npm run host:local
 - **On shared or public Wi-Fi**, other devices on that network can open the site while it runs. Run `npm run host:stop` when you're done.
 - It uses the same database as `npm run dev`: your Atlas database from `apps/api/.env`.
 
-## 4. Troubleshooting
+## 5. Troubleshooting
 
 | You see | What to do |
 |---|---|
@@ -105,11 +128,13 @@ npm run host:local
 | `Atlas rejected the username or password` | The string still contains `<db_username>` or `<db_password>`, or the password is wrong. Check the user under Security → Database Access; you can set a new password there (Edit → Edit Password) |
 | The site says the database is disconnected, or the log says `Atlas did not answer` or `SSL alert number 80` | **Your internet address changed**, and Atlas only lets in addresses it knows. Under Atlas → Network Access, add your current address (**Add IP Address → Add Current IP Address**). You can pick a **temporary** entry that deletes itself after a day or a week. While it is disconnected, the pages still open, but the lists of services and the contact form answer at once with "temporarily unavailable. Please try again in a minute" (the contact form keeps what was typed). The site reconnects by itself within about a minute of the fix; nothing needs restarting. A phone hotspot changes address often, so this will repeat |
 | `Database connection failed; retrying in 10s` | The same causes: check Network Access first, then that the password in the string is right. The API keeps retrying, so it reconnects as soon as the setting is fixed |
+| "Too many attempts. Please wait a few minutes" when signing in | The sign-in limit (10 failed tries per 15 minutes per connection or email address) was reached. Wait 15 minutes. This protects accounts from password guessing |
+| `This command asks you questions … run it yourself in a terminal window` | `admin:create` must run in a real terminal so it can hide the password. Run it from a terminal window, not through another tool |
 | `Port 8080 is already used by another program` | Something else is using port 8080. Close it, or set `LOCAL_HOST_PORT` to a different number |
 | `Port 5173 is already in use` or `Could not start the API on port 4000` | Another copy is already running. Close it, or find it with `Get-NetTCPConnection -LocalPort 5173` |
 | The `/dev/ui` page says **API not reachable** | `npm run dev` isn't running, or the API stopped; its message in the terminal says why |
 
-## 5. The legacy static site
+## 6. The legacy static site
 
 Not part of the platform, and kept unchanged. To view it:
 

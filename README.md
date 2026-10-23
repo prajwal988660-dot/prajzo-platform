@@ -4,14 +4,15 @@ Prajzo is a web development studio and website customization platform. Customers
 
 Private repository: https://github.com/prajwal988660-dot/prajzo-platform
 
-## Status (18 October 2026)
+## Status (23 October 2026)
 
 | Phase | State |
 |---|---|
 | 0: Discovery and plan | Done and approved |
 | 1: Foundation | Done and approved (merged 18 October 2026) |
-| 2: Public website and service catalogue | **Done. Waiting for your approval** (pull request `phase-2-public-site`) |
-| 3: Accounts and access control | Next, after your approval |
+| 2: Public website and service catalogue | Done (pull request #2, open for your approval) |
+| 3: Accounts and access control | **Done. Waiting for your approval** (pull request `phase-3-accounts`) |
+| 4 onwards | Order to be confirmed with you: see the roadmap |
 
 Plan and progress: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/CHECKLIST.md](docs/CHECKLIST.md)
 
@@ -31,6 +32,8 @@ npm run dev
 | http://localhost:4000/api/health/ready | API readiness, including the database |
 
 To see Prajzo the way visitors will, hosted on your own computer as one optimized site, run `npm run host:local` and open http://localhost:8080 (stop it with `npm run host:stop`). Details are in [docs/SETUP.md](docs/SETUP.md).
+
+Create your own administrator account once (it asks for the details and hides the password): `npm run admin:create -w @prajzo/api`. See [docs/SETUP.md](docs/SETUP.md), section 3.
 
 Before every commit, and at the end of every phase:
 

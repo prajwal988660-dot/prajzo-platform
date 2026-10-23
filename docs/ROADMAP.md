@@ -1,6 +1,6 @@
 # Prajzo roadmap
 
-Last updated: 18 October 2026 (end of Phase 2)
+Last updated: 23 October 2026 (end of Phase 3)
 
 This document covers the order in which Prajzo gets built, what each phase delivers, and how we'll know each phase is done. Every phase ends with a short summary and a pause for your approval before the next one starts.
 
@@ -36,7 +36,7 @@ Estimates are in 4-hour working sessions. They're rough and will be recalibrated
 | 0 | Discovery and plan | Read this plan | 1 (done) | Your approval |
 | 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, approved 18 Oct) | Approval |
 | 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 1 (done, awaiting approval) | Approval |
-| 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 3–4 | Approval |
+| 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 1 (done, awaiting approval) | Approval |
 | 4 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
 | 5 | Website builder (core) | Click "Customize This Design", edit the portfolio, preview desktop/tablet/mobile, save it | 7–9 | Approval |
 | 6 | Demo 2: Business | Open `/demo/business` and customize it | 3–4 | **Demo approval** |
@@ -374,6 +374,21 @@ This phase needs your accounts, plus your approval for anything paid.
 | Contact details | contact@prajzo.com; +91 98866 07720 for phone and WhatsApp; Instagram @prajzoo |
 | Prices | "Low range": starting from ₹2,999, ₹7,999 and ₹19,999 (D-026) |
 | Hosting and domain | Hostinger, domain prajzo.com. Which Hostinger plan you have is still open (see below) |
+| Approval of Phase 2 | "Continue the project building", on 23 October. Pull request #2 (including local hosting) is still open on GitHub for you to merge |
+
+### Needed now: the order of what comes next (asked at the Phase 3 gate)
+
+You said "main website first, then the demos" (D-025). Phases 1–3 are done, so here are the two ways to continue. Both build the same things; only the order differs.
+
+**Option A (recommended): finish and launch the main website first.** It matches what you asked for, and Prajzo can start taking real enquiries and projects sooner.
+
+1. **Project requests and customer dashboard:** a "Start a Project" form for signed-in customers, reference numbers, "My Projects" with the status and a timeline (this is the old Phase 10, without the design-submission part).
+2. **Admin dashboard:** read and answer contact messages, review project requests, send quotes, set delivery dates, change statuses, manage prices (the old Phase 11).
+3. **Hardening:** security, accessibility, speed and search-engine review (Phase 12).
+4. **Go live on Hostinger** (Phase 13). From here the main website is online.
+5. **Then the template engine, the five demos and the website builder**, one demo at a time with your approval after each, and finally "submit your design as a project".
+
+**Option B: the original order.** Template engine and Portfolio demo, then the builder, the other four demos, then project requests, admin, hardening and going live. The website goes online last.
 
 ### Needed later
 

@@ -6,7 +6,9 @@ import { pinoHttp } from 'pino-http';
 import type { Env } from './config/env';
 import type { Logger } from './lib/logger';
 import { apiNotFound, errorHandler } from './middleware/error-handler';
+import { originCheck } from './middleware/origin-check';
 import { securityHeaders } from './middleware/security-headers';
+import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
@@ -42,6 +44,12 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   app.use(express.json({ limit: '100kb' }));
 
   const v1 = Router();
+  // Requests that change data must come from this website, not from another one.
+  v1.use(originCheck(env.APP_ORIGIN));
+  const accounts = createAuthRouters({ env, logger, mailer });
+  v1.use('/auth', accounts.auth);
+  v1.use('/me', accounts.me);
+  v1.use('/admin', accounts.admin);
   v1.use(catalogueRouter());
   v1.use(
     contactRouter({

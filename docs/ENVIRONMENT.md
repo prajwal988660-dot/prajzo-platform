@@ -22,6 +22,9 @@ Secrets and settings live in environment variables, never in code.
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
 | `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+| `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
+| `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
+| `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
 | `DNS_SERVERS` | `1.1.1.1,8.8.8.8` | No | DNS servers for looking up `mongodb+srv://` addresses. Only needed when the API log shows `querySrv ECONNREFUSED` (a known Node.js-on-Windows problem; set on this PC) |
 
@@ -42,7 +45,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where contact-form notifications go. In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
 | Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
-| 3 | `SESSION_TTL_HOURS`, `ADMIN_SESSION_TTL_HOURS` | Session lifetimes (sensible defaults built in) |
 | 4 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
 | 5 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development |
 | 13 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Real email through your provider |
@@ -62,5 +64,5 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ## Things that are not environment variables
 
-- **Admin credentials.** Admins are created with `npm run admin:create`, which asks interactively. No admin email or password is ever stored in a file.
+- **Admin credentials.** Admins are created with `npm run admin:create -w @prajzo/api`, which asks interactively and hides the password as you type. No admin email or password is ever stored in a file. The same command resets a forgotten administrator password.
 - **Test settings.** Tests start their own in-memory MongoDB and use built-in test values. `npm install` downloads the MongoDB binary they use (about 75 MB, cached in `node_modules/.cache`), which needs internet once.

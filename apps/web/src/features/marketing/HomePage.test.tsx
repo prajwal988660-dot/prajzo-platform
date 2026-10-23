@@ -94,6 +94,8 @@ describe('Home page', () => {
       '/contact',
       '/privacy',
       '/terms',
+      '/login',
+      '/register',
     ];
     for (const href of internalLinks) {
       expect(knownPages, `link to ${href}`).toContain(href.split('?')[0]);

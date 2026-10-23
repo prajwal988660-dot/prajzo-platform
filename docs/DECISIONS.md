@@ -246,4 +246,53 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - `SERVE_WEB_APP=true` (set by that command) makes the API serve the built website outside production. Production behaves as before.
 - **Safety:** the saved process number is trusted only if that process is really the one listening on the port. After a restart of the computer an old number may belong to another program, and `host:stop` must never end that program.
 - **Why on the same address:** the same setup is what Hostinger will run, so problems with the built site, cookies and routing show up here first.
-- **Known limit:** your Atlas database only accepts internet addresses it knows. A phone hotspot changes address often, so the site will sometimes show "database disconnected" until the new address is added. The log says so. See [SETUP.md](SETUP.md), section 4.
+- **Known limit:** your Atlas database only accepts internet addresses it knows. A phone hotspot changes address often, so the site will sometimes show "database disconnected" until the new address is added. The log says so. See [SETUP.md](SETUP.md), section 5.
+
+---
+
+## Phase 3 decisions (23 October 2026)
+
+### D-031: Sessions, and separate sign-in for administrators
+
+- **Decision:**
+  - Sign-ins are server-side sessions stored in MongoDB. The browser holds only a random session ID in the cookie `prajzo.sid`: HttpOnly (page scripts can't read it), SameSite=Lax (not sent along with requests started by other sites), and Secure (https only) in production.
+  - A **new session ID is issued at every sign-in**, so an old or planted ID can't be reused.
+  - Sessions last 14 days since the last visit for customers and **8 hours** for administrators (`SESSION_TTL_DAYS`, `ADMIN_SESSION_TTL_HOURS`).
+  - Administrators sign in only through `/admin/login` (their own endpoint), and customers only through `/login`. Each is refused on the other's route, with the same message as a wrong password.
+  - Visitors who aren't signed in get no session and cause no database work.
+- **Why:** a session can be ended on the spot (sign-out, password change, a disabled account), and splitting the two kinds of account removes a whole class of "customer becomes admin" mistakes.
+- **Considered:** tokens kept in the browser's storage, which any injected script could read.
+
+### D-032: Passwords
+
+- **Decision:**
+  - Passwords are stored only as **argon2id** hashes (64 MiB memory, 3 passes, 4 lanes).
+  - Customers choose 10–128 characters, with at least 5 different ones (so "aaaaaaaaaa" is refused), and not one of a short list of very common passwords. There are deliberately no "must contain a capital, a number and a symbol" rules. Administrators need 12 or more.
+  - Spaces are allowed, and passwords are never trimmed.
+  - Signing in doesn't re-apply these rules, so older passwords still work.
+  - Unknown emails take the same time as wrong passwords (a decoy hash is checked).
+  - **Tests use cheaper hashing**, switched on explicitly by test code only. The real server never calls that switch, and a test proves the real settings stay strong.
+- **Why:** this follows current guidance (length matters more than complexity rules), and hashing that is expensive on purpose slows down anyone who steals the database. Tests that hash hundreds of passwords in parallel made the browser tests time out.
+
+### D-033: Protection against guessing and forged requests
+
+- **Decision:**
+  - **Rate limits** (default 10 per 15 minutes, `AUTH_RATE_LIMIT_MAX`): failed sign-ins are counted per connection and also per email address, so changing connection doesn't help a guesser. Successful sign-ins aren't counted. Sign-up and password-reset requests are limited too.
+  - Requests that change data must carry an `Origin` header naming this website (the address it was reached on, or the public address). Requests with no Origin (tools like curl) can't ride on anyone's cookies, so they pass.
+  - The "database unreachable" check runs before the limiters, so failed attempts during an outage never use up a visitor's allowance.
+- **Why:** it stops password guessing and cross-site request forgery without extra tokens in every form.
+
+### D-034: Recovering a forgotten password
+
+- **Decision:**
+  - **Customers:** an emailed link with a random token. Only its SHA-256 hash is stored. It works once, expires after 1 hour, and a newer link cancels older ones. Using it signs the person out everywhere. The page says the same thing whether or not the email has an account.
+  - **Administrators:** no emailed link (their email would become the key to the admin area). A forgotten admin password is reset by running `npm run admin:create` again with the same email.
+  - Emails are printed in the API log until real email sending is set up.
+- **Why:** this is the usual safe flow for customers, and it keeps the admin area out of reach of anyone who only controls an email inbox.
+
+### D-035: Browser tests and the database library
+
+- **Decision:**
+  - The browser tests run against a throw-away server with a test administrator whose password is invented fresh for every run, never written to a file, and a test-only route to read the "emails" it sent.
+  - One copy of the MongoDB driver is installed for the whole project (`overrides` in `package.json`), because the session library and Mongoose each brought their own and their types disagreed.
+- **Why:** end-to-end tests can follow a real password-reset link without any real email, and a single driver version avoids subtle differences between copies.
