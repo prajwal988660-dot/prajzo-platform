@@ -139,16 +139,16 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
 ## Add-on: protecting the website's code (requested 23 October 2026, [D-037](DECISIONS.md))
 
-- [ ] Staging password: when `STAGING_PASSWORD` is set, every page, file and API request asks for a username and password; only `/api/health` stays open; search engines are told not to index; nothing is stored by shared caches; wrong guesses are rate-limited; the setting is validated at startup
-- [ ] The production build is minified and bundled with content-hashed files, with no source maps and no development-only code; every build checks this and fails if it isn't true
-- [ ] Right-click and image dragging are blocked on the website and the demos, but never in form fields; text can still be selected and copied; one switch (`VITE_PROTECT_CONTENT`)
-- [ ] Terms: previews, drafts and demos stay Prajzo's until a project is fully paid
-- [ ] Tests:
-  - [ ] Staging password: refused without it (pages, CSS, scripts, API), accepted with it, health check open, wrong guesses limited, not cached, not indexed
-  - [ ] Build check: catches a source map, development code and unminified files
-  - [ ] Right-click blocked on content and allowed in form fields (unit tests and a real browser)
-  - [ ] Checked by hand on the real production build
-- [ ] The limits are written down: a visitor can still view the source, use developer tools and save files
+- [x] Staging password: when `STAGING_PASSWORD` is set, every page, file and API request asks for a username and password; only `/api/health` stays open; search engines are told not to index; nothing is stored by shared caches; wrong guesses are rate-limited (20 per 15 minutes per connection); the setting is validated at startup
+- [x] The production build is minified and bundled with content-hashed files, with no source maps and no development-only code; every build checks this and fails if it isn't true
+- [x] Right-click and image dragging are blocked on the website and the demos, but never in form fields; text can still be selected and copied; one switch (`VITE_PROTECT_CONTENT`)
+- [x] Terms: previews, drafts and demos stay Prajzo's until a project is fully paid (draft wording; needs the lawyer's review with the rest of the Terms)
+- [x] Tests (all run):
+  - [x] Staging password, 15 tests: refused without it (pages, CSS, scripts, images, every API route, changes to data), accepted with it, passwords with colons, health check open, wrong guesses limited, not cached, not indexed, off when not set, settings validated
+  - [x] Build check, 11 tests: catches a source map, a pointer to one, development code, the development gallery, unminified files and missing content hashes; and it was seen failing on a planted problem in the real build
+  - [x] Right-click: 8 unit tests, plus 5 real-browser checks on desktop and phone (blocked on content, allowed in form fields, images can't be dragged, text selectable with the mouse)
+  - [x] Checked by hand on the real production build behind a password (23 October): the browser without the password can't load the page; with it, right-click is cancelled on content and allowed in fields; no source maps referenced or served; the server log never contained the password
+- [x] The limits are written down: a visitor can still view the source, use developer tools and save files ([D-037](DECISIONS.md), [SETUP.md](SETUP.md) section 6)
 - [ ] **(gate)** Your approval (merging the pull request)
 
 ## Phase 4: Project requests and customer dashboard

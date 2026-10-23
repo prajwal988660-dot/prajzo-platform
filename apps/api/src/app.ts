@@ -8,6 +8,7 @@ import type { Logger } from './lib/logger';
 import { apiNotFound, errorHandler } from './middleware/error-handler';
 import { originCheck } from './middleware/origin-check';
 import { securityHeaders } from './middleware/security-headers';
+import { createStagingGate } from './middleware/staging-gate';
 import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { contactRouter } from './modules/contact/contact.routes';
@@ -41,6 +42,12 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
       autoLogging: { ignore: (req) => req.url?.startsWith('/api/health') ?? false },
     }),
   );
+  // Staging only (D-037): ask for a password before serving anything at all.
+  if (env.STAGING_PASSWORD) {
+    logger.warn('Staging password is ON: every page, file and API request asks for a password');
+    app.use(createStagingGate({ user: env.STAGING_USER, password: env.STAGING_PASSWORD }));
+  }
+
   app.use(express.json({ limit: '100kb' }));
 
   const v1 = Router();

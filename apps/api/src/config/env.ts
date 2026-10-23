@@ -59,6 +59,20 @@ const envSchema = z
           .min(1),
       )
       .optional(),
+    // Staging protection (D-037): when STAGING_PASSWORD is set, the whole site asks for this user
+    // name and password. Set it on a staging site only; leave it unset on the live site.
+    STAGING_USER: z
+      .string()
+      .regex(
+        /^[A-Za-z0-9._-]{1,32}$/,
+        'may only contain letters, digits, dots, dashes and underscores (up to 32 characters)',
+      )
+      .default('preview'),
+    STAGING_PASSWORD: z
+      .string()
+      .min(12, 'must be at least 12 characters')
+      .max(200, 'must be at most 200 characters')
+      .optional(),
     // Where contact-form notifications go. Defaults to the public contact email.
     ADMIN_NOTIFY_EMAIL: z.email('must be an email address').optional(),
     // Contact-form messages allowed per connection every 15 minutes (spam protection).
