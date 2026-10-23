@@ -55,7 +55,7 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   app.use('/api/v1', v1);
   app.use('/api', apiNotFound);
 
-  if (env.NODE_ENV === 'production') {
+  if (env.SERVE_WEB_APP ?? env.NODE_ENV === 'production') {
     serveWebApp(app, env.WEB_DIST_DIR ?? path.resolve(process.cwd(), '../web/dist'), logger);
   }
 

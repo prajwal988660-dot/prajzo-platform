@@ -63,6 +63,46 @@ export async function disconnectDatabase(): Promise<void> {
   await mongoose.disconnect();
 }
 
+/**
+ * Logs when an established database connection drops and when it comes back, so the log
+ * explains why the site reports "database disconnected". The driver keeps retrying on its own;
+ * nothing needs restarting once the cause (usually a changed IP address in Atlas) is fixed.
+ * Returns a function that stops the logging (used when the API shuts down on purpose).
+ */
+export function watchConnection(logger: Logger): () => void {
+  const { connection } = mongoose;
+  // Failures before the first successful connection are already reported by connectWithRetry.
+  let everConnected = false;
+  const onConnected = () => {
+    everConnected = true;
+  };
+  const onDisconnected = () => {
+    if (everConnected) {
+      logger.warn(
+        'Database connection lost; retrying automatically. If your internet address changed, ' +
+          'add the new one under Atlas → Network Access.',
+      );
+    }
+  };
+  const onReconnected = () => logger.info('Database connection restored');
+  const onError = (error: unknown) => {
+    if (everConnected) {
+      logger.error({ reason: describeError(error) }, `Database error. ${connectionHint(error)}`);
+    }
+  };
+
+  connection.on('connected', onConnected);
+  connection.on('disconnected', onDisconnected);
+  connection.on('reconnected', onReconnected);
+  connection.on('error', onError);
+  return () => {
+    connection.off('connected', onConnected);
+    connection.off('disconnected', onDisconnected);
+    connection.off('reconnected', onReconnected);
+    connection.off('error', onError);
+  };
+}
+
 /** A plain-language next step for the most common MongoDB Atlas connection problems. */
 export function connectionHint(error: unknown): string {
   const text = describeError(error);
@@ -78,7 +118,9 @@ export function connectionHint(error: unknown): string {
       'Atlas → Database Access, and the password inside the connection string.'
     );
   }
-  if (/whitelist|ip address|server selection|timed out|ETIMEDOUT/i.test(text)) {
+  if (
+    /whitelist|ip address|server selection|timed out|ETIMEDOUT|tlsv1 alert|ssl alert/i.test(text)
+  ) {
     return (
       'Atlas did not answer. Under Atlas → Network Access, add your current IP address ' +
       '(it can change when your internet connection restarts).'

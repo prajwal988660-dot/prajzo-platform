@@ -35,6 +35,9 @@ const envSchema = z
       .min(32, 'must be at least 32 characters'),
     LOG_LEVEL: z.enum(logLevels).default('info'),
     TRUST_PROXY: z.stringbool().default(false),
+    // Serve the built web app from the API (one address for everything). Always on in
+    // production; local hosting (npm run host:local) turns it on in development too.
+    SERVE_WEB_APP: z.stringbool().optional(),
     WEB_DIST_DIR: z.string().optional(),
     // Optional: DNS servers for looking up mongodb+srv:// addresses, e.g. "1.1.1.1,8.8.8.8".
     // Works around a known Node.js-on-Windows problem ("querySrv ECONNREFUSED").

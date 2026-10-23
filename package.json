@@ -14,6 +14,8 @@
     "dev": "concurrently --names api,web --prefix-colors blue,magenta \"npm run dev -w @prajzo/api\" \"npm run dev -w @prajzo/web\"",
     "build": "npm run build -w @prajzo/web && npm run build -w @prajzo/api",
     "start": "npm run start -w @prajzo/api",
+    "host:local": "npm run build && npm run host:local -w @prajzo/api -- --restart",
+    "host:stop": "npm run host:stop -w @prajzo/api",
     "typecheck": "tsc -p tsconfig.json && npm run typecheck --workspaces --if-present",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",

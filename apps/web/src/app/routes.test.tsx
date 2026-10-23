@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -28,7 +28,8 @@ describe('app routes', () => {
   ])('%s shows its page', async (path, heading, title) => {
     renderAt(path);
     expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    expect(document.title).toBe(title);
+    // The tab title is set a moment after the page appears.
+    await waitFor(() => expect(document.title).toBe(title));
   });
 
   it('shows the custom 404 page for unknown addresses', async () => {
@@ -36,7 +37,7 @@ describe('app routes', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Page not found' }),
     ).toBeInTheDocument();
-    expect(document.title).toBe('Page not found · Prajzo');
+    await waitFor(() => expect(document.title).toBe('Page not found · Prajzo'));
   });
 
   it('takes the visitor home from the 404 page', async () => {

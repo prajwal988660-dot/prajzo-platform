@@ -16,8 +16,9 @@ playwright-report/
 test-results/
 blob-report/
 
-# Local data and uploads
+# Local data, uploads and local-host logs
 apps/api/storage/
+apps/api/logs/
 .data/
 
 # Logs

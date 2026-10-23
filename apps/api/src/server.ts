@@ -2,7 +2,13 @@ import dns from 'node:dns';
 import { createServer } from 'node:http';
 import { createApp } from './app';
 import { ConfigError, loadEnv, type Env } from './config/env';
-import { connectWithRetry, describeError, disconnectDatabase, pingDatabase } from './db/connection';
+import {
+  connectWithRetry,
+  describeError,
+  disconnectDatabase,
+  pingDatabase,
+  watchConnection,
+} from './db/connection';
 import { createLogger } from './lib/logger';
 import { ensureCatalogueDefaults } from './modules/catalogue/catalogue.service';
 import { createConsoleMailer } from './services/mailer';
@@ -45,6 +51,8 @@ function main(): void {
     logger.info(`Using DNS servers ${env.DNS_SERVERS.join(', ')} for database address lookups`);
   }
 
+  const stopWatching = watchConnection(logger);
+
   void connectWithRetry(env.MONGODB_URI, logger, { signal: stopConnecting.signal })
     .then(async () => {
       if (stopConnecting.signal.aborted) return;
@@ -62,6 +70,7 @@ function main(): void {
     shuttingDown = true;
     logger.info({ signal }, 'Shutting down');
     stopConnecting.abort();
+    stopWatching(); // closing on purpose is not a "lost connection"
     server.close(() => {
       disconnectDatabase()
         .catch((error: unknown) => logger.error({ err: error }, 'Error while closing the database'))
