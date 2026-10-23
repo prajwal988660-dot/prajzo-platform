@@ -25,7 +25,7 @@ test('every main page can be reached from the navigation', async ({ page, isMobi
     ['Services', 'Websites and web apps for every need'],
     ['How It Works', 'A clear path from idea to launch'],
     ['Pricing', 'Affordable prices, agreed up front'],
-    ['Contact', 'Start a project'],
+    ['Contact', 'Talk to us'],
     ['Home', 'Your Idea. Your Design. Our Development.'],
   ] as const;
 
@@ -42,13 +42,20 @@ test('the services page lists all 15 kinds of website', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Custom Website Development' })).toBeVisible();
 });
 
-test('a package\'s "Get a quote" opens the contact form with that package chosen', async ({
+test('a package\'s "Get a quote" opens Start a Project, remembering the package', async ({
   page,
 }) => {
   await page.goto('/pricing');
   await page.getByRole('link', { name: 'Get a quote for Professional Website' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Start a project' })).toBeVisible();
-  await expect(page.getByRole('combobox', { name: 'Package' })).toHaveValue('professional-website');
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Tell us about your project' }),
+  ).toBeVisible();
+  await expect(page).toHaveURL('/start-project?package=professional-website');
+  // A visitor is asked to sign in first, and the package comes back with them afterwards.
+  await expect(page.getByRole('link', { name: 'Create a free account' })).toHaveAttribute(
+    'href',
+    '/register?next=%2Fstart-project%3Fpackage%3Dprofessional-website',
+  );
 });
 
 test('the footer links to the legal pages and contact details', async ({ page }) => {

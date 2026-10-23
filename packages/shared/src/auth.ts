@@ -148,5 +148,10 @@ export const adminOverviewSchema = z.object({
     total: z.number().int().nonnegative(),
     unread: z.number().int().nonnegative(),
   }),
+  projectRequests: z.object({
+    total: z.number().int().nonnegative(),
+    /** Requests nobody has started reviewing yet (status "Request Received"). */
+    received: z.number().int().nonnegative(),
+  }),
 });
 export type AdminOverview = z.infer<typeof adminOverviewSchema>;

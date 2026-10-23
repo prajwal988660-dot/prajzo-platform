@@ -54,6 +54,10 @@ describe('requireDatabase', () => {
       ['post', '/api/v1/auth/password/reset'],
       ['patch', '/api/v1/me'],
       ['get', '/api/v1/admin/overview'],
+      ['post', '/api/v1/project-requests'],
+      ['get', '/api/v1/project-requests'],
+      ['get', '/api/v1/project-requests/PRZ-2026-0001'],
+      ['post', '/api/v1/project-requests/PRZ-2026-0001/actions'],
     ] as const;
     for (let round = 0; round < 3; round += 1) {
       for (const [method, path] of paths) {

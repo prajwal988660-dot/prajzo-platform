@@ -92,6 +92,7 @@ describe('Home page', () => {
       '/pricing',
       '/about',
       '/contact',
+      '/start-project',
       '/privacy',
       '/terms',
       '/login',

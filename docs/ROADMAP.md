@@ -1,6 +1,6 @@
 # Prajzo roadmap
 
-Last updated: 23 October 2026 (build order chosen: Option A)
+Last updated: 23 October 2026 (end of Phase 4)
 
 This document covers the order in which Prajzo gets built, what each phase delivers, and how we'll know each phase is done. Every phase ends with a short summary and a pause for your approval before the next one starts.
 
@@ -39,7 +39,7 @@ Estimates are in 4-hour working sessions. They're rough: Phases 1–3 each took 
 | 1 | Foundation | Run the app shell and the API locally; run every check with one command | 1 (done, approved 18 Oct) | Approval |
 | 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 1 (done, awaiting approval) | Approval |
 | 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 1 (done, awaiting approval) | Approval |
-| 4 | Project requests and customer dashboard | Send a project from the Start a Project form, get a reference number, follow it in My Projects, cancel it while it's early | 4–5 | Approval |
+| 4 | Project requests and customer dashboard | Send a project from the Start a Project form, get a reference number, follow it in My Projects, cancel it while it's early | 1 (done, awaiting approval) | Approval |
 | 5 | Admin dashboard | Review requests, send quotes, set delivery dates, change statuses, read contact messages; customers accept quotes and ask for revisions | 5–6 | Approval |
 | 6 | Hardening and quality | Run the full test suite; security, accessibility, performance, SEO and code-protection passes done | 3–4 | Approval |
 | 7 | Deployment | **The main website live on your domain** (needs your hosting, email and domain accounts) | 2–3 | Approval |
@@ -51,7 +51,7 @@ Estimates are in 4-hour working sessions. They're rough: Phases 1–3 each took 
 | 13 | Demo 5: Forms and Quick Solutions | Open `/demo/forms`, submit each form, customize it | 2–3 | **Demo approval** |
 | 14 | Submit a design as a project | Customize a template, submit it, follow it in My Projects | 1 | Approval |
 
-Remaining: Phases 4–7 (main website online) about 14–18 sessions, Phases 8–14 (builder and demos) about 24–31. That is roughly 38–49 sessions, or 8–10 weeks at one session a day, five days a week, not counting time spent waiting for approvals.
+Remaining: Phases 5–7 (main website online) about 10–13 sessions, Phases 8–14 (builder and demos) about 24–31. That is roughly 34–44 sessions, or 8–10 weeks at one session a day, five days a week, not counting time spent waiting for approvals.
 
 **Not a numbered phase:** the protection of the website's code (D-037), added on request on 23 October 2026. See the checklist.
 

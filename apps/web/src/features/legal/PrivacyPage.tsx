@@ -5,7 +5,7 @@ import { LegalPage } from './LegalPage';
 export function PrivacyPage() {
   usePageTitle('Privacy Policy');
   return (
-    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="18 October 2026">
+    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="23 October 2026">
       <section>
         <h2>Who we are</h2>
         <p>
@@ -24,6 +24,16 @@ export function PrivacyPage() {
             the type of website or package you're interested in, and your message.
           </li>
           <li>
+            <strong>When you create an account:</strong> your name, email address, phone number
+            (optional) and a password. We store your password only in scrambled form, so we can't
+            read it. We also record when you agreed to our terms and when you last signed in.
+          </li>
+          <li>
+            <strong>When you send a project request:</strong> the details you give us, such as the
+            project's name and type, your description, the features you want, a preferred date, how
+            you'd like to be contacted and any notes, together with the status of your request.
+          </li>
+          <li>
             <strong>When you visit this website:</strong> basic technical information needed to run
             and protect it, such as your IP address and browser type in our server logs.
           </li>
@@ -35,6 +45,7 @@ export function PrivacyPage() {
         <h2>Why we use it</h2>
         <ul>
           <li>To reply to your enquiry and prepare a quote</li>
+          <li>To run your account and keep your projects together</li>
           <li>To plan, build and deliver your project if you become a client</li>
           <li>To keep this website secure and protect it from spam and misuse</li>
           <li>To meet our legal and accounting obligations</li>
@@ -60,9 +71,10 @@ export function PrivacyPage() {
       <section>
         <h2>How long we keep it</h2>
         <p>
-          We keep contact messages for up to 24 months after our last conversation, unless you
-          become a client. For clients, we keep project and billing records for as long as the law
-          requires. After that, we delete or anonymise your data.
+          We keep contact messages and project requests that don't go ahead for up to 24 months
+          after our last conversation. We keep your account until you ask us to delete it. For
+          clients, we keep project and billing records for as long as the law requires. After that,
+          we delete or anonymise your data.
         </p>
       </section>
 
@@ -94,9 +106,10 @@ export function PrivacyPage() {
       <section>
         <h2>Cookies</h2>
         <p>
-          We don't use advertising or tracking cookies. We may use cookies that are strictly
-          necessary for the website to work, for example to keep you signed in once accounts are
-          available.
+          We don't use advertising or tracking cookies. We use one cookie that is strictly necessary
+          for the website to work: it keeps you signed in after you create an account or sign in. It
+          can't be read by scripts on the page, and it is removed when you sign out or after a
+          period without visits.
         </p>
       </section>
 

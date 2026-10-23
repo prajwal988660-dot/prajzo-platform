@@ -6,10 +6,12 @@ import {
   type UserRole,
 } from '@prajzo/shared';
 import mongoose from 'mongoose';
+import { isDuplicateKeyError } from '../../db/errors';
 import { AppError } from '../../lib/errors';
 import type { Logger } from '../../lib/logger';
 import type { Mailer } from '../../services/mailer';
 import { ContactMessageModel } from '../contact/contact-message.model';
+import { ProjectRequestModel } from '../projects/project-request.model';
 import {
   createResetToken,
   hashPassword,
@@ -30,12 +32,6 @@ export function toPublicUser(user: UserDocument): PublicUser {
     phone: user.phone ?? null,
     role: user.role,
   };
-}
-
-function isDuplicateKeyError(error: unknown): boolean {
-  return (
-    typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 11000
-  );
 }
 
 const emailTaken = () =>
@@ -183,12 +179,18 @@ export async function completePasswordReset(token: string, newPassword: string):
 
 /** Real counts for the admin overview. */
 export async function adminOverview(): Promise<AdminOverview> {
-  const [customers, total, unread] = await Promise.all([
+  const [customers, total, unread, projectTotal, projectReceived] = await Promise.all([
     UserModel.countDocuments({ role: 'customer' }),
     ContactMessageModel.countDocuments({}),
     ContactMessageModel.countDocuments({ status: 'new' }),
+    ProjectRequestModel.countDocuments({}),
+    ProjectRequestModel.countDocuments({ status: 'received' }),
   ]);
-  return { customers, contactMessages: { total, unread } };
+  return {
+    customers,
+    contactMessages: { total, unread },
+    projectRequests: { total: projectTotal, received: projectReceived },
+  };
 }
 
 type AdminAccountInput = { name: string; email: string; password: string };

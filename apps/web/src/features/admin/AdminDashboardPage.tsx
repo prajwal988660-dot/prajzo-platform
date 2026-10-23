@@ -3,7 +3,6 @@ import { FolderKanban, Inbox, Users } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { Container } from '../../components/layout/Container';
 import { Card } from '../../components/ui/Card';
-import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
 import { useApi } from '../../lib/use-api';
 import { usePageTitle } from '../../lib/use-page-title';
@@ -11,7 +10,7 @@ import { useAuth } from '../auth/auth-context';
 
 /**
  * The administration overview. The numbers are real counts from the database. Reading and
- * answering messages, and managing projects, arrive in later phases; this page says so.
+ * answering messages, and reviewing projects, arrive in Phase 5; this page says so.
  */
 export function AdminDashboardPage() {
   usePageTitle('Administration');
@@ -29,30 +28,28 @@ export function AdminDashboardPage() {
           <LoadError message={overview.error.message} onRetry={overview.retry} />
         )}
         {overview.status === 'success' && (
-          <ul className="grid gap-5 sm:grid-cols-3">
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <Stat icon={Users} label="Customers" value={overview.data.customers} />
+            <Stat
+              icon={FolderKanban}
+              label="New project requests"
+              value={overview.data.projectRequests.received}
+            />
+            <Stat
+              icon={FolderKanban}
+              label="All project requests"
+              value={overview.data.projectRequests.total}
+            />
             <Stat icon={Inbox} label="New messages" value={overview.data.contactMessages.unread} />
             <Stat icon={Inbox} label="All messages" value={overview.data.contactMessages.total} />
           </ul>
         )}
       </div>
 
-      <section aria-labelledby="requests-heading" className="mt-12">
-        <h2 id="requests-heading" className="text-xl font-semibold tracking-tight">
-          Project requests
-        </h2>
-        <EmptyState
-          className="mt-4"
-          icon={FolderKanban}
-          title="No project requests yet"
-          description="Customers can't submit project requests from the website builder yet. They will appear here once they can."
-        />
-      </section>
-
       <p className="mt-10 max-w-2xl text-sm leading-relaxed text-slate-600">
-        Messages sent through the contact form are saved in the database. A screen for reading and
-        answering them is planned for a later phase; until then, view them in MongoDB Atlas under
-        Browse Collections → contactmessages.
+        Project requests and messages from the contact form are saved in the database. Screens for
+        reading and answering them are planned for the next phase; until then, view them in MongoDB
+        Atlas under Browse Collections → projectrequests and contactmessages.
       </p>
     </Container>
   );

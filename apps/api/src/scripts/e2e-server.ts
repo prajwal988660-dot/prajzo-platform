@@ -8,6 +8,7 @@
  */
 import { createServer } from 'node:http';
 import express from 'express';
+import mongoose from 'mongoose';
 import { pino } from 'pino';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createApp } from '../app';
@@ -16,7 +17,6 @@ import { connectDatabase, disconnectDatabase, pingDatabase } from '../db/connect
 import { createLogger } from '../lib/logger';
 import { createAdminUser } from '../modules/auth/auth.service';
 import { useCheapPasswordHashingForTests } from '../modules/auth/password';
-import { UserModel } from '../modules/auth/user.model';
 import { ensureCatalogueDefaults } from '../modules/catalogue/catalogue.service';
 import { createCaptureMailer } from '../services/mailer';
 
@@ -41,10 +41,12 @@ const env = parseEnv({
   SESSION_SECRET: 'e2e-session-secret-that-is-long-enough-0123456789',
   CONTACT_RATE_LIMIT_MAX: '100',
   AUTH_RATE_LIMIT_MAX: '100',
+  PROJECT_REQUEST_RATE_LIMIT_MAX: '100',
 });
 
 await connectDatabase(env.MONGODB_URI);
-await UserModel.init();
+// Build every index (such as "one reference number per project") before the first test runs.
+await Promise.all(mongoose.modelNames().map((name) => mongoose.model(name).init()));
 await ensureCatalogueDefaults();
 await createAdminUser({ name: 'E2E Admin', email: adminEmail, password: adminPassword });
 

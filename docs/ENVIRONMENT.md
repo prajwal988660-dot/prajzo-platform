@@ -23,6 +23,7 @@ Secrets and settings live in environment variables, never in code.
 | `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
 | `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
+| `PROJECT_REQUEST_RATE_LIMIT_MAX` | `10` | No | Project requests one customer may send per hour |
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |

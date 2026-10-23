@@ -22,7 +22,8 @@ describe('app routes', () => {
     ['/how-it-works', 'A clear path from idea to launch', 'How It Works · Prajzo'],
     ['/pricing', 'Affordable prices, agreed up front', 'Pricing and Plans · Prajzo'],
     ['/about', 'We build websites that work for you', 'About Us · Prajzo'],
-    ['/contact', 'Start a project', 'Contact Us · Prajzo'],
+    ['/contact', 'Talk to us', 'Contact Us · Prajzo'],
+    ['/start-project', 'Tell us about your project', 'Start a Project · Prajzo'],
     ['/privacy', 'Privacy Policy', 'Privacy Policy · Prajzo'],
     ['/terms', 'Terms and Conditions', 'Terms and Conditions · Prajzo'],
   ])('%s shows its page', async (path, heading, title) => {
@@ -57,7 +58,7 @@ describe('app routes', () => {
     ).toEqual(['Home', 'Services', 'How It Works', 'Pricing', 'Contact']);
     expect(within(header).getByRole('link', { name: 'Start a Project' })).toHaveAttribute(
       'href',
-      '/contact',
+      '/start-project',
     );
   });
 

@@ -50,6 +50,12 @@ const lazyPages: RouteObject[] = [
     lazy: async () => ({ Component: (await import('../features/legal/TermsPage')).TermsPage }),
   },
   {
+    path: 'start-project',
+    lazy: async () => ({
+      Component: (await import('../features/projects/StartProjectPage')).StartProjectPage,
+    }),
+  },
+  {
     path: 'reset-password',
     lazy: async () => ({
       Component: (await import('../features/auth/ResetPasswordPage')).ResetPasswordPage,
@@ -88,6 +94,18 @@ const customerPages: RouteObject = {
       path: 'account',
       lazy: async () => ({
         Component: (await import('../features/account/AccountPage')).AccountPage,
+      }),
+    },
+    {
+      path: 'account/projects',
+      lazy: async () => ({
+        Component: (await import('../features/projects/MyProjectsPage')).MyProjectsPage,
+      }),
+    },
+    {
+      path: 'account/projects/:reference',
+      lazy: async () => ({
+        Component: (await import('../features/projects/ProjectDetailPage')).ProjectDetailPage,
       }),
     },
   ],

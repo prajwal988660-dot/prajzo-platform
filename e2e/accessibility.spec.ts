@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { signInAsAdminQuietly, signUpQuietly, uniqueEmail } from './helpers';
+import { sendProjectQuietly, signInAsAdminQuietly, signUpQuietly, uniqueEmail } from './helpers';
 
 const publicPages = [
   '/',
@@ -9,6 +9,7 @@ const publicPages = [
   '/pricing',
   '/about',
   '/contact',
+  '/start-project',
   '/privacy',
   '/terms',
   '/login',
@@ -52,6 +53,38 @@ test.describe('signed-in pages', () => {
   }, testInfo) => {
     await signUpQuietly(page, uniqueEmail('axe', testInfo.project.name));
     await page.goto('/account');
+    await expectNoSeriousProblems(page);
+  });
+
+  test('the Start a Project form, empty and with its error messages showing', async ({
+    page,
+  }, testInfo) => {
+    await signUpQuietly(page, uniqueEmail('axe-form', testInfo.project.name));
+    await page.goto('/start-project');
+    await expect(page.getByLabel(/^Project name/)).toBeVisible();
+    await expectNoSeriousProblems(page);
+
+    await page.getByRole('button', { name: 'Send project request' }).click();
+    await expect(page.getByText('Choose the type of website you need')).toBeVisible();
+    await expectNoSeriousProblems(page);
+  });
+
+  test('My projects and a project page (with the cancel question open)', async ({
+    page,
+  }, testInfo) => {
+    await signUpQuietly(page, uniqueEmail('axe-projects', testInfo.project.name));
+    const reference = await sendProjectQuietly(page, { notes: 'A note', features: ['gallery'] });
+
+    await page.goto('/account/projects');
+    await expect(page.getByRole('link', { name: /Website for my studio/ })).toBeVisible();
+    await expectNoSeriousProblems(page);
+
+    await page.goto(`/account/projects/${reference}`);
+    await expect(page.getByRole('heading', { name: 'Timeline' })).toBeVisible();
+    await expectNoSeriousProblems(page);
+
+    await page.getByRole('button', { name: 'Cancel this project' }).click();
+    await expect(page.getByText('Are you sure you want to cancel this project?')).toBeVisible();
     await expectNoSeriousProblems(page);
   });
 
