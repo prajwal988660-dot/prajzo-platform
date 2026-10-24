@@ -1,4 +1,5 @@
 import {
+  formatRupees,
   paginationQuerySchema,
   projectActionRequestSchema,
   projectListSchema,
@@ -7,31 +8,33 @@ import {
 } from '@prajzo/shared';
 import { Router, type Request } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { describeError } from '../../db/connection';
 import { AppError } from '../../lib/errors';
 import { noStore } from '../../middleware/no-store';
 import { requireDatabase } from '../../middleware/require-database';
-import type { Mailer } from '../../services/mailer';
 import { createGuards, currentUser } from '../auth/guards';
 import type { Sessions } from '../auth/session';
-import { confirmationEmail, notificationEmail } from './project-request.emails';
+import type { ProjectEffects } from './project-effects';
+import type { ProjectRequestDocument } from './project-request.model';
 import {
+  acceptQuote,
   cancelOwnProject,
   createProjectRequest,
+  declineQuote,
   getOwnProject,
   listOwnProjects,
-  toProjectDetail,
+  replyToQuestion,
+  requestRevision,
+  signOff,
 } from './project-request.service';
+import { toProjectDetail } from './project-view';
 
 type ProjectRequestRouterOptions = {
   sessions: Sessions;
-  mailer: Mailer;
-  /** Where new-request notifications go. */
-  notifyEmail: string;
-  /** The website's public address, for the link in the customer's email. */
-  appOrigin: string;
+  effects: ProjectEffects;
   /** Requests one customer may send per hour. */
   rateLimitMax: number;
+  /** Things one customer may do to their projects per hour. */
+  actionRateLimitMax: number;
 };
 
 /** The :reference in the address. Anything but plain text counts as "not found". */
@@ -41,58 +44,50 @@ const referenceOf = (req: Request): string => {
 };
 
 /**
- * A customer's project requests: send one, list them, read one, and cancel one while it is still
- * early. Everything here is for signed-in customers and only ever touches their own projects.
+ * A customer's project requests: send one, list them, read one, and act on one (accept or
+ * decline a quote, answer a question, ask for a revision, say it looks good, or cancel while it
+ * is still early). Everything here is for signed-in customers and only ever touches their own
+ * projects.
  */
 export function projectRequestRouter({
   sessions,
-  mailer,
-  notifyEmail,
-  appOrigin,
+  effects,
   rateLimitMax,
+  actionRateLimitMax,
 }: ProjectRequestRouterOptions): Router {
   const router = Router();
   const { requireCustomer } = createGuards(sessions);
   router.use(noStore, requireDatabase, sessions.middleware);
 
   // Counted per customer (the guard runs first), so one customer can't use up anyone else's turn.
-  const limitSending = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    limit: rateLimitMax,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false,
-    keyGenerator: (_req, res) => currentUser(res.locals as Record<string, unknown>).id,
-    handler: (_req, _res, next) => {
-      next(
-        new AppError(
-          429,
-          'RATE_LIMITED',
-          "You've sent a lot of project requests in the last hour. Please wait a while before sending another, or contact us.",
-        ),
-      );
-    },
-  });
+  const perCustomer = (limit: number, windowMs: number, message: string) =>
+    rateLimit({
+      windowMs,
+      limit,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+      keyGenerator: (_req, res) => currentUser(res.locals as Record<string, unknown>).id,
+      handler: (_req, _res, next) => {
+        next(new AppError(429, 'RATE_LIMITED', message));
+      },
+    });
+  const limitSending = perCustomer(
+    rateLimitMax,
+    60 * 60 * 1000,
+    "You've sent a lot of project requests in the last hour. Please wait a while before sending another, or contact us.",
+  );
+  const limitActions = perCustomer(
+    actionRateLimitMax,
+    60 * 60 * 1000,
+    "You've done a lot in the last hour. Please wait a little, or contact us if something is urgent.",
+  );
 
   router.post('/', requireCustomer, limitSending, async (req, res) => {
     const customer = currentUser(res.locals);
     const input = projectRequestSchema.parse(req.body);
     const project = await createProjectRequest(customer, input);
     req.log.info({ userId: customer.id, reference: project.reference }, 'Project request received');
-
-    // The request is safely stored, so a failed email must not fail it (or keep the customer waiting).
-    void Promise.allSettled([
-      mailer.send(confirmationEmail(project, appOrigin)),
-      mailer.send(notificationEmail(project, notifyEmail)),
-    ]).then((results) => {
-      for (const result of results) {
-        if (result.status === 'rejected') {
-          req.log.error(
-            { reason: describeError(result.reason), reference: project.reference },
-            'Project request email failed',
-          );
-        }
-      }
-    });
+    await effects.projectSent(req, customer, project);
 
     const body: ProjectResponse = { project: toProjectDetail(project) };
     res.status(201).json(body);
@@ -109,12 +104,51 @@ export function projectRequestRouter({
     res.json(body);
   });
 
-  router.post('/:reference/actions', requireCustomer, async (req, res) => {
+  router.post('/:reference/actions', requireCustomer, limitActions, async (req, res) => {
     const customer = currentUser(res.locals);
+    const reference = referenceOf(req);
     const input = projectActionRequestSchema.parse(req.body);
-    // "Cancel" is the only action a customer can take so far; the others arrive with Phase 5.
-    const project = await cancelOwnProject(customer, referenceOf(req), input.note);
-    req.log.info({ userId: customer.id, reference: project.reference }, 'Project cancelled');
+
+    let project: ProjectRequestDocument;
+    switch (input.action) {
+      case 'cancel':
+        project = await cancelOwnProject(customer, reference, input.note);
+        await effects.customerDid(req, customer, project, 'cancelled', input.note);
+        break;
+      case 'accept-quote': {
+        project = await acceptQuote(customer, reference, input.quoteVersion);
+        const quote = project.quotes.find((item) => item.version === input.quoteVersion);
+        await effects.customerDid(
+          req,
+          customer,
+          project,
+          'accepted-quote',
+          quote ? `Quote version ${quote.version}: ${formatRupees(quote.amountPaise)}` : undefined,
+        );
+        break;
+      }
+      case 'decline-quote':
+        project = await declineQuote(customer, reference, input.quoteVersion, input.note);
+        await effects.customerDid(req, customer, project, 'declined-quote', input.note);
+        break;
+      case 'reply':
+        project = await replyToQuestion(customer, reference, input.message);
+        await effects.customerDid(req, customer, project, 'replied', input.message);
+        break;
+      case 'request-revision':
+        project = await requestRevision(customer, reference, input.message);
+        await effects.customerDid(req, customer, project, 'requested-revision', input.message);
+        break;
+      case 'sign-off':
+        project = await signOff(customer, reference);
+        await effects.customerDid(req, customer, project, 'signed-off');
+        break;
+    }
+
+    req.log.info(
+      { userId: customer.id, reference: project.reference, action: input.action },
+      'Project action',
+    );
     const body: ProjectResponse = { project: toProjectDetail(project) };
     res.json(body);
   });

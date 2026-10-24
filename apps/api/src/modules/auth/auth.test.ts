@@ -667,11 +667,16 @@ describe('requests from other websites', () => {
 });
 
 describe('while the database is connected, unknown account routes stay unknown', () => {
-  it('answers 404 for routes that do not exist under /auth, /me and /admin', async () => {
+  it('answers 404 for routes that do not exist under /auth and /me', async () => {
     const { app } = newApp();
     expect((await request(app).get('/api/v1/auth/nothing')).status).toBe(404);
     expect((await request(app).get('/api/v1/me/nothing')).status).toBe(404);
-    expect((await request(app).get('/api/v1/admin/nothing')).status).toBe(404);
+  });
+
+  it('asks anyone who is not an administrator to sign in before saying anything about /admin', async () => {
+    // So nobody can find out which admin addresses exist. An administrator gets the plain 404.
+    const { app } = newApp();
+    expect((await request(app).get('/api/v1/admin/nothing')).status).toBe(401);
   });
 });
 

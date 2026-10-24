@@ -42,6 +42,7 @@ const env = parseEnv({
   CONTACT_RATE_LIMIT_MAX: '100',
   AUTH_RATE_LIMIT_MAX: '100',
   PROJECT_REQUEST_RATE_LIMIT_MAX: '100',
+  PROJECT_ACTION_RATE_LIMIT_MAX: '1000',
 });
 
 await connectDatabase(env.MONGODB_URI);

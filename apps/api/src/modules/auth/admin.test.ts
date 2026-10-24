@@ -86,11 +86,15 @@ describe('who can see the admin overview', () => {
     const response = await admin.get('/api/v1/admin/overview');
 
     expect(response.status).toBe(200);
-    expect(adminOverviewSchema.parse(response.body)).toEqual({
-      customers: 2, // administrators are not counted as customers
-      contactMessages: { total: 3, unread: 2 },
-      projectRequests: { total: 0, received: 0 },
+    const overview = adminOverviewSchema.parse(response.body);
+    expect(overview.customers).toBe(2); // administrators are not counted as customers
+    expect(overview.contactMessages).toEqual({ total: 3, unread: 2 });
+    expect(overview.projectRequests).toMatchObject({
+      total: 0,
+      received: 0,
+      toDo: { newRequests: 0, replies: 0, accepted: 0, revisions: 0 },
     });
+    expect(overview.recentActivity).toEqual([]);
   });
 
   it('stops working as soon as the administrator is demoted or disabled', async () => {

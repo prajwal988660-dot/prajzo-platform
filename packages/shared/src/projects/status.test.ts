@@ -42,6 +42,22 @@ const expectedChanges = [
   'revision-requested → cancelled: admin',
 ];
 
+/** What an admin must provide with each change (rows not listed need nothing). */
+const expectedAdminNeeds: Record<string, string> = {
+  'under-review → awaiting-information': 'note',
+  'under-review → quote-sent': 'quote',
+  'quote-sent → approved': 'note',
+  'approved → in-development': 'deliveryDate',
+  'in-development → awaiting-information': 'note',
+  'awaiting-review → revision-requested': 'note',
+  'under-review → cancelled': 'note',
+  'approved → cancelled': 'note',
+  'in-development → cancelled': 'note',
+  'testing → cancelled': 'note',
+  'awaiting-review → cancelled': 'note',
+  'revision-requested → cancelled': 'note',
+};
+
 /** Asks canChangeStatus about every possible change by every actor, and lists what it allows. */
 function whatTheCodeAllows(): string[] {
   const allowed: string[] = [];
@@ -175,6 +191,41 @@ describe('the status workflow', () => {
           allowed: true,
           needs: 'note',
         });
+      }
+    });
+
+    it('is exactly this for every change an admin can make', () => {
+      for (const from of projectStatuses) {
+        for (const to of projectStatuses) {
+          const change = canChangeStatus(from, to, 'admin');
+          if (!change.allowed) continue;
+          expect(change.needs ?? 'nothing', `${from} → ${to}`).toBe(
+            expectedAdminNeeds[`${from} → ${to}`] ?? 'nothing',
+          );
+        }
+      }
+    });
+
+    it('is a note when asking the customer for information, or recording something for them', () => {
+      for (const [from, to] of [
+        ['under-review', 'awaiting-information'],
+        ['in-development', 'awaiting-information'],
+        ['quote-sent', 'approved'],
+        ['awaiting-review', 'revision-requested'],
+      ] as const) {
+        expect(canChangeStatus(from, to, 'admin'), `${from} → ${to}`).toEqual({
+          allowed: true,
+          needs: 'note',
+        });
+      }
+    });
+
+    it('is never asked of a customer, even where an admin must give a note', () => {
+      for (const [from, to] of [
+        ['quote-sent', 'approved'],
+        ['awaiting-review', 'revision-requested'],
+      ] as const) {
+        expect(canChangeStatus(from, to, 'customer')).toEqual({ allowed: true, needs: undefined });
       }
     });
 

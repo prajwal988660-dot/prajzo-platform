@@ -1,15 +1,6 @@
-import type { ServicePackage } from '@prajzo/shared';
+import { formatRupees, type ServicePackage } from '@prajzo/shared';
 
-const rupees = new Intl.NumberFormat('en-IN', {
-  style: 'currency',
-  currency: 'INR',
-  maximumFractionDigits: 0,
-});
-
-/** 299900 paise → "₹2,999" (Indian digit grouping: ₹1,20,000). */
-export function formatRupees(paise: number): string {
-  return rupees.format(paise / 100);
-}
+export { formatCalendarDate, formatRupees } from '@prajzo/shared';
 
 /** How a package's price is shown: "From ₹2,999", "₹2,999" or "Request a quote". */
 export function describePrice(
@@ -48,14 +39,4 @@ export function formatDateTime(iso: string): string {
 /** A moment from the API as a date in India: "23 Oct 2026". */
 export function formatDate(iso: string): string {
   return dateOnly.format(new Date(iso));
-}
-
-/** A calendar date with no time ("2026-12-01") as "1 Dec 2026", never shifted by a time zone. */
-export function formatCalendarDate(value: string): string {
-  return new Intl.DateTimeFormat('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`));
 }

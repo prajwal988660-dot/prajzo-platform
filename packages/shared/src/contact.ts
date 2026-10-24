@@ -1,12 +1,5 @@
 import { z } from 'zod';
-
-const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max)
-    .optional()
-    .transform((value) => (value === '' ? undefined : value));
+import { optionalText } from './text';
 
 /**
  * The contact form. The same rules run in the browser (instant feedback) and on the server

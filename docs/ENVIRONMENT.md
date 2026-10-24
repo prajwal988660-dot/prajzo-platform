@@ -24,6 +24,7 @@ Secrets and settings live in environment variables, never in code.
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
 | `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
 | `PROJECT_REQUEST_RATE_LIMIT_MAX` | `10` | No | Project requests one customer may send per hour |
+| `PROJECT_ACTION_RATE_LIMIT_MAX` | `60` | No | Things one customer may do to their projects per hour: accept or decline a quote, answer a question, ask for a revision, cancel |
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |

@@ -1,12 +1,10 @@
 import {
-  adminOverviewSchema,
   changePasswordRequestSchema,
   forgotPasswordRequestSchema,
   loginRequestSchema,
   registerRequestSchema,
   resetPasswordRequestSchema,
   updateProfileRequestSchema,
-  type AdminOverview,
   type OkResponse,
   type SessionResponse,
   type UserRole,
@@ -20,7 +18,6 @@ import { noStore } from '../../middleware/no-store';
 import { requireDatabase } from '../../middleware/require-database';
 import type { Mailer } from '../../services/mailer';
 import {
-  adminOverview,
   authenticate,
   changePassword,
   completePasswordReset,
@@ -75,7 +72,7 @@ const ok = (message: string): OkResponse => ({ ok: true, message });
 export function createAuthRouters(deps: AuthDeps) {
   const { env, logger, mailer } = deps;
   const sessions = createSessions(env);
-  const { requireUser, requireAdmin } = createGuards(sessions);
+  const { requireUser } = createGuards(sessions);
   const max = env.AUTH_RATE_LIMIT_MAX;
 
   // Failed sign-ins are counted per connection and also per email address, so a guesser can't
@@ -216,14 +213,5 @@ export function createAuthRouters(deps: AuthDeps) {
     res.json(ok('Your password has been changed. Other devices have been signed out.'));
   });
 
-  // ---------- /admin ----------
-  const admin = Router();
-  admin.use(noStore, requireDatabase, sessions.middleware);
-
-  admin.get('/overview', requireAdmin, async (_req, res) => {
-    const overview: AdminOverview = adminOverviewSchema.parse(await adminOverview());
-    res.json(overview);
-  });
-
-  return { auth, me, admin, sessions };
+  return { auth, me, sessions };
 }

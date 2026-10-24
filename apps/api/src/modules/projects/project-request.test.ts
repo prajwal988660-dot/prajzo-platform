@@ -105,8 +105,16 @@ describe('sending a project request', () => {
       contactPreference: 'email',
       allowedActions: ['cancel'],
     });
-    expect(project.history).toHaveLength(1);
-    expect(project.history[0]).toMatchObject({ from: null, to: 'received', by: 'customer' });
+    expect(project.timeline).toHaveLength(1);
+    expect(project.timeline[0]).toMatchObject({
+      kind: 'status',
+      from: null,
+      to: 'received',
+      by: 'customer',
+    });
+    expect(project.quote).toBeNull();
+    expect(project.confirmedDeliveryDate).toBeNull();
+    expect(project.revisions).toBeNull();
 
     const stored = await ProjectRequestModel.findOne({ reference: project.reference });
     const owner = await UserModel.findOne({ email: customerInput.email });
@@ -221,7 +229,7 @@ describe('sending a project request', () => {
     const { project } = projectResponseSchema.parse(response.body);
     expect(project.status).toBe('received');
     expect(project.reference).toBe(`PRZ-${year}-0001`);
-    expect(project.history).toHaveLength(1);
+    expect(project.timeline).toHaveLength(1);
 
     const stored = (await ProjectRequestModel.findOne().lean())!;
     const owner = await UserModel.findOne({ email: customerInput.email });
@@ -462,7 +470,9 @@ describe('reading your projects', () => {
       preferredDate: null,
       status: 'received',
     });
-    expect(project.history.map((entry) => entry.to)).toEqual(['received']);
+    expect(
+      project.timeline.map((entry) => (entry.kind === 'status' ? entry.to : entry.kind)),
+    ).toEqual(['received']);
   });
 
   it("never shows another customer's project, and can't tell you whether it exists", async () => {
@@ -544,8 +554,9 @@ describe('cancelling a project', () => {
     const { project } = projectResponseSchema.parse(response.body);
     expect(project.status).toBe('cancelled');
     expect(project.allowedActions).toEqual([]);
-    expect(project.history).toHaveLength(2);
-    expect(project.history[1]).toMatchObject({
+    expect(project.timeline).toHaveLength(2);
+    expect(project.timeline[1]).toMatchObject({
+      kind: 'status',
       from: 'received',
       to: 'cancelled',
       by: 'customer',
@@ -560,7 +571,7 @@ describe('cancelling a project', () => {
     const agent = await signedInCustomer(newApp());
     const reference = await sendAndGetReference(agent);
     const { project } = projectResponseSchema.parse((await cancel(agent, reference)).body);
-    expect(project.history[1]?.note).toBeNull();
+    expect(project.timeline[1]).toMatchObject({ kind: 'status', note: null });
   });
 
   it('cannot be done twice', async () => {
@@ -596,7 +607,7 @@ describe('cancelling a project', () => {
       const detail = projectResponseSchema.parse(
         (await agent.get(`/api/v1/project-requests/${reference}`)).body,
       ).project;
-      expect(detail.allowedActions).toEqual(['cancel']);
+      expect(detail.allowedActions).toContain('cancel');
 
       const response = await cancel(agent, reference);
       expect(response.status).toBe(200);
@@ -611,7 +622,7 @@ describe('cancelling a project', () => {
       const detail = projectResponseSchema.parse(
         (await agent.get(`/api/v1/project-requests/${reference}`)).body,
       ).project;
-      expect(detail.allowedActions).toEqual([]);
+      expect(detail.allowedActions).not.toContain('cancel');
 
       const response = await cancel(agent, reference);
       expect(response.status).toBe(409);
@@ -684,6 +695,11 @@ describe('what the admin overview counts', () => {
       .send({ email: 'boss@example.com', password: 'a-very-long-admin-password' });
     const overview = adminOverviewSchema.parse((await admin.get('/api/v1/admin/overview')).body);
 
-    expect(overview.projectRequests).toEqual({ total: 3, received: 2 });
+    expect(overview.projectRequests).toMatchObject({ total: 3, received: 2 });
+    expect(overview.projectRequests.byStatus).toMatchObject({
+      received: 2,
+      'under-review': 1,
+      cancelled: 0,
+    });
   });
 });
