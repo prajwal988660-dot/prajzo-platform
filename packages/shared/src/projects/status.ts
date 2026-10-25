@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 /**
  * The eleven stages of a project request, in the order a typical project passes through them.
- * The rules below are the proposal in docs/ARCHITECTURE.md section 8, to be confirmed with the
- * owner before Phase 5. Phase 4 uses only the first status and the cancellation rules.
+ * The rules below are the table in docs/ARCHITECTURE.md section 8, confirmed by the owner on
+ * 23 October 2026.
  */
 export const projectStatuses = [
   'received',
@@ -98,7 +98,10 @@ export const projectStatusInfo: Record<
 
 export type StatusActor = 'customer' | 'admin';
 
-/** Something an admin must provide for a change to be accepted (enforced in Phase 5). */
+/**
+ * Something an admin must provide for a change to be accepted. A note is shown to the customer
+ * in their timeline, so it should say what they need to know (a question, a reason).
+ */
 export type StatusRequirement = 'quote' | 'deliveryDate' | 'note';
 
 type Transition = {
@@ -114,18 +117,20 @@ const adminOnly: readonly StatusActor[] = ['admin'];
 /** Every allowed change of status. Anything not listed here is refused. */
 export const statusTransitions: readonly Transition[] = [
   { from: 'received', to: 'under-review', by: adminOnly },
-  { from: 'under-review', to: 'awaiting-information', by: adminOnly },
+  { from: 'under-review', to: 'awaiting-information', by: adminOnly, needs: 'note' },
   { from: 'under-review', to: 'quote-sent', by: adminOnly, needs: 'quote' },
   { from: 'awaiting-information', to: 'under-review', by: adminOnly },
-  // Accepting a quote is the customer's own decision; an admin may record one received another way.
-  { from: 'quote-sent', to: 'approved', by: both },
+  // Accepting a quote is the customer's own decision; an admin may record one received another
+  // way, and says how in a note.
+  { from: 'quote-sent', to: 'approved', by: both, needs: 'note' },
   { from: 'quote-sent', to: 'under-review', by: adminOnly },
   { from: 'approved', to: 'in-development', by: adminOnly, needs: 'deliveryDate' },
   { from: 'in-development', to: 'testing', by: adminOnly },
-  { from: 'in-development', to: 'awaiting-information', by: adminOnly },
+  { from: 'in-development', to: 'awaiting-information', by: adminOnly, needs: 'note' },
   { from: 'testing', to: 'in-development', by: adminOnly },
   { from: 'testing', to: 'awaiting-review', by: adminOnly },
-  { from: 'awaiting-review', to: 'revision-requested', by: both },
+  // An admin recording a revision for the customer says what was asked, in a note.
+  { from: 'awaiting-review', to: 'revision-requested', by: both, needs: 'note' },
   { from: 'awaiting-review', to: 'completed', by: adminOnly },
   { from: 'revision-requested', to: 'in-development', by: adminOnly },
   // Early on, the customer may cancel too.
@@ -144,7 +149,11 @@ export const statusTransitions: readonly Transition[] = [
 export type StatusChange =
   { allowed: true; needs: StatusRequirement | undefined } | { allowed: false };
 
-/** Whether `actor` may move a project from one status to another. */
+/**
+ * Whether `actor` may move a project from one status to another. `needs` is what an admin must
+ * provide with the change; customers are never asked for it (what they send is checked by the
+ * action they take, such as a message with a revision request).
+ */
 export function canChangeStatus(
   from: ProjectStatus,
   to: ProjectStatus,
@@ -153,7 +162,8 @@ export function canChangeStatus(
   const transition = statusTransitions.find(
     (candidate) => candidate.from === from && candidate.to === to && candidate.by.includes(actor),
   );
-  return transition ? { allowed: true, needs: transition.needs } : { allowed: false };
+  if (!transition) return { allowed: false };
+  return { allowed: true, needs: actor === 'admin' ? transition.needs : undefined };
 }
 
 /** The statuses `actor` may move a project to from its current status. */

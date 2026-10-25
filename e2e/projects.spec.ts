@@ -189,11 +189,21 @@ test.describe('the administrator overview', () => {
     await signInAsAdminQuietly(page);
     await page.goto('/admin');
 
-    const all = page.getByText('All project requests', { exact: true });
-    await expect(all).toBeVisible();
-    await expect(all.locator('xpath=following-sibling::p')).toHaveText(/^[1-9]\d*$/);
-    const fresh = page.getByText('New project requests', { exact: true });
-    await expect(fresh.locator('xpath=following-sibling::p')).toHaveText(/^[1-9]\d*$/);
+    // The totals are real: at least this project, and "new requests" is part of them.
+    const total = page
+      .getByRole('region', { name: 'At a glance' })
+      .getByText('Project requests', { exact: true });
+    await expect(total).toBeVisible();
+    await expect(total.locator('xpath=following-sibling::p')).toHaveText(/^[1-9]\d*$/);
+    const fresh = page
+      .getByRole('region', { name: 'Needs you now' })
+      .getByRole('link', { name: /New requests/ });
+    await expect(fresh.locator('p').first()).toHaveText(/^[1-9]\d*$/);
+    await expect(
+      page
+        .getByRole('region', { name: 'Projects by status' })
+        .getByRole('link', { name: /^Request Received [1-9]\d*$/ }),
+    ).toBeVisible();
 
     // Never more than the total, and the same figures the API reports.
     const overview = (await (await page.request.get('/api/v1/admin/overview')).json()) as {

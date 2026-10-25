@@ -170,6 +170,82 @@ export const routes: RouteObject[] = [
                     .AdminDashboardPage,
                 }),
               },
+              {
+                path: 'projects',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminProjectsPage'))
+                    .AdminProjectsPage,
+                }),
+              },
+              {
+                path: 'projects/:reference',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminProjectPage')).AdminProjectPage,
+                }),
+              },
+              {
+                path: 'customers',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminCustomersPage'))
+                    .AdminCustomersPage,
+                }),
+              },
+              {
+                path: 'customers/:id',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminCustomerPage'))
+                    .AdminCustomerPage,
+                }),
+              },
+              {
+                path: 'messages',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminMessagesPage'))
+                    .AdminMessagesPage,
+                }),
+              },
+              {
+                path: 'catalogue',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminCataloguePage'))
+                    .AdminCataloguePage,
+                }),
+              },
+              {
+                path: 'catalogue/categories/new',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminCategoryFormPage'))
+                    .AdminCategoryFormPage,
+                }),
+              },
+              {
+                path: 'catalogue/categories/:key',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminCategoryFormPage'))
+                    .AdminCategoryFormPage,
+                }),
+              },
+              {
+                path: 'catalogue/packages/new',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminPackageFormPage'))
+                    .AdminPackageFormPage,
+                }),
+              },
+              {
+                path: 'catalogue/packages/:key',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminPackageFormPage'))
+                    .AdminPackageFormPage,
+                }),
+              },
+              {
+                path: 'activity',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminActivityPage'))
+                    .AdminActivityPage,
+                }),
+              },
             ],
           },
           { path: '*', element: <NotFoundPage /> },

@@ -9,10 +9,12 @@ import { apiNotFound, errorHandler } from './middleware/error-handler';
 import { originCheck } from './middleware/origin-check';
 import { securityHeaders } from './middleware/security-headers';
 import { createStagingGate } from './middleware/staging-gate';
+import { adminRouter } from './modules/admin/admin.routes';
 import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
+import { createProjectEffects } from './modules/projects/project-effects';
 import { projectRequestRouter } from './modules/projects/project-request.routes';
 import type { Mailer } from './services/mailer';
 import { serveWebApp } from './web/serve-web-app';
@@ -57,15 +59,20 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   const accounts = createAuthRouters({ env, logger, mailer });
   v1.use('/auth', accounts.auth);
   v1.use('/me', accounts.me);
-  v1.use('/admin', accounts.admin);
+  // The activity log entries and emails that follow a change to a project (D-041, D-049).
+  const effects = createProjectEffects({
+    mailer,
+    notifyEmail: env.ADMIN_NOTIFY_EMAIL ?? siteContact.email,
+    appOrigin: env.APP_ORIGIN,
+  });
+  v1.use('/admin', adminRouter({ sessions: accounts.sessions, effects }));
   v1.use(
     '/project-requests',
     projectRequestRouter({
       sessions: accounts.sessions,
-      mailer,
-      notifyEmail: env.ADMIN_NOTIFY_EMAIL ?? siteContact.email,
-      appOrigin: env.APP_ORIGIN,
+      effects,
       rateLimitMax: env.PROJECT_REQUEST_RATE_LIMIT_MAX,
+      actionRateLimitMax: env.PROJECT_ACTION_RATE_LIMIT_MAX,
     }),
   );
   v1.use(catalogueRouter());

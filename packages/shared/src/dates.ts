@@ -21,3 +21,22 @@ export function isCalendarDate(value: string): boolean {
   const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
 }
+
+/** A calendar date (YYYY-MM-DD) some days later, calculated without any time zone. */
+export function addDays(value: string, days: number): string {
+  const date = new Date(`${value}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+const calendarDate = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** A calendar date with no time ("2026-12-01") as "1 Dec 2026", never shifted by a time zone. */
+export function formatCalendarDate(value: string): string {
+  return calendarDate.format(new Date(`${value}T00:00:00Z`));
+}

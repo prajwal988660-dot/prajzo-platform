@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { expectNoSeriousProblems } from './axe';
 import { sendProjectQuietly, signInAsAdminQuietly, signUpQuietly, uniqueEmail } from './helpers';
 
 const publicPages = [
@@ -19,26 +19,6 @@ const publicPages = [
   '/admin/login',
   '/page-that-does-not-exist',
 ];
-
-async function expectNoSeriousProblems(page: Page) {
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await page.waitForLoadState('networkidle');
-
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .analyze();
-  const serious = results.violations.filter(
-    (violation) => violation.impact === 'serious' || violation.impact === 'critical',
-  );
-
-  expect(
-    serious.map((violation) => ({
-      rule: violation.id,
-      help: violation.help,
-      elements: violation.nodes.map((node) => node.target.join(' ')),
-    })),
-  ).toEqual([]);
-}
 
 for (const path of publicPages) {
   test(`${path} has no serious accessibility problems`, async ({ page }) => {
@@ -91,7 +71,7 @@ test.describe('signed-in pages', () => {
   test('the administration overview has no serious accessibility problems', async ({ page }) => {
     await signInAsAdminQuietly(page);
     await page.goto('/admin');
-    await expect(page.getByText('Customers', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Needs you now' })).toBeVisible();
     await expectNoSeriousProblems(page);
   });
 });

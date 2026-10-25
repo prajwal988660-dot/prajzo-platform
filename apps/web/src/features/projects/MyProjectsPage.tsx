@@ -5,6 +5,7 @@ import { Container } from '../../components/layout/Container';
 import { ButtonLink } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
+import { Pagination, pageFromAddress } from '../../components/ui/Pagination';
 import { useApi } from '../../lib/use-api';
 import { useNoIndex } from '../../lib/use-no-index';
 import { usePageTitle } from '../../lib/use-page-title';
@@ -18,8 +19,7 @@ export function MyProjectsPage() {
   usePageTitle('My projects');
   useNoIndex();
   const [searchParams] = useSearchParams();
-  const requested = Number(searchParams.get('page'));
-  const page = Number.isInteger(requested) && requested >= 1 ? requested : 1;
+  const page = pageFromAddress(searchParams.get('page'));
   const projects = useApi(`/v1/project-requests?page=${page}&limit=${pageSize}`, projectListSchema);
 
   return (
@@ -51,6 +51,7 @@ function ProjectsView({
   if (list.total === 0) {
     return (
       <EmptyState
+        headingLevel={2}
         icon={FolderKanban}
         title="No projects yet"
         description="Tell us about your idea and we'll reply with questions or a quote. Your projects will appear here."
@@ -62,6 +63,7 @@ function ProjectsView({
   if (list.items.length === 0) {
     return (
       <EmptyState
+        headingLevel={2}
         icon={FolderKanban}
         title="There are no projects on this page"
         description="You may have followed an old link."
@@ -85,27 +87,7 @@ function ProjectsView({
         ))}
       </ul>
 
-      {totalPages > 1 && (
-        <nav aria-label="Pages of projects" className="flex items-center justify-between gap-3">
-          {page > 1 ? (
-            <ButtonLink to={`?page=${page - 1}`} variant="secondary">
-              Previous
-            </ButtonLink>
-          ) : (
-            <span />
-          )}
-          <p className="text-sm text-slate-600">
-            Page {page} of {totalPages}
-          </p>
-          {page < totalPages ? (
-            <ButtonLink to={`?page=${page + 1}`} variant="secondary">
-              Next
-            </ButtonLink>
-          ) : (
-            <span />
-          )}
-        </nav>
-      )}
+      <Pagination page={page} totalPages={totalPages} label="Pages of projects" />
     </>
   );
 }

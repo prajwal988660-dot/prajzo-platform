@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 23 October 2026 (end of Phase 4)
+Last updated: 25 October 2026 (Phase 5 done, waiting for your approval)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -170,26 +170,45 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
   - [x] Real browser, on desktop and phone: send, email, follow and cancel a project, with a reload in between; a form with mistakes sends nothing; a visitor signs up and is brought back to the form; one customer can't see another's project on the page or in the API; the administrator overview counts requests. That is 14 checks for these journeys (7 on desktop, 7 on phone), plus 14 for the site's pages and 44 accessibility checks (axe) on every page including the new ones, empty and with error messages. The whole browser suite runs again on GitHub
   - [x] Looked at by eye at 390, 768 and 1280 px (form, errors, list, project page, cancel question, cancelled project, account page)
 - [x] Docs updated; summary with the tests that ran
-- [ ] **Your action:** confirm the status workflow ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow)): who may move a project from which status to which. Phase 5 builds on it
-- [ ] **(gate)** Approval for Phase 5
+- [x] **Your action:** confirm the status workflow ([ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow)): who may move a project from which status to which. You confirmed it on 23 October ("workflow OK")
+- [x] **(gate)** Approval for Phase 5: you said "start Phase 5" on 23 October. Pull request #5 for Phase 4 is still open
 
 ## Phase 5: Admin dashboard
 
-- [ ] Overview with real counts by status and recent activity
-- [ ] Project requests:
-  - [ ] Filter, search, pagination
-  - [ ] Details with the customer's full request
-  - [ ] Scope, quote and confirmed delivery date
-  - [ ] Status changes with notes; internal notes; status history
-- [ ] The customer's side of the workflow, shown only when the workflow allows it: accept or decline a quote, answer a question, request a revision
-- [ ] Customers list and details
-- [ ] Categories management; packages and prices management
-- [ ] Inbox for contact messages: read, handled, archive
-- [ ] Audit log of admin actions; status-change emails (printed to the console until Phase 7)
-- [ ] Tests:
-  - [ ] Every admin endpoint refuses non-admins
-  - [ ] Every status transition, allowed and refused, with history recorded
-  - [ ] End to end: an admin takes a project from "Request Received" to "Completed", with the customer accepting the quote
+- [x] The status workflow confirmed by you (23 October)
+- [x] Shared rules: what each status change needs (a quote, a delivery date, or a note the customer will see), quotes, timeline entries, and every admin and customer request and response
+- [x] Project requests, admin side:
+  - [x] List with filter by status, search by reference, name, email or title, and paging; each project shows "Needs you", "Waiting for customer", "Customer replied" or "Said it looks good"
+  - [x] Details: the customer's full request, the customer (with email, call and WhatsApp links), every quote version, the confirmed delivery date, rounds of changes used, internal notes, and the whole timeline with who did each thing
+  - [x] Status changes with the quote, delivery date or note each one needs; only the changes the workflow allows are offered; final moves (Completed, Cancelled) need a tick first
+  - [x] Delivery date set or changed at any stage before the end, shown in the timeline
+  - [x] Internal notes that customers never see ([D-046](DECISIONS.md))
+- [x] The customer's side of the workflow, each button shown only when the workflow allows it:
+  - [x] Read the quote; accept it (names the version they saw, after being asked to confirm) or decline it
+  - [x] Answer a question from Prajzo
+  - [x] Ask for changes (counted against the rounds the quote includes); say it looks good
+  - [x] See the confirmed delivery date and the rounds of changes used
+  - [x] If the project changed while the page was open, they are told why nothing happened and shown it as it is now
+- [x] Emails (printed to the API log until Phase 7): to the customer on every status change and date change; to Prajzo on everything the customer does ([D-047](DECISIONS.md))
+- [x] Overview: what needs doing now, projects by status, totals, recent activity
+- [x] Customers: list with search, and details with their projects
+- [x] Inbox for contact messages: new, read, archived; reply from your own email app ([D-049](DECISIONS.md))
+- [x] Catalogue: edit, add and hide website types and packages, including prices typed in rupees ([D-050](DECISIONS.md)). Not built: deleting (it would break old projects) and drag-and-drop ordering
+- [x] Activity log: admin actions and what customers do to their projects ([D-048](DECISIONS.md))
+- [x] Admin area: navigation, a page for each of the above, usable on a phone
+- [x] Fixed on the way:
+  - [x] When a customer said "it looks good", the project still showed "waiting for customer", so it was easy to miss. It now counts as waiting on Prajzo, is flagged in the list, and has its own count on the overview
+  - [x] "Not found" screens now have a proper page heading, and empty lists use the right heading level
+  - [x] Choosing a filter or searching no longer drops keyboard focus; the dropdowns in the catalogue forms no longer cut their text off on a phone
+- [x] Tests (all run):
+  - [x] Shared rules, 118 in total (50 new): what each move needs, quote and delivery-date rules (including the exact wording of each message), every request and response shape
+  - [x] Server, 314 in total (118 new): every admin route refuses visitors (401) and customers (403), found by the test itself so a new route can't be missed; all 121 possible moves between the 11 statuses, by an admin and by a customer, allowed and refused, each recorded with who, when, from and to; what each move needs; two changes at the same moment, one wins; quotes (versions, whole rupees, accepting names the version, a stale quote refused); every customer action (ownership, wrong status, repeats, limits); internal notes never in anything a customer receives; emails and activity entries; customers, messages, catalogue and overview; and a 17-step project from "Request Received" to "Completed" in one test
+  - [x] Website, 418 in total (230 new): the customer's project page (quote with its confirmation, question and answers, review and change request, cancel, conflicts, outages that keep what was typed); every admin page with its success, error and empty states, filters, search and paging from the address; each kind of status move with its checks; the delivery date, notes, messages, catalogue forms (rupees to paise, the key, the price rules), customers and activity; headings; that a search box and filter keep keyboard focus
+  - [x] Real browser, on desktop and phone: 139 pass in total (24 new). The new ones follow a project from "Request Received" to "Completed" with the customer answering, accepting the quote, asking for a change and signing off, checking the emails and that internal notes never reach the customer; who may use the admin area (visitor, customer, API); a page that is out of date; reading, archiving and answering messages; adding and editing a hidden package and website type without touching the public site; customers and activity. Plus 33 page states checked with axe on each device (every admin page with real data, every form with its errors showing, and each stage of the customer's project page)
+  - [x] The whole browser suite also runs again on GitHub
+- [x] Looked at by eye at 390, 768 and 1280 px: 72 screenshots (24 pages and states at each width). The main pages were checked at all three widths and the problems found were fixed (cards two across on a phone, dropdown text, baseline of the request details)
+- [x] Docs updated: decisions D-043 to D-050, architecture (data model, API, workflow), setup (a walk-through of the admin area), environment, roadmap, README
+- [ ] **Your action:** create your administrator account ([SETUP.md](SETUP.md), section 3) and try the admin area with the walk-through right after it
 - [ ] **(gate)** Approval for Phase 6
 
 ## Phase 6: Hardening and quality
@@ -202,7 +221,7 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [ ] Code protection checked on the real production build: no source maps, no development code, the staging password covers every file, right-click blocking leaves form fields working
 - [ ] Full end-to-end suite green
 - [ ] Every page checked at 390, 768 and 1280 px
-- [ ] Automated accessibility checks (axe) plus a manual keyboard pass
+- [ ] Automated accessibility checks (axe) plus a manual keyboard pass, including where focus goes after moving between pages of a list (it returns to the top of the page)
 - [ ] Performance: code splitting, image sizes, Lighthouse check
 - [ ] SEO titles and descriptions, Open Graph images, favicons
 - [ ] Error logging; database backup and restore rehearsed

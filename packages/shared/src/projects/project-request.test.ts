@@ -193,13 +193,83 @@ describe('projectActionRequestSchema', () => {
     ).toEqual({ action: 'cancel', note: 'Changed my mind' });
   });
 
+  it('accepts accepting a quote, which names the version the customer was looking at', () => {
+    expect(projectActionRequestSchema.parse({ action: 'accept-quote', quoteVersion: 2 })).toEqual({
+      action: 'accept-quote',
+      quoteVersion: 2,
+    });
+    for (const quoteVersion of [0, -1, 1.5, '2', undefined]) {
+      expect(
+        projectActionRequestSchema.safeParse({ action: 'accept-quote', quoteVersion }).success,
+        String(quoteVersion),
+      ).toBe(false);
+    }
+  });
+
+  it('accepts declining a quote, with an optional reason', () => {
+    expect(
+      projectActionRequestSchema.parse({
+        action: 'decline-quote',
+        quoteVersion: 1,
+        note: ' Too much ',
+      }),
+    ).toEqual({ action: 'decline-quote', quoteVersion: 1, note: 'Too much' });
+    expect(projectActionRequestSchema.safeParse({ action: 'decline-quote' }).success).toBe(false);
+  });
+
+  it('needs a real answer when replying to a question', () => {
+    expect(
+      projectActionRequestSchema.parse({
+        action: 'reply',
+        message: '  Here are the logo files.  ',
+      }),
+    ).toEqual({ action: 'reply', message: 'Here are the logo files.' });
+    for (const message of ['', ' ', 'x', undefined, 'x'.repeat(2001)]) {
+      expect(
+        projectActionRequestSchema.safeParse({ action: 'reply', message }).success,
+        String(message).slice(0, 10),
+      ).toBe(false);
+    }
+  });
+
+  it('needs to know what to change when asking for a revision', () => {
+    expect(
+      projectActionRequestSchema.parse({
+        action: 'request-revision',
+        message: 'Please make the logo bigger.',
+      }),
+    ).toEqual({ action: 'request-revision', message: 'Please make the logo bigger.' });
+    for (const message of ['', 'no', undefined, 'x'.repeat(1501)]) {
+      expect(
+        projectActionRequestSchema.safeParse({ action: 'request-revision', message }).success,
+        String(message).slice(0, 10),
+      ).toBe(false);
+    }
+  });
+
+  it('accepts saying it looks good, with nothing else', () => {
+    expect(projectActionRequestSchema.parse({ action: 'sign-off' })).toEqual({
+      action: 'sign-off',
+    });
+  });
+
   it('refuses any other action, and a reason that is too long', () => {
-    for (const action of ['approve', 'complete', 'refund', '', undefined]) {
+    for (const action of ['approve', 'complete', 'refund', 'under-review', '', undefined]) {
       expect(projectActionRequestSchema.safeParse({ action }).success, String(action)).toBe(false);
     }
     expect(
       projectActionRequestSchema.safeParse({ action: 'cancel', note: 'x'.repeat(501) }).success,
     ).toBe(false);
+  });
+
+  it("drops anything that isn't part of the action", () => {
+    const parsed = projectActionRequestSchema.parse({
+      action: 'accept-quote',
+      quoteVersion: 1,
+      status: 'completed',
+      amountPaise: 1,
+    });
+    expect(Object.keys(parsed).sort()).toEqual(['action', 'quoteVersion']);
   });
 });
 
@@ -240,9 +310,19 @@ describe('what the API sends back', () => {
     contactPreference: 'email',
     phone: null,
     notes: null,
-    history: [
-      { from: null, to: 'received', by: 'customer', note: null, at: '2026-10-23T13:30:00.000Z' },
+    timeline: [
+      {
+        kind: 'status',
+        from: null,
+        to: 'received',
+        by: 'customer',
+        note: null,
+        at: '2026-10-23T13:30:00.000Z',
+      },
     ],
+    quote: null,
+    confirmedDeliveryDate: null,
+    revisions: null,
     allowedActions: ['cancel'],
   };
 
@@ -254,8 +334,59 @@ describe('what the API sends back', () => {
     );
   });
 
+  it('describes every kind of timeline entry', () => {
+    const at = '2026-10-24T04:30:00.000Z';
+    const entries = [
+      { kind: 'status', from: 'received', to: 'under-review', by: 'admin', note: null, at },
+      { kind: 'reply', by: 'customer', text: 'Here are the files.', at },
+      {
+        kind: 'delivery-date',
+        by: 'admin',
+        from: null,
+        to: '2026-11-05',
+        note: 'Festival week',
+        at,
+      },
+      { kind: 'sign-off', by: 'customer', at },
+    ];
+    expect(projectDetailSchema.safeParse({ ...detail, timeline: entries }).success).toBe(true);
+    for (const bad of [
+      { kind: 'reply', by: 'admin', text: 'x', at },
+      { kind: 'sign-off', by: 'admin', at },
+      { kind: 'delivery-date', by: 'customer', from: null, to: '2026-11-05', note: null, at },
+      { kind: 'shrug', at },
+    ]) {
+      expect(projectDetailSchema.safeParse({ ...detail, timeline: [bad] }).success).toBe(false);
+    }
+  });
+
+  it('shows a quote with the revisions it includes, and the revisions used', () => {
+    const withQuote = {
+      ...detail,
+      status: 'quote-sent',
+      quote: {
+        version: 1,
+        amountPaise: 1_500_000,
+        scope: 'A five-page website with a gallery and a contact form.',
+        revisionsIncluded: 2,
+        sentAt: '2026-10-24T04:30:00.000Z',
+        accepted: false,
+      },
+      confirmedDeliveryDate: '2026-11-05',
+      revisions: { included: 2, used: 1 },
+    };
+    expect(projectDetailSchema.safeParse(withQuote).success).toBe(true);
+    expect(
+      projectDetailSchema.safeParse({ ...withQuote, quote: { ...withQuote.quote, version: 0 } })
+        .success,
+    ).toBe(false);
+    expect(
+      projectDetailSchema.safeParse({ ...withQuote, revisions: { included: 2, used: -1 } }).success,
+    ).toBe(false);
+  });
+
   it('describes a page of projects', () => {
-    const { history: _history, ...rest } = detail;
+    const { timeline: _timeline, ...rest } = detail;
     const summary = {
       reference: rest.reference,
       title: rest.title,

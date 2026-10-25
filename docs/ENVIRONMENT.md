@@ -24,6 +24,7 @@ Secrets and settings live in environment variables, never in code.
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
 | `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
 | `PROJECT_REQUEST_RATE_LIMIT_MAX` | `10` | No | Project requests one customer may send per hour |
+| `PROJECT_ACTION_RATE_LIMIT_MAX` | `60` | No | Things one customer may do to their projects per hour: accept or decline a quote, answer a question, ask for a revision, cancel |
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
@@ -51,7 +52,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 | Phase | Variables | Purpose |
 |---|---|---|
-| 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where contact-form notifications go. In development they are printed to the API console, not sent |
+| 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where Prajzo's own notifications go: contact-form messages, new project requests, and what customers do to their projects (accept or decline a quote, answer, ask for changes, say it looks good, cancel). In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
 | Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
 | 8 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |

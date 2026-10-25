@@ -140,18 +140,3 @@ export type SessionResponse = z.infer<typeof sessionResponseSchema>;
 
 export const okResponseSchema = z.object({ ok: z.literal(true), message: z.string() });
 export type OkResponse = z.infer<typeof okResponseSchema>;
-
-/** GET /admin/overview: real counts from the database. */
-export const adminOverviewSchema = z.object({
-  customers: z.number().int().nonnegative(),
-  contactMessages: z.object({
-    total: z.number().int().nonnegative(),
-    unread: z.number().int().nonnegative(),
-  }),
-  projectRequests: z.object({
-    total: z.number().int().nonnegative(),
-    /** Requests nobody has started reviewing yet (status "Request Received"). */
-    received: z.number().int().nonnegative(),
-  }),
-});
-export type AdminOverview = z.infer<typeof adminOverviewSchema>;

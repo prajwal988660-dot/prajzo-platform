@@ -1,15 +1,8 @@
 import { z } from 'zod';
 import { isCalendarDate, todayInIndia } from '../dates';
 import { paginatedSchema } from '../api/pagination';
+import { optionalText, requiredText } from '../text';
 import { projectStatusSchema } from './status';
-
-const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max)
-    .optional()
-    .transform((value) => (value === '' ? undefined : value));
 
 /** Things a customer can ask for. The same list is shown in the form and checked by the server. */
 export const projectFeatures = [
@@ -123,28 +116,91 @@ export type ProjectRequestFormValues = z.input<typeof projectRequestSchema>;
 export type ProjectRequest = z.output<typeof projectRequestSchema>;
 
 /** What a customer may do to a project right now. The server decides, so no rule is repeated in the app. */
-export const projectActions = ['cancel'] as const;
+export const projectActions = [
+  'cancel',
+  'accept-quote',
+  'decline-quote',
+  'reply',
+  'request-revision',
+  'sign-off',
+] as const;
 export type ProjectAction = (typeof projectActions)[number];
 
-/** POST /project-requests/:reference/actions */
-export const projectActionRequestSchema = z.object({
-  action: z.enum(projectActions),
-  note: optionalText(500),
-});
+/** A customer's answer to a question from Prajzo. */
+export const replyMessageSchema = requiredText(
+  2,
+  2000,
+  'Write your answer',
+  'Keep your answer under 2,000 characters',
+);
+
+/** What a customer wants changed when they ask for a revision. */
+export const revisionMessageSchema = requiredText(
+  5,
+  1500,
+  "Tell us what you'd like changed (at least 5 characters)",
+  'Keep this under 1,500 characters',
+);
+
+/** POST /project-requests/:reference/actions: one shape for each thing a customer can do. */
+export const projectActionRequestSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('cancel'), note: optionalText(500) }),
+  /** `quoteVersion` is the quote the customer was looking at, so a quote that changed meanwhile isn't accepted by mistake. */
+  z.object({ action: z.literal('accept-quote'), quoteVersion: z.number().int().min(1) }),
+  z.object({
+    action: z.literal('decline-quote'),
+    quoteVersion: z.number().int().min(1),
+    note: optionalText(500),
+  }),
+  z.object({ action: z.literal('reply'), message: replyMessageSchema }),
+  z.object({ action: z.literal('request-revision'), message: revisionMessageSchema }),
+  z.object({ action: z.literal('sign-off') }),
+]);
 export type ProjectActionRequest = z.output<typeof projectActionRequestSchema>;
 export type ProjectActionFormValues = z.input<typeof projectActionRequestSchema>;
 
 export const projectReferencePattern = /^PRZ-\d{4}-\d{4,}$/;
 
-/** One line of the status timeline. */
-export const projectHistoryEntrySchema = z.object({
-  from: projectStatusSchema.nullable(),
-  to: projectStatusSchema,
-  by: z.enum(['customer', 'admin']),
-  note: z.string().nullable(),
-  at: z.string(),
-});
-export type ProjectHistoryEntry = z.infer<typeof projectHistoryEntrySchema>;
+const actors = z.enum(['customer', 'admin']);
+
+/**
+ * The kinds of entry in a project's timeline: a change of status (with the note that came with
+ * it), the customer's answer to a question, a confirmed or changed delivery date, and the
+ * customer saying the finished project looks good.
+ */
+export const timelineVariants = {
+  status: z.object({
+    kind: z.literal('status'),
+    from: projectStatusSchema.nullable(),
+    to: projectStatusSchema,
+    by: actors,
+    note: z.string().nullable(),
+    at: z.string(),
+  }),
+  reply: z.object({
+    kind: z.literal('reply'),
+    by: z.literal('customer'),
+    text: z.string(),
+    at: z.string(),
+  }),
+  deliveryDate: z.object({
+    kind: z.literal('delivery-date'),
+    by: z.literal('admin'),
+    from: z.string().nullable(),
+    to: z.string(),
+    note: z.string().nullable(),
+    at: z.string(),
+  }),
+  signOff: z.object({ kind: z.literal('sign-off'), by: z.literal('customer'), at: z.string() }),
+};
+
+export const timelineEntrySchema = z.discriminatedUnion('kind', [
+  timelineVariants.status,
+  timelineVariants.reply,
+  timelineVariants.deliveryDate,
+  timelineVariants.signOff,
+]);
+export type TimelineEntry = z.infer<typeof timelineEntrySchema>;
 
 /** A project in a list. */
 export const projectSummarySchema = z.object({
@@ -156,6 +212,26 @@ export const projectSummarySchema = z.object({
   updatedAt: z.string(),
 });
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
+
+/** A quote as the customer sees it. Amounts are whole paise (1 rupee = 100 paise). */
+export const quoteSchema = z.object({
+  version: z.number().int().min(1),
+  amountPaise: z.number().int().nonnegative(),
+  /** What the price includes, in the admin's words. */
+  scope: z.string(),
+  revisionsIncluded: z.number().int().nonnegative(),
+  sentAt: z.string(),
+  /** True for the version the customer accepted. */
+  accepted: z.boolean(),
+});
+export type Quote = z.infer<typeof quoteSchema>;
+
+/** How many rounds of changes the accepted quote includes, and how many have been asked for. */
+export const revisionsSchema = z.object({
+  included: z.number().int().nonnegative(),
+  used: z.number().int().nonnegative(),
+});
+export type Revisions = z.infer<typeof revisionsSchema>;
 
 /** A project, as its owner sees it. Internal notes and other people's data are never included. */
 export const projectDetailSchema = projectSummarySchema.extend({
@@ -169,7 +245,12 @@ export const projectDetailSchema = projectSummarySchema.extend({
   contactPreference: z.enum(contactPreferences),
   phone: z.string().nullable(),
   notes: z.string().nullable(),
-  history: z.array(projectHistoryEntrySchema),
+  timeline: z.array(timelineEntrySchema),
+  /** The quote to show: the accepted one, or the latest while it waits for an answer. */
+  quote: quoteSchema.nullable(),
+  /** A date Prajzo has confirmed (YYYY-MM-DD). Never a promise before it exists. */
+  confirmedDeliveryDate: z.string().nullable(),
+  revisions: revisionsSchema.nullable(),
   allowedActions: z.array(z.enum(projectActions)),
 });
 export type ProjectDetail = z.infer<typeof projectDetailSchema>;

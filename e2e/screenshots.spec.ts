@@ -96,7 +96,7 @@ for (const width of widths) {
     await page.request.post('/api/v1/auth/logout');
     await signInAsAdminQuietly(page);
     await page.goto('/admin');
-    await page.getByText('Customers', { exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Needs you now' }).waitFor();
     await shot('admin');
   });
 }

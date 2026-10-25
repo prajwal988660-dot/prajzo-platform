@@ -8,15 +8,12 @@ import {
   requestedUrls,
   sampleAdmin,
   sampleCustomer,
+  sampleOverview,
   signedInAs,
 } from '../../test/mock-api';
 import { currentAddress, renderApp } from '../../test/render-app';
 
-const overview = {
-  customers: 12,
-  contactMessages: { total: 30, unread: 4 },
-  projectRequests: { total: 9, received: 3 },
-};
+const overview = sampleOverview({ customers: 12, contactMessages: { total: 30, unread: 4 } });
 const adminRoutes = { 'GET /api/v1/admin/overview': () => jsonResponse(200, overview) };
 
 describe('pages for signed-in customers', () => {
@@ -118,12 +115,11 @@ describe('the administration area', () => {
     renderApp('/admin');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Overview' })).toBeVisible();
-    const customers = await screen.findByText('Customers');
-    expect(customers.nextElementSibling).toHaveTextContent('12');
-    expect(screen.getByText('New messages').nextElementSibling).toHaveTextContent('4');
-    expect(screen.getByText('All messages').nextElementSibling).toHaveTextContent('30');
-    expect(screen.getByText('New project requests').nextElementSibling).toHaveTextContent('3');
-    expect(screen.getByText('All project requests').nextElementSibling).toHaveTextContent('9');
+    const glance = within(
+      (await screen.findByRole('heading', { name: 'At a glance' })).parentElement!,
+    );
+    expect(glance.getByText('Customers').nextElementSibling).toHaveTextContent('12');
+    expect(glance.getByText('Contact messages').nextElementSibling).toHaveTextContent('30');
     expect(screen.getByText(/Signed in as Prajzo Admin/)).toBeVisible();
   });
 
@@ -205,7 +201,10 @@ describe('the administration area', () => {
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent('temporarily unavailable');
     await user.click(within(alert).getByRole('button', { name: 'Try again' }));
-    expect((await screen.findByText('Customers')).nextElementSibling).toHaveTextContent('12');
+    const glance = within(
+      (await screen.findByRole('heading', { name: 'At a glance' })).parentElement!,
+    );
+    expect(glance.getByText('Customers').nextElementSibling).toHaveTextContent('12');
   });
 });
 

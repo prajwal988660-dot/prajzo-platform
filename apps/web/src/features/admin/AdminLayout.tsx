@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react';
 import { useState } from 'react';
-import { Link, Outlet } from 'react-router';
+import { Link, NavLink, Outlet } from 'react-router';
 import { Container } from '../../components/layout/Container';
 import { Logo } from '../../components/layout/Logo';
 import { Alert } from '../../components/ui/Alert';
@@ -9,6 +9,15 @@ import { Button } from '../../components/ui/Button';
 import { submitErrorMessage } from '../../lib/form-errors';
 import { useNoIndex } from '../../lib/use-no-index';
 import { useAuth } from '../auth/auth-context';
+
+const sections = [
+  { to: '/admin', label: 'Overview', end: true },
+  { to: '/admin/projects', label: 'Projects', end: false },
+  { to: '/admin/customers', label: 'Customers', end: false },
+  { to: '/admin/messages', label: 'Messages', end: false },
+  { to: '/admin/catalogue', label: 'Catalogue', end: false },
+  { to: '/admin/activity', label: 'Activity', end: false },
+];
 
 /** A plain frame for the administration area: no marketing header, footer or chat button. */
 export function AdminLayout() {
@@ -43,17 +52,12 @@ export function AdminLayout() {
             <Logo />
             <Badge tone="brand">Admin</Badge>
           </div>
-          <nav aria-label="Administration" className="flex items-center gap-5 text-sm font-medium">
-            <Link to="/admin" className="text-slate-700 hover:text-ink">
-              Overview
-            </Link>
-            <Link to="/" className="text-slate-700 hover:text-ink">
-              View website
-            </Link>
-          </nav>
           {user && (
             <div className="flex items-center gap-3 text-sm">
-              <span className="hidden text-slate-600 sm:inline">{user.email}</span>
+              <Link to="/" className="font-medium text-slate-700 hover:text-ink">
+                View website
+              </Link>
+              <span className="hidden text-slate-600 md:inline">{user.email}</span>
               <Button variant="secondary" size="sm" loading={busy} onClick={() => void leave()}>
                 <LogOut aria-hidden="true" className="size-4" />
                 Sign out
@@ -61,6 +65,31 @@ export function AdminLayout() {
             </div>
           )}
         </Container>
+        {user && (
+          <nav aria-label="Administration" className="border-t border-slate-100">
+            <Container>
+              <ul className="-mx-1 flex gap-1 overflow-x-auto py-2 text-sm font-medium">
+                {sections.map((section) => (
+                  <li key={section.to}>
+                    <NavLink
+                      to={section.to}
+                      end={section.end}
+                      className={({ isActive }) =>
+                        `block whitespace-nowrap rounded-full px-4 py-2 transition ${
+                          isActive
+                            ? 'bg-ink text-white'
+                            : 'text-slate-700 hover:bg-slate-100 hover:text-ink'
+                        }`
+                      }
+                    >
+                      {section.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </Container>
+          </nav>
+        )}
         {signOutError && (
           <Container className="pb-3">
             <Alert tone="error" title="Still signed in">

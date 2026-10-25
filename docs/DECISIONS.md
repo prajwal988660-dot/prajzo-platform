@@ -2,7 +2,7 @@
 
 This file records each important technical decision: what was decided, why, and what else was considered. New decisions are added at the end. A changed decision is not deleted; it is marked **Replaced by D-0xx**.
 
-D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which is still to be confirmed before Phase 5 (see D-036). D-021 onwards were made during Phase 1.
+D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the plan on 17 October 2026. The exceptions are D-008, which you changed (see D-025), and D-020, which you confirmed on 23 October 2026 ("workflow OK"). D-021 onwards were made during Phase 1.
 
 ---
 
@@ -144,7 +144,7 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 ### D-020: Project status workflow
 
 - **Decision:** the 11 statuses and the transition table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), enforced on the server, with a history entry (who and when) for every change.
-- **Status:** proposed; to be confirmed with you before Phase 5. Phase 4 uses only its first status and the cancellation rows (D-036).
+- **Status:** **confirmed** by you on 23 October 2026 ("workflow OK"). Phase 4 used its first status and the cancellation rows; Phase 5 builds the rest. Small additions made while building Phase 5 are recorded in D-043.
 
 ---
 
@@ -392,3 +392,78 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 
 - **Decision:** the Privacy Policy and Terms are updated whenever what the site collects changes. The Privacy Policy now covers accounts (name, email, phone, a password stored only in scrambled form, and sign-in times), project requests, and the one sign-in cookie.
 - **Needs a lawyer:** the draft keeps requests that don't go ahead for up to 24 months (like contact messages) and accounts until deletion is requested. Please have these periods confirmed with the rest of the policy.
+
+---
+
+## Phase 5 decisions (24 and 25 October 2026)
+
+### D-043: Three more steps ask for a note
+
+- **Decision:** the workflow you confirmed ("workflow OK") is unchanged, apart from what an admin must write when making these moves:
+  - **To Awaiting Customer Information**, from Under Review or from In Development: the question, or what is needed. The customer sees it on their project page and in an email, and answers there.
+  - **To Revision Requested, when an admin records it for the customer**: what the customer asked to change.
+  - Two things already needed a note and still do: recording a quote the customer accepted another way ("Accepted on WhatsApp on 24 Oct"), and cancelling a project that is further along.
+- **Why:** a customer should never be moved to "we need something from you" without being told what.
+- **Cost:** a sentence of typing for the admin on those moves.
+- **Done:** the workflow table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow) marks the rows.
+
+### D-044: Quotes are versions, in whole rupees
+
+- **Decision:**
+  - Each quote is a version (1, 2…) with a price in whole rupees (₹1 to ₹1 crore, kept in paise), a description of what the price includes, and the rounds of changes it includes. Old versions are kept for ever.
+  - Changing a quote means going back to Under Review and sending a new version; the form starts from the last one.
+  - The customer accepts or declines the version they were shown. If a newer one has been sent since they opened the page, the server refuses and the page shows them the new quote.
+  - Accepting fixes how many rounds of changes are included. Each request for changes counts as one. Going past that number is allowed, and the admin is shown a warning ("Over the included changes"); the customer is told further changes may be quoted separately.
+  - The number of rounds has no default: the admin types it for every quote.
+- **Why:** a price the customer agreed to must never change under them, and a dispute should be answerable from the record.
+- **Your decisions, not the site's:** whether a quote should expire, how many rounds you usually include, and what extra changes cost. The site only records and flags them. Quotes don't expire for now.
+
+### D-045: What a customer can do, and who has to act next
+
+- **Decision:**
+  - A customer can cancel (as before), accept or decline a quote, answer a question (as often as needed), ask for changes, and say "it looks good".
+  - **"It looks good" tells Prajzo; it doesn't complete the project.** Only an admin completes it, as the workflow says. The admin is told it is now their turn.
+  - The server decides which of these are allowed at any moment and tells the website; a button is shown only when it will work (as in D-040). Each action is one conditional database step, so two at once can't both succeed.
+  - The server also says **who has to act next**: the customer after a question, a quote or a finished project, Prajzo otherwise. A customer's answer or "it looks good" hands the project back to Prajzo. The admin lists show "Needs you" or "Waiting for customer" and the overview counts what needs doing.
+  - One customer can do at most 60 of these an hour (`PROJECT_ACTION_RATE_LIMIT_MAX`).
+- **Why:** nothing should depend on the admin remembering to look, and no button should ever fail on a customer.
+
+### D-046: The admin area is safe by construction
+
+- **Decision:**
+  - The "must be an administrator" check sits at the top of the admin routes, before any route, so a new admin route can't forget it. A test finds every admin route by itself and checks that visitors get 401 and customers 403.
+  - A customer can't use the admin API even on their own project.
+  - Internal notes are for admins only: never in a customer's page, in the API's reply to a customer, or in an email. A browser test follows a project from start to finish and checks this.
+  - If a page is out of date (someone else moved the project first), the server refuses with a clear reason, and the page loads the project again and says why nothing changed.
+  - Final moves (Completed and Cancelled) need a tick in a box first, because they can't be undone.
+- **Not built in this phase:** disabling an account, deleting anything, bulk actions. Nothing is deleted from the admin area; things are archived or hidden.
+
+### D-047: Emails about a project
+
+- **Decision:**
+  - **The customer** is emailed on every status change (with the quote or the question when there is one) and when the delivery date is confirmed or changed, each with a link to the project.
+  - **Prajzo** is emailed when a customer accepts or declines a quote, answers a question, asks for changes, says it looks good, or cancels. Replies go to the customer. They go to `ADMIN_NOTIFY_EMAIL`, or contact@prajzo.com if that isn't set.
+  - Until real email is set up in Phase 7 they are printed in the API log. A failed email never fails the action, and the website never says "we've emailed you".
+- **Why:** the same as D-041: the work is saved first, and an email problem shouldn't lose it.
+
+### D-048: An activity log
+
+- **Decision:**
+  - The log records what admins do (status changes, quotes, dates, notes, message status, catalogue edits) and what customers do to their projects. Each entry says who, what, to what and when, in plain words written at the time. Entries are only ever added.
+  - It is shown on the Activity page (filtered by kind) and as "Recent activity" on the overview. It does not record sign-ins or page views.
+- **Needs a decision with the Privacy Policy:** how long to keep entries. They hold people's names and project references, and are kept indefinitely for now.
+
+### D-049: Contact messages are answered from your own email app
+
+- **Decision:** messages from the contact form go through New, Read and Archived. "Reply by email" opens your own email app with the sender's address and a subject filled in. Nothing is sent from the site.
+- **Why:** there is no sending domain until Phase 7, the replies stay in the mailbox the studio already uses, and the site can never claim a reply was sent that wasn't.
+- **Cost:** the site doesn't know whether you replied.
+
+### D-050: Catalogue management
+
+- **Decision:**
+  - Admins can edit, add and hide website types and packages, including prices. Prices are typed in rupees and kept in paise. A "Request a quote" package has no price; the others must have one.
+  - Keys (such as `online-shop`) can't be changed once made. Nothing is deleted: a hidden item disappears from the website but stays in the admin area, and projects that already use it are not affected, because each project keeps its own copy of the names.
+  - Order is a number ("lower comes first"), not drag and drop.
+  - The public catalogue is cached for 60 seconds, so a change reaches the website within about a minute.
+- **Considered and not done:** deleting (it would break old projects' links), and drag-and-drop ordering (more code than a number is worth for a handful of items).
