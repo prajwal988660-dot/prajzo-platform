@@ -207,8 +207,8 @@ test.describe('administrators', () => {
 
     await expect(page).toHaveURL('/admin');
     await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible();
-    await expect(page.getByText('Customers', { exact: true })).toBeVisible();
-    await expect(page.getByText('New messages')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Needs you now' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'At a glance' })).toBeVisible();
     // The administration area has its own plain frame.
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0);
 
