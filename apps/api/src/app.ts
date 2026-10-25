@@ -6,6 +6,7 @@ import { pinoHttp } from 'pino-http';
 import type { Env } from './config/env';
 import type { Logger } from './lib/logger';
 import { apiNotFound, errorHandler } from './middleware/error-handler';
+import { noStore } from './middleware/no-store';
 import { originCheck } from './middleware/origin-check';
 import { securityHeaders } from './middleware/security-headers';
 import { createStagingGate } from './middleware/staging-gate';
@@ -54,6 +55,8 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   app.use(express.json({ limit: '100kb' }));
 
   const v1 = Router();
+  // Answers are never kept by default; only the public catalogue says otherwise (and not on staging).
+  v1.use(noStore);
   // Requests that change data must come from this website, not from another one.
   v1.use(originCheck(env.APP_ORIGIN));
   const accounts = createAuthRouters({ env, logger, mailer });
@@ -75,7 +78,7 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
       actionRateLimitMax: env.PROJECT_ACTION_RATE_LIMIT_MAX,
     }),
   );
-  v1.use(catalogueRouter());
+  v1.use(catalogueRouter({ publicCaching: !env.STAGING_PASSWORD }));
   v1.use(
     contactRouter({
       mailer,

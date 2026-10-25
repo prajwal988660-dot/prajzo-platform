@@ -17,6 +17,8 @@ describe('requireDatabase', () => {
       message: expect.stringContaining('temporarily unavailable') as string,
     });
     expect(Date.now() - started).toBeLessThan(1000); // not the 10 s of waiting it replaces
+    // An outage must never be kept by a cache, even though the catalogue normally may be.
+    expect(response.headers['cache-control']).not.toMatch(/public|max-age/);
   });
 
   it('protects the packages list and the contact form too', async () => {
