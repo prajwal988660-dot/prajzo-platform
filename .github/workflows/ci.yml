@@ -1,6 +1,8 @@
 name: CI
 
-# Runs the same checks as `npm run check`, plus the browser tests, on every pull request and on main.
+# Runs the same checks as `npm run check`, plus the browser tests (on the development servers and on
+# the real production build) and a scan of everything git has ever recorded for secrets, on every
+# pull request and on main.
 on:
   pull_request:
   push:
@@ -20,11 +22,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          # All of git's history, so the scan for secrets can look at all of it.
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run scan:secrets -- --history
       - run: npm run check
 
   e2e:
@@ -40,3 +46,18 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  production:
+    name: Production build in a real browser (staging password, headers, cookies, pages)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Builds first, then runs the built server in production mode, never the development servers.
+      - run: npm run test:production
