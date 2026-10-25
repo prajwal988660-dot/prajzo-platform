@@ -108,7 +108,7 @@ prajzo/
 │        ├─ config/               settings loading and validation
 │        ├─ db/                   connection, models, seed data
 │        ├─ modules/              one folder per area: auth, catalogue, templates,
-│        │                        configurations, uploads, project-requests, admin,
+│        │                        configurations, uploads, projects, audit, admin,
 │        │                        contact, demo-submissions, health
 │        │                        (each holds its routes, service, schemas and tests)
 │        ├─ middleware/           guards, validation, rate limits, errors, headers
@@ -122,7 +122,9 @@ prajzo/
 │     └─ src/
 │        ├─ config/               website configuration schema and validation
 │        ├─ templates/            template definitions + default (demo) configurations
-│        ├─ workflow/             project statuses and allowed transitions
+│        ├─ projects/             project statuses and allowed transitions, requests, quotes
+│        ├─ admin/                what the admin pages send and receive: overview, activity,
+│        │                        customers, messages, catalogue
 │        └─ schemas/              request schemas (auth, contact, project requests…)
 ├─ e2e/                           Playwright end-to-end tests
 ├─ docs/                          roadmap, checklist, architecture, decisions, environment, setup
@@ -273,12 +275,12 @@ Every configuration stores `schemaVersion` and the template's `version`. When a 
 | `templates` | key (matches a template definition), title, summary, description, features[], categoryKeys[], previewImage, status (`draft` / `published` / `archived`), featured, sortOrder | key unique; admins edit this catalogue entry, while the design lives in code |
 | `packages` | key, name, targetDelivery (label, hours), scope[], priceMode (`quote` / `fixed` / `from`), priceAmountPaise, active, sortOrder | key unique; prices stay "Request a quote" until set |
 | `configurations` | ownerId, name, templateKey, templateVersion, schemaVersion, config, timestamps | { ownerId, updatedAt } |
-| `projectRequests` | reference, customerId, source (`start-form` / `builder`), title, categoryKey, categoryTitle, packageKey, packageName, description, features[], integrations[], preferredDate, contactPreference, contact (name, email, phone), notes, status, statusHistory[] (from, to, by, userId, note, at), timestamps. Added in Phase 5: quote, confirmedDeliveryDate, revisions, adminNotes[]. Added in Phase 14: configurationId, configSnapshot, templateKey | reference unique; { customerId, createdAt }; { status, updatedAt }. adminNotes are never sent to customers |
+| `projectRequests` | reference, customerId, source (`start-form` / `builder`), title, categoryKey, categoryTitle, packageKey, packageName, description, features[], integrations[], preferredDate, contactPreference, contact (name, email, phone), notes, status, statusHistory[] (from, to, by, userId, byName, note, at), timestamps. Added in Phase 5: events[] (customer answers, delivery date changes, sign-offs), quotes[] (version, amountPaise, scope, revisionsIncluded, sentAt, sentBy, sentByName), acceptedQuote (version, at, by), confirmedDeliveryDate, revisions (included, used), customerReplyPending, adminNotes[] (text, by, byName, at). Added in Phase 14: configurationId, configSnapshot, templateKey | reference unique; { customerId, createdAt }; { status, updatedAt }; { updatedAt }. adminNotes are never sent to customers. Quotes are only ever added to, never changed |
 | `assets` | ownerId, storageKey, url, mimeType, bytes, width, height, sha256, createdAt | { ownerId, createdAt } |
 | `counters` | `_id` (e.g. `projectRequest:2026`), seq | atomic increment produces reference numbers |
 | `contactMessages` | name, email, phone, message, status (`new` / `read` / `archived`), createdAt | { status, createdAt } |
 | `demoSubmissions` | demoKey, formType, payload, createdAt | expiry index: deleted after 7 days |
-| `auditLog` | actorId, action, targetType, targetId, details, at | { at }; { targetType, targetId } |
+| `auditlogs` | actorId, actorName, actorRole (`admin` / `customer`), action (such as `project.status`), summary (plain words, written when it happened), targetType (`project` / `category` / `package` / `contact-message`), targetId, at | { at }; { targetType, at }; { targetType, targetId, at }. Entries are only ever added |
 
 Relationships:
 
@@ -304,12 +306,17 @@ All routes are under `/api/v1` except the health checks. List endpoints take `?p
 | Signed in | `PATCH /me`, `POST /me/password` | Profile; change password (ends other sessions) |
 | Customer (own records) | `GET`, `POST /configurations`; `GET`, `PATCH`, `DELETE /configurations/:id`; `POST /configurations/:id/duplicate` | Saved designs |
 | Customer | `POST /uploads` | Image upload |
-| Customer (own records) | `GET`, `POST /project-requests`; `GET /project-requests/:reference`; `POST /project-requests/:reference/actions` | Project requests. Built in Phase 4: send, list, read and `cancel` (while early). Accepting or declining a quote, answering a question and asking for a revision arrive in Phase 5. Each project says which actions are allowed now (`allowedActions`) |
-| Admin | `GET /admin/overview` | Real counts and recent activity |
-| Admin | `GET /admin/project-requests`; `GET`, `PATCH /admin/project-requests/:reference`; `POST …/status`; `POST …/notes` | Review, quote, date, status, notes |
-| Admin | `GET /admin/customers`, `GET /admin/customers/:id` | Customers |
-| Admin | `GET`, `POST`, `PATCH /admin/templates…`, `/admin/categories…`, `/admin/packages…` | Catalogue management |
-| Admin | `GET`, `PATCH /admin/contact-messages…`; `GET /admin/demo-submissions`; `GET /admin/audit-log` | Inbox and audit |
+| Customer (own records) | `GET`, `POST /project-requests`; `GET /project-requests/:reference`; `POST /project-requests/:reference/actions` | Project requests. Send, list and read (Phase 4). `…/actions` does one of `cancel`, `accept-quote` (names the version seen), `decline-quote`, `reply`, `request-revision` or `sign-off` (Phase 5). Each project says which actions are allowed now (`allowedActions`) |
+| Admin | `GET /admin/overview` | Real counts by status, what needs doing now, recent activity |
+| Admin | `GET /admin/activity` | The activity log, newest first (`?targetType=` filters by kind) |
+| Admin | `GET /admin/project-requests` (`?status=`, `?q=`); `GET /admin/project-requests/:reference` | Every request, and one in full: quotes, notes, who did what |
+| Admin | `POST /admin/project-requests/:reference/status`; `…/delivery-date`; `…/notes` | Move a project on (with the quote, date or note the move needs), confirm or change the delivery date, add an internal note. A page that is out of date gets 409 |
+| Admin | `GET /admin/customers` (`?q=`), `GET /admin/customers/:id` | Customers and their projects |
+| Admin | `GET /admin/contact-messages` (`?status=`, `?q=`), `PATCH /admin/contact-messages/:id` | Inbox: new, read, archived |
+| Admin | `GET`, `POST /admin/categories`, `PATCH /admin/categories/:key`; `GET`, `POST /admin/packages`, `PATCH /admin/packages/:key` | Catalogue management, prices (Phase 5) |
+| Admin | `GET`, `POST`, `PATCH /admin/templates…`; `GET /admin/demo-submissions` | Template management and the demo inbox (Phase 8) |
+
+Every admin route sits behind one "must be an administrator" check applied to the whole admin router (visitors get 401, customers 403), and a test finds every route by itself to make sure.
 
 ## 8. Project status workflow
 
@@ -318,17 +325,17 @@ The rules live in `packages/shared/workflow` and the API enforces them. Every ch
 | From | To | Who may do it |
 |---|---|---|
 | Request Received | Under Review | Admin |
-| Under Review | Awaiting Customer Information | Admin |
+| Under Review | Awaiting Customer Information | Admin, with the question as a note † |
 | Under Review | Quote Sent | Admin (a quote amount and scope are required) |
 | Awaiting Customer Information | Under Review | Admin, after the customer has replied |
 | Quote Sent | Approved | Customer (accepts the quote), or Admin (records an acceptance received another way, with a note) |
 | Quote Sent | Under Review | Admin (revising the quote) |
 | Approved | In Development | Admin (a confirmed delivery date is required) |
 | In Development | Testing | Admin |
-| In Development | Awaiting Customer Information | Admin |
+| In Development | Awaiting Customer Information | Admin, with the question as a note † |
 | Testing | In Development | Admin |
 | Testing | Awaiting Customer Review | Admin |
-| Awaiting Customer Review | Revision Requested | Customer or Admin (counts one revision) |
+| Awaiting Customer Review | Revision Requested | Customer, or Admin recording it for them with a note of what was asked † (counts one revision) |
 | Awaiting Customer Review | Completed | Admin, after the customer signs off |
 | Revision Requested | In Development | Admin |
 | Request Received, Awaiting Customer Information, Quote Sent | Cancelled | Customer or Admin |
@@ -339,7 +346,7 @@ The workflow also enforces these rules:
 
 - Customers can never set a price, a delivery date or an admin-only status.
 - Accepting a quote is the customer's own decision. It doesn't approve anything on the admin's behalf.
-- These transitions were **confirmed** by the owner on 23 October 2026. When an admin makes one, some rows also need something from them: a quote (to Quote Sent), a confirmed delivery date (to In Development), or a note. The notes are shown to the customer in their timeline. See D-043 for the notes that were added to the three rows marked below.
+- These transitions were **confirmed** by the owner on 23 October 2026. When an admin makes one, some rows also need something from them: a quote (to Quote Sent), a confirmed delivery date (to In Development), or a note. The notes are shown to the customer in their timeline. The three rows marked † also need a note since Phase 5 (D-043). "It looks good" from the customer is a message to Prajzo, not a status change: only an admin completes the project (D-045).
 
 ## 9. Security and privacy
 

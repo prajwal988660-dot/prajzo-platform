@@ -100,6 +100,29 @@ Administrators can't be created on the website; there is no sign-up page for the
 
 Never type this password into a chat or a file. The command must run in a real terminal window, not through another program.
 
+### Try the whole journey on your computer
+
+You can play both sides, the customer and the studio, with two browser windows:
+
+1. Run `npm run host:local` and open http://localhost:8080 in your normal browser window. **Create a customer account** (a different email from your administrator's) and send a project from **Start a Project**.
+2. Open a **private window** (so the two sign-ins don't mix) and sign in at http://localhost:8080/admin/login with your administrator account.
+3. In the admin area, **Projects** shows the new request, marked "Needs you". Open it, then use **Move this project on**: Under Review, a question for the customer, a quote, and so on. Each move asks for what it needs (a quote, a date, a note), and the customer sees the new status, your notes and the quote on their project page.
+4. Switch to the customer window and reload. Answer the question, accept the quote, ask for changes, say it looks good. In the admin window, the project shows what the customer did and whose turn it is.
+5. Finish with **Completed**. Your **internal notes** are never shown to the customer.
+
+What each admin page is for:
+
+| Page | What you do there |
+|---|---|
+| Overview | See what needs you now, projects by status and recent activity |
+| Projects | Filter, search and open requests; quotes, delivery dates, notes and status changes |
+| Customers | Find a customer and see all their projects |
+| Messages | Read messages from the contact form, mark them read, archive them, and reply from your own email app |
+| Catalogue | Edit website types and packages, including prices (changes reach the website within about a minute) |
+| Activity | See who did what, and when |
+
+The emails the site would send (to the customer on every change, to you on what they do) are printed in the API log (`apps/api/logs/local-host.log` when hosted, or the terminal running `npm run dev`) until real email is set up in Phase 7.
+
 ## 4. Run Prajzo locally like a real server
 
 `npm run dev` is for working on the code. To see Prajzo the way visitors will, as one optimized site served from one address, host it locally:
@@ -132,6 +155,7 @@ npm run host:local
 | `This command asks you questions … run it yourself in a terminal window` | `admin:create` must run in a real terminal so it can hide the password. Run it from a terminal window, not through another tool |
 | Right-click does nothing on http://localhost:8080 | That is the right-click protection (D-037), which production builds have. It is off in `npm run dev`. To turn it off for a build, set `VITE_PROTECT_CONTENT=false` and build again |
 | "You've sent a lot of project requests in the last hour" | One customer account sent 10 project requests in an hour (spam protection). Wait an hour, or raise `PROJECT_REQUEST_RATE_LIMIT_MAX` in `apps/api/.env` while testing |
+| "You've done a lot in the last hour" | One customer account did 60 things to its projects in an hour (accepting quotes, answering questions, asking for changes, cancelling). Wait a little, or raise `PROJECT_ACTION_RATE_LIMIT_MAX` in `apps/api/.env` while testing |
 | `Port 8080 is already used by another program` | Something else is using port 8080. Close it, or set `LOCAL_HOST_PORT` to a different number |
 | `Port 5173 is already in use` or `Could not start the API on port 4000` | Another copy is already running. Close it, or find it with `Get-NetTCPConnection -LocalPort 5173` |
 | The `/dev/ui` page says **API not reachable** | `npm run dev` isn't running, or the API stopped; its message in the terminal says why |

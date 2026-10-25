@@ -40,7 +40,7 @@ Estimates are in 4-hour working sessions. They're rough: Phases 1–3 each took 
 | 2 | Public website and service catalogue | Browse Home, Services (15 categories), How It Works, Pricing, About, Contact (working form), Privacy, Terms | 1 (done, awaiting approval) | Approval |
 | 3 | Accounts and access control | Register, log in, log out, reset a password; log in as an admin created by a setup script | 1 (done, awaiting approval) | Approval |
 | 4 | Project requests and customer dashboard | Send a project from the Start a Project form, get a reference number, follow it in My Projects, cancel it while it's early | 1 (done, awaiting approval) | Approval |
-| 5 | Admin dashboard | Review requests, send quotes, set delivery dates, change statuses, read contact messages; customers accept quotes and ask for revisions | 5–6 | Approval |
+| 5 | Admin dashboard | Review requests, send quotes, set delivery dates, change statuses, read contact messages; customers accept quotes and ask for revisions | 2 (done, awaiting approval) | Approval |
 | 6 | Hardening and quality | Run the full test suite; security, accessibility, performance, SEO and code-protection passes done | 3–4 | Approval |
 | 7 | Deployment | **The main website live on your domain** (needs your hosting, email and domain accounts) | 2–3 | Approval |
 | 8 | Template engine + Demo 1: Portfolio | Open `/demo/portfolio`; see it on the Templates and Live Demos page | 5–6 | **Demo approval** |
@@ -51,7 +51,7 @@ Estimates are in 4-hour working sessions. They're rough: Phases 1–3 each took 
 | 13 | Demo 5: Forms and Quick Solutions | Open `/demo/forms`, submit each form, customize it | 2–3 | **Demo approval** |
 | 14 | Submit a design as a project | Customize a template, submit it, follow it in My Projects | 1 | Approval |
 
-Remaining: Phases 5–7 (main website online) about 10–13 sessions, Phases 8–14 (builder and demos) about 24–31. That is roughly 34–44 sessions, or 8–10 weeks at one session a day, five days a week, not counting time spent waiting for approvals.
+Remaining: Phases 6–7 (main website online) about 5–7 sessions, Phases 8–14 (builder and demos) about 24–31. That is roughly 29–38 sessions, or 6–8 weeks at one session a day, five days a week, not counting time spent waiting for approvals.
 
 **Not a numbered phase:** the protection of the website's code (D-037), added on request on 23 October 2026. See the checklist.
 
@@ -411,7 +411,7 @@ Every demo must:
 |---|---|---|
 | What to build next | "Go with option A": the main website first | Phases renumbered into build order (D-036) |
 | Protecting the website's and demos' code | "Disable right-click and CSS assets on staging, minify, bundle, password-protected staging … for our website and the demo site" | Staging password, a build that checks itself, right-click and image-drag blocking, a Terms clause; and a plain statement of what none of it can do (D-037) |
-| Project status workflow | "Workflow OK" (23 October): the table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), as proposed | Phase 5 builds the rest of it (D-020, D-043) |
+| Project status workflow | "Workflow OK" (23 October): the table in [ARCHITECTURE.md §8](ARCHITECTURE.md#8-project-status-workflow), as proposed | Built in Phase 5 (D-020, D-043) |
 | Approval of Phases 2 and 3 | "Continue" and "go with option A". Pull requests #2 and #3 are still open on GitHub for you to merge | Work continues stacked on them |
 
 ### Decisions still needed
@@ -420,6 +420,8 @@ Every demo must:
 |---|---|
 | Before Phase 7 | Your Hostinger plan type (Business or Cloud can run Prajzo; Single or Premium can't run Node.js apps; VPS needs manual setup), whether anything is live on prajzo.com today, and whether the contact@prajzo.com mailbox exists |
 | Phase 7 | Email provider, any paid plans |
+| Before real customers | Whether quotes should expire, how many rounds of changes you usually include, and what extra changes cost ([D-044](DECISIONS.md)). The site records and flags them but doesn't decide them |
+| With the lawyer's review | How long to keep the activity log and finished projects ([D-048](DECISIONS.md), [D-042](DECISIONS.md)) |
 | Phase 8 | Confirm that demo form submissions are stored and then deleted after 7 days |
 | Phase 9 | Image storage for the builder's uploads |
 
