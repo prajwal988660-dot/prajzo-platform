@@ -92,7 +92,7 @@ describe('who can see the admin overview', () => {
     expect(overview.projectRequests).toMatchObject({
       total: 0,
       received: 0,
-      toDo: { newRequests: 0, replies: 0, accepted: 0, revisions: 0 },
+      toDo: { newRequests: 0, replies: 0, accepted: 0, revisions: 0, signedOff: 0 },
     });
     expect(overview.recentActivity).toEqual([]);
   });

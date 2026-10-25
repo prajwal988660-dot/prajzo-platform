@@ -114,6 +114,12 @@ describe('a project from the first request to the last', () => {
     // 5. The customer says it looks good; Prajzo completes the project.
     expect((await customerDoes(customer, reference, { action: 'sign-off' })).status).toBe(200);
     await moment();
+    // Prajzo is told it is their turn: the customer is happy and the project is waiting to be completed.
+    expect(await adminView(admin, reference)).toMatchObject({
+      status: 'awaiting-review',
+      waitingOn: 'prajzo',
+      customerSignedOff: true,
+    });
     await adminMoves(admin, reference, {
       to: 'completed',
       note: 'Signed off by the customer. Thank you!',
@@ -161,6 +167,7 @@ describe('a project from the first request to the last', () => {
       status: 'completed',
       waitingOn: null,
       customerReplied: false,
+      customerSignedOff: false,
       revisionsOverIncluded: false,
     });
     expect(seen.allowedChanges).toEqual([]);

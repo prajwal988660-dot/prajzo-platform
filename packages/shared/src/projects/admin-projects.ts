@@ -33,6 +33,8 @@ export const adminProjectSummarySchema = projectSummarySchema.extend({
   waitingOn: waitingOnSchema.nullable(),
   /** The customer has answered a question and nobody has moved the project on since. */
   customerReplied: z.boolean(),
+  /** The customer said the finished project looks good, and it has not been completed yet. */
+  customerSignedOff: z.boolean(),
 });
 export type AdminProjectSummary = z.infer<typeof adminProjectSummarySchema>;
 
@@ -87,6 +89,7 @@ export const adminProjectDetailSchema = projectDetailSchema
     allowedChanges: z.array(allowedChangeSchema),
     waitingOn: waitingOnSchema.nullable(),
     customerReplied: z.boolean(),
+    customerSignedOff: z.boolean(),
     /** More revisions have been asked for than the accepted quote includes. */
     revisionsOverIncluded: z.boolean(),
   });

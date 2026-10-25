@@ -96,7 +96,7 @@ export async function changeProjectStatus(
   const change = canChangeStatus(from, to, 'admin');
   if (!change.allowed) {
     throw conflict(
-      `This project can't move from "${label(from)}" to "${label(to)}". It may have changed a moment ago: reload the page to see what is possible now.`,
+      `This project can't move from "${label(from)}" to "${label(to)}". It may have changed a moment ago. Check how it stands now.`,
     );
   }
   const needs = change.needs;
@@ -168,7 +168,7 @@ export async function changeProjectStatus(
   );
   if (!updated) {
     throw conflict(
-      'This project was changed by someone else a moment ago, so nothing was changed. Reload the page and try again.',
+      'This project was changed by someone else a moment ago, so nothing was changed. Check how it stands now and try again.',
     );
   }
   return { project: updated, from };
@@ -209,7 +209,7 @@ export async function setDeliveryDate(
   );
   if (!updated) {
     throw conflict(
-      'This project was changed by someone else a moment ago, so nothing was changed. Reload the page and try again.',
+      'This project was changed by someone else a moment ago, so nothing was changed. Check how it stands now and try again.',
     );
   }
   return { project: updated, from };

@@ -58,6 +58,7 @@ describe('the project list', () => {
       categoryTitle: 'Business Websites',
       waitingOn: 'prajzo',
       customerReplied: false,
+      customerSignedOff: false,
     });
     expect(result).toMatchObject({ page: 1, limit: 20, total: 2 });
   });
@@ -232,6 +233,7 @@ describe('opening a project', () => {
       preferredDate: inDays(30),
       waitingOn: 'customer',
       customerReplied: false,
+      customerSignedOff: false,
       revisions: null,
     });
     expect(view.quotes).toHaveLength(1);

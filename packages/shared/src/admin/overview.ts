@@ -23,6 +23,8 @@ export const adminOverviewSchema = z.object({
       accepted: count,
       /** Revisions the customer asked for. */
       revisions: count,
+      /** Customers who said a finished project looks good: waiting for Prajzo to complete it. */
+      signedOff: count,
     }),
   }),
   /** The latest things admins and customers did. */

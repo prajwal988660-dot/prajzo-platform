@@ -274,6 +274,7 @@ describe('adminProjectDetailSchema', () => {
     ],
     waitingOn: 'customer',
     customerReplied: false,
+    customerSignedOff: false,
     revisionsOverIncluded: false,
   };
 

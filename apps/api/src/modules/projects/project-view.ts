@@ -36,19 +36,30 @@ function toQuote(quote: QuoteRecord, accepted: boolean): Quote {
   };
 }
 
-/** Who has to act next. A customer's answer to a question hands the project back to Prajzo. */
+/**
+ * Who has to act next. A customer's answer to a question, or their "it looks good" on a finished
+ * project, hands the project back to Prajzo.
+ */
 export function waitingOn(project: ProjectRequestDocument): WaitingOn | null {
   if (isFinalStatus(project.status)) return null;
   if (project.status === 'awaiting-information') {
     return project.customerReplyPending ? 'prajzo' : 'customer';
   }
-  if (project.status === 'quote-sent' || project.status === 'awaiting-review') return 'customer';
+  if (project.status === 'awaiting-review') {
+    return signedOffSinceReview(project) ? 'prajzo' : 'customer';
+  }
+  if (project.status === 'quote-sent') return 'customer';
   return 'prajzo';
 }
 
 /** The customer answered a question and nobody has moved the project on since. */
 export function customerReplied(project: ProjectRequestDocument): boolean {
   return project.status === 'awaiting-information' && project.customerReplyPending === true;
+}
+
+/** The customer said the project looks good, and it is still waiting for Prajzo to complete it. */
+export function customerSignedOff(project: ProjectRequestDocument): boolean {
+  return project.status === 'awaiting-review' && signedOffSinceReview(project);
 }
 
 /** True once the customer has said the project looks good, since it last became ready for review. */
@@ -212,6 +223,7 @@ export function toAdminProjectSummary(project: ProjectRequestDocument): AdminPro
     customerEmail: project.contact.email,
     waitingOn: waitingOn(project),
     customerReplied: customerReplied(project),
+    customerSignedOff: customerSignedOff(project),
   };
 }
 
@@ -244,6 +256,7 @@ export function toAdminProjectDetail(project: ProjectRequestDocument): AdminProj
     }),
     waitingOn: waitingOn(project),
     customerReplied: customerReplied(project),
+    customerSignedOff: customerSignedOff(project),
     revisionsOverIncluded: revisions ? revisions.used > revisions.included : false,
   });
 }

@@ -1,4 +1,6 @@
 import {
+  adminOverviewSchema,
+  adminProjectListSchema,
   apiErrorBodySchema,
   formatRupees,
   projectStatuses,
@@ -476,6 +478,56 @@ describe('saying it looks good', () => {
     expect(project.allowedActions).toEqual(['request-revision']);
     expect(mailer.sent[0]?.subject).toBe(`${reference}: Asha Rao says it looks good`);
     expect(await AuditLogModel.countDocuments({ action: 'project.signed-off' })).toBe(1);
+  });
+
+  it('hands the project back to Prajzo: waiting on them, listed, counted, and reset by more changes', async () => {
+    const { customer, admin, reference } = await readyForReview();
+    const overview = async () =>
+      adminOverviewSchema.parse((await admin.get('/api/v1/admin/overview')).body);
+    const listed = async () =>
+      adminProjectListSchema
+        .parse((await admin.get('/api/v1/admin/project-requests')).body)
+        .items.find((item) => item.reference === reference);
+
+    // Before: the customer has the ball.
+    expect(await adminView(admin, reference)).toMatchObject({
+      waitingOn: 'customer',
+      customerSignedOff: false,
+    });
+    expect(await listed()).toMatchObject({ waitingOn: 'customer', customerSignedOff: false });
+    expect((await overview()).projectRequests.toDo.signedOff).toBe(0);
+
+    await customerDoes(customer, reference, { action: 'sign-off' });
+
+    // After: Prajzo has it, the list and the overview say so.
+    expect(await adminView(admin, reference)).toMatchObject({
+      waitingOn: 'prajzo',
+      customerSignedOff: true,
+    });
+    expect(await listed()).toMatchObject({ waitingOn: 'prajzo', customerSignedOff: true });
+    expect((await overview()).projectRequests.toDo.signedOff).toBe(1);
+
+    // Asking for more changes, and a new review, starts again: it is the customer's turn.
+    await customerDoes(customer, reference, {
+      action: 'request-revision',
+      message: 'One more change please.',
+    });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await backToReview(admin, reference);
+    expect(await adminView(admin, reference)).toMatchObject({
+      waitingOn: 'customer',
+      customerSignedOff: false,
+    });
+    expect((await overview()).projectRequests.toDo.signedOff).toBe(0);
+
+    // And once it is completed, nothing is waiting on anyone.
+    await customerDoes(customer, reference, { action: 'sign-off' });
+    await adminMoves(admin, reference, { to: 'completed' });
+    expect(await adminView(admin, reference)).toMatchObject({
+      waitingOn: null,
+      customerSignedOff: false,
+    });
+    expect((await overview()).projectRequests.toDo.signedOff).toBe(0);
   });
 
   it('cannot be said twice, but can be said again after another round of changes', async () => {

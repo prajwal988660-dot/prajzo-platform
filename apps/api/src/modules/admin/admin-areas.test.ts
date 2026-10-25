@@ -706,6 +706,7 @@ describe('the overview', () => {
       replies: 0,
       accepted: 0,
       revisions: 0,
+      signedOff: 0,
     });
     expect(overview.recentActivity).toEqual([]);
   });
@@ -766,6 +767,7 @@ describe('the overview', () => {
       replies: 1, // only the one where the customer has answered
       accepted: 1,
       revisions: 1,
+      signedOff: 0,
     });
   });
 

@@ -126,6 +126,22 @@ export const projectActions = [
 ] as const;
 export type ProjectAction = (typeof projectActions)[number];
 
+/** A customer's answer to a question from Prajzo. */
+export const replyMessageSchema = requiredText(
+  2,
+  2000,
+  'Write your answer',
+  'Keep your answer under 2,000 characters',
+);
+
+/** What a customer wants changed when they ask for a revision. */
+export const revisionMessageSchema = requiredText(
+  5,
+  1500,
+  "Tell us what you'd like changed (at least 5 characters)",
+  'Keep this under 1,500 characters',
+);
+
 /** POST /project-requests/:reference/actions: one shape for each thing a customer can do. */
 export const projectActionRequestSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('cancel'), note: optionalText(500) }),
@@ -136,19 +152,8 @@ export const projectActionRequestSchema = z.discriminatedUnion('action', [
     quoteVersion: z.number().int().min(1),
     note: optionalText(500),
   }),
-  z.object({
-    action: z.literal('reply'),
-    message: requiredText(2, 2000, 'Write your answer', 'Keep your answer under 2,000 characters'),
-  }),
-  z.object({
-    action: z.literal('request-revision'),
-    message: requiredText(
-      5,
-      1500,
-      "Tell us what you'd like changed (at least 5 characters)",
-      'Keep this under 1,500 characters',
-    ),
-  }),
+  z.object({ action: z.literal('reply'), message: replyMessageSchema }),
+  z.object({ action: z.literal('request-revision'), message: revisionMessageSchema }),
   z.object({ action: z.literal('sign-off') }),
 ]);
 export type ProjectActionRequest = z.output<typeof projectActionRequestSchema>;

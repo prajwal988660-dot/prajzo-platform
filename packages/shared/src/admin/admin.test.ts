@@ -220,7 +220,7 @@ describe('the overview', () => {
       total: 4,
       received: 1,
       byStatus: { ...counts, received: 1, 'quote-sent': 3 },
-      toDo: { newRequests: 1, replies: 0, accepted: 0, revisions: 0 },
+      toDo: { newRequests: 1, replies: 0, accepted: 0, revisions: 0, signedOff: 0 },
     },
     recentActivity: [],
   };
