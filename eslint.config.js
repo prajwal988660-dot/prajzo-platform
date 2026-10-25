@@ -44,6 +44,7 @@ export default defineConfig([
       'apps/web/scripts/**/*.mjs',
       'packages/**/*.ts',
       'e2e/**/*.ts',
+      'e2e-production/**/*.ts',
       '*.{js,ts}',
       'apps/*/*.config.ts',
       'packages/*/*.config.ts',
