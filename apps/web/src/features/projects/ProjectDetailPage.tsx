@@ -1,13 +1,6 @@
-import {
-  contactPreferenceLabels,
-  projectFeatureLabels,
-  projectIntegrationLabels,
-  projectResponseSchema,
-  projectStatusInfo,
-  type ProjectDetail,
-} from '@prajzo/shared';
+import { projectResponseSchema, projectStatusInfo, type ProjectDetail } from '@prajzo/shared';
 import { FolderSearch } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { Container } from '../../components/layout/Container';
 import { Alert } from '../../components/ui/Alert';
@@ -15,16 +8,22 @@ import { ButtonLink } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
-import { formatCalendarDate, formatDate, formatDateTime } from '../../lib/format';
+import { formatCalendarDate, formatDate } from '../../lib/format';
 import { useApi } from '../../lib/use-api';
 import { useNoIndex } from '../../lib/use-no-index';
 import { usePageTitle } from '../../lib/use-page-title';
 import { ContactOptions } from '../marketing/components/ContactOptions';
 import { PageIntro } from '../marketing/components/PageIntro';
 import { CancelProject } from './CancelProject';
+import { QuoteCard } from './QuoteCard';
+import { ReplyToQuestion } from './ReplyToQuestion';
+import { RequestDetails } from './RequestDetails';
+import { ReviewProject } from './ReviewProject';
 import { StatusBadge } from './StatusBadge';
+import { Timeline } from './Timeline';
+import type { Notice } from './use-project-action';
 
-/** One of the customer's projects: what they asked for, where it stands, and its timeline. */
+/** One of the customer's projects: what they asked for, where it stands, and what they can do next. */
 export function ProjectDetailPage() {
   const { reference = '' } = useParams();
   // A different reference starts again from scratch, so nothing from the last project lingers.
@@ -37,10 +36,26 @@ function ProjectDetailView({ reference }: { reference: string }) {
     `/v1/project-requests/${encodeURIComponent(reference)}`,
     projectResponseSchema,
   );
-  // The project after the customer cancelled it, so the page shows the new state at once.
+  // The project after the customer did something, so the page shows the new state at once.
   const [changed, setChanged] = useState<ProjectDetail | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const project = changed ?? loaded.data?.project ?? null;
   usePageTitle(project?.title ?? 'Project');
+
+  const { retry } = loaded;
+  const onDone = useCallback((updated: ProjectDetail, done: Notice) => {
+    setChanged(updated);
+    setNotice(done);
+  }, []);
+  // Someone moved the project on while this page was open: forget what we showed, load it again.
+  const onOutOfDate = useCallback(
+    (message: string) => {
+      setChanged(null);
+      setNotice({ tone: 'warning', title: 'The project has changed', text: message });
+      retry();
+    },
+    [retry],
+  );
 
   if (loaded.status === 'loading') {
     return (
@@ -56,6 +71,7 @@ function ProjectDetailView({ reference }: { reference: string }) {
           <EmptyState
             icon={FolderSearch}
             title="We couldn't find that project"
+            headingLevel={1}
             description="Check the reference number, or look for it in your list. Projects are only visible to the account that sent them."
             action={<ButtonLink to="/account/projects">See my projects</ButtonLink>}
           />
@@ -71,34 +87,29 @@ function ProjectDetailView({ reference }: { reference: string }) {
   if (!project) return null;
 
   return (
-    <ProjectView
-      project={project}
-      onCancelled={setChanged}
-      onOutOfDate={loaded.retry}
-      justCancelled={changed !== null}
-    />
+    <ProjectView project={project} notice={notice} onDone={onDone} onOutOfDate={onOutOfDate} />
   );
 }
 
 function ProjectView({
   project,
-  onCancelled,
+  notice,
+  onDone,
   onOutOfDate,
-  justCancelled,
 }: {
   project: ProjectDetail;
-  onCancelled: (project: ProjectDetail) => void;
-  onOutOfDate: () => void;
-  justCancelled: boolean;
+  notice: Notice | null;
+  onDone: (project: ProjectDetail, notice: Notice) => void;
+  onOutOfDate: (message: string) => void;
 }) {
   const info = projectStatusInfo[project.status];
   const noticeRef = useRef<HTMLDivElement>(null);
 
-  // After cancelling, the cancel button is gone; move focus to the confirmation so keyboard and
-  // screen-reader users aren't left with nothing selected.
+  // After something is done, its button may be gone; move focus to the confirmation so keyboard
+  // and screen-reader users aren't left with nothing selected.
   useEffect(() => {
-    if (justCancelled) noticeRef.current?.focus();
-  }, [justCancelled]);
+    if (notice) noticeRef.current?.focus();
+  }, [notice]);
 
   return (
     <>
@@ -111,11 +122,10 @@ function ProjectView({
 
       <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.5fr_1fr]">
         <div className="grid content-start gap-10">
-          {justCancelled && (
+          {notice && (
             <div ref={noticeRef} tabIndex={-1} className="outline-none">
-              <Alert tone="success" title="Your project has been cancelled">
-                No further work will be done on it. You&apos;re welcome to start a new project at
-                any time.
+              <Alert tone={notice.tone ?? 'success'} title={notice.title}>
+                {notice.text}
               </Alert>
             </div>
           )}
@@ -130,8 +140,37 @@ function ProjectView({
                 <span className="font-medium text-ink">What happens next: </span>
                 {info.next}
               </p>
+              {project.confirmedDeliveryDate && (
+                <p className="text-slate-700">
+                  <span className="font-medium text-ink">Delivery date: </span>
+                  {formatCalendarDate(project.confirmedDeliveryDate)}{' '}
+                  <span className="text-sm text-slate-600">(confirmed by Prajzo)</span>
+                </p>
+              )}
+              {project.revisions && project.status !== 'awaiting-review' && (
+                <p className="text-slate-700">
+                  <span className="font-medium text-ink">Rounds of changes used: </span>
+                  {project.revisions.used} of {project.revisions.included} included
+                </p>
+              )}
             </Card>
           </section>
+
+          {project.status === 'awaiting-information' && (
+            <ReplyToQuestion project={project} onDone={onDone} onOutOfDate={onOutOfDate} />
+          )}
+          {project.status === 'awaiting-review' && (
+            <ReviewProject project={project} onDone={onDone} onOutOfDate={onOutOfDate} />
+          )}
+          {project.quote && (
+            <QuoteCard
+              reference={project.reference}
+              quote={project.quote}
+              allowedActions={project.allowedActions}
+              onDone={onDone}
+              onOutOfDate={onOutOfDate}
+            />
+          )}
 
           <section aria-labelledby="request-heading">
             <h2 id="request-heading" className="text-xl font-semibold tracking-tight">
@@ -143,7 +182,7 @@ function ProjectView({
           {project.allowedActions.includes('cancel') && (
             <CancelProject
               reference={project.reference}
-              onCancelled={onCancelled}
+              onDone={onDone}
               onOutOfDate={onOutOfDate}
             />
           )}
@@ -154,7 +193,7 @@ function ProjectView({
             <h2 id="timeline-heading" className="text-xl font-semibold tracking-tight">
               Timeline
             </h2>
-            <Timeline project={project} />
+            <Timeline entries={project.timeline} audience="customer" />
           </section>
           <section aria-labelledby="help-heading">
             <h2 id="help-heading" className="text-xl font-semibold tracking-tight">
@@ -169,77 +208,5 @@ function ProjectView({
         </aside>
       </Container>
     </>
-  );
-}
-
-function Detail({ term, children }: { term: string; children: ReactNode }) {
-  return (
-    <div className="grid gap-1 border-b border-slate-100 py-4 sm:grid-cols-[11rem_1fr] sm:gap-4">
-      <dt className="text-sm font-medium text-slate-600">{term}</dt>
-      <dd className="min-w-0 break-words text-ink">{children}</dd>
-    </div>
-  );
-}
-
-function RequestDetails({ project }: { project: ProjectDetail }) {
-  const features = project.features.map((feature) => projectFeatureLabels[feature]);
-  const integrations = project.integrations.map(
-    (integration) => projectIntegrationLabels[integration],
-  );
-  return (
-    <dl className="mt-2">
-      <Detail term="Type of website">{project.categoryTitle}</Detail>
-      <Detail term="Package">{project.packageName ?? 'Not chosen yet'}</Detail>
-      <Detail term="About the project">
-        <span className="whitespace-pre-line">{project.description}</span>
-      </Detail>
-      <Detail term="Features">{features.length > 0 ? features.join(', ') : 'None chosen'}</Detail>
-      <Detail term="Services to connect">
-        {integrations.length > 0 ? integrations.join(', ') : 'None chosen'}
-      </Detail>
-      <Detail term="Preferred date">
-        {project.preferredDate ? (
-          <>
-            {formatCalendarDate(project.preferredDate)}{' '}
-            <span className="text-sm text-slate-600">(a wish, not a promise)</span>
-          </>
-        ) : (
-          'No date given'
-        )}
-      </Detail>
-      <Detail term="How to contact you">
-        {contactPreferenceLabels[project.contactPreference]}
-        {project.phone ? ` · ${project.phone}` : ''}
-      </Detail>
-      {project.notes && (
-        <Detail term="Notes">
-          <span className="whitespace-pre-line">{project.notes}</span>
-        </Detail>
-      )}
-    </dl>
-  );
-}
-
-function Timeline({ project }: { project: ProjectDetail }) {
-  const last = project.history.length - 1;
-  return (
-    <ol className="mt-5 grid gap-6 border-l-2 border-slate-200 pl-6">
-      {project.history.map((entry, index) => (
-        <li key={`${entry.at}-${index}`} className="relative">
-          <span
-            aria-hidden="true"
-            className={`absolute -left-[2.1rem] top-1.5 size-3 rounded-full ring-4 ring-white ${
-              index === last ? 'bg-brand-indigo' : 'bg-slate-300'
-            }`}
-          />
-          <p className="font-semibold text-ink">{projectStatusInfo[entry.to].label}</p>
-          <p className="text-sm text-slate-600">
-            {entry.by === 'customer' ? 'You' : 'Prajzo'} ·{' '}
-            <time dateTime={entry.at}>{formatDateTime(entry.at)}</time>
-          </p>
-          {entry.note && <p className="mt-1 text-sm text-slate-700">&ldquo;{entry.note}&rdquo;</p>}
-        </li>
-      ))}
-    </ol>
   );
 }

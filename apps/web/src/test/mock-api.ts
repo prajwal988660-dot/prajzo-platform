@@ -1,4 +1,20 @@
-import type { Category, ProjectDetail, ProjectSummary, ServicePackage } from '@prajzo/shared';
+import {
+  projectStatuses,
+  type AdminCategory,
+  type AdminContactMessage,
+  type AdminCustomer,
+  type AdminOverview,
+  type AdminPackage,
+  type AdminProjectDetail,
+  type AdminProjectSummary,
+  type AuditEntry,
+  type Category,
+  type ProjectDetail,
+  type ProjectStatus,
+  type ProjectSummary,
+  type Quote,
+  type ServicePackage,
+} from '@prajzo/shared';
 import { vi } from 'vitest';
 
 type Handler = (init: RequestInit | undefined) => Response | Promise<Response>;
@@ -150,10 +166,33 @@ export function sampleProject(overrides: Partial<ProjectDetail> = {}): ProjectDe
     contactPreference: 'whatsapp',
     phone: '+91 98866 07720',
     notes: 'Please message after 5 pm.',
-    history: [
-      { from: null, to: 'received', by: 'customer', note: null, at: '2026-10-23T13:30:00.000Z' },
+    timeline: [
+      {
+        kind: 'status',
+        from: null,
+        to: 'received',
+        by: 'customer',
+        note: null,
+        at: '2026-10-23T13:30:00.000Z',
+      },
     ],
+    quote: null,
+    confirmedDeliveryDate: null,
+    revisions: null,
     allowedActions: ['cancel'],
+    ...overrides,
+  };
+}
+
+/** A quote waiting for the customer's answer. */
+export function sampleQuote(overrides: Partial<Quote> = {}): Quote {
+  return {
+    version: 1,
+    amountPaise: 1_500_000,
+    scope: 'A five-page website with a photo gallery and a contact form, ready to publish.',
+    revisionsIncluded: 2,
+    sentAt: '2026-10-24T04:30:00.000Z',
+    accepted: false,
     ...overrides,
   };
 }
@@ -167,3 +206,152 @@ export function projectList(items: ProjectSummary[], total = items.length, page 
 export const noProjects: Record<string, Handler> = {
   'GET /api/v1/project-requests?limit=3': () => jsonResponse(200, projectList([], 0, 1, 3)),
 };
+
+// ---------- What administrators see
+
+/** A project in the admin list. */
+export function sampleAdminProjectSummary(
+  overrides: Partial<AdminProjectSummary> = {},
+): AdminProjectSummary {
+  return {
+    ...sampleProjectSummary(),
+    customerName: 'Asha Rao',
+    customerEmail: 'asha@example.com',
+    waitingOn: 'prajzo',
+    customerReplied: false,
+    customerSignedOff: false,
+    ...overrides,
+  };
+}
+
+/** A whole project as an admin sees it: a new request that has not been looked at yet. */
+export function sampleAdminProject(
+  overrides: Partial<AdminProjectDetail> = {},
+): AdminProjectDetail {
+  const {
+    timeline: _timeline,
+    quote: _quote,
+    allowedActions: _actions,
+    ...shared
+  } = sampleProject();
+  return {
+    ...shared,
+    source: 'start-form',
+    customer: {
+      id: 'user-1',
+      name: 'Asha Rao',
+      email: 'asha@example.com',
+      phone: '+91 98866 07720',
+    },
+    timeline: [
+      {
+        kind: 'status',
+        from: null,
+        to: 'received',
+        by: 'customer',
+        note: null,
+        at: '2026-10-23T13:30:00.000Z',
+        actorName: 'Asha Rao',
+      },
+    ],
+    quotes: [],
+    adminNotes: [],
+    allowedChanges: [
+      { to: 'under-review', needs: null },
+      { to: 'cancelled', needs: null },
+    ],
+    waitingOn: 'prajzo',
+    customerReplied: false,
+    customerSignedOff: false,
+    revisionsOverIncluded: false,
+    ...overrides,
+  };
+}
+
+/** A quote an admin sent. */
+export function sampleAdminQuote(
+  overrides: Partial<AdminProjectDetail['quotes'][number]> = {},
+): AdminProjectDetail['quotes'][number] {
+  return { ...sampleQuote(), sentByName: 'Prajzo Admin', ...overrides };
+}
+
+/** Counts for the overview: four projects, two unread messages, one thing to do. */
+export function sampleOverview(overrides: Partial<AdminOverview> = {}): AdminOverview {
+  const byStatus = Object.fromEntries(projectStatuses.map((status) => [status, 0])) as Record<
+    ProjectStatus,
+    number
+  >;
+  return {
+    customers: 3,
+    contactMessages: { total: 5, unread: 2 },
+    projectRequests: {
+      total: 4,
+      received: 1,
+      byStatus: { ...byStatus, received: 1, 'under-review': 1, 'quote-sent': 2 },
+      toDo: { newRequests: 1, replies: 0, accepted: 0, revisions: 0, signedOff: 0 },
+    },
+    recentActivity: [sampleAuditEntry()],
+    ...overrides,
+  };
+}
+
+/** One line of the activity log. */
+export function sampleAuditEntry(overrides: Partial<AuditEntry> = {}): AuditEntry {
+  return {
+    id: 'audit-1',
+    at: '2026-10-23T13:30:00.000Z',
+    actorName: 'Asha Rao',
+    actorRole: 'customer',
+    action: 'project.created',
+    summary: 'Sent the project "Website for my studio"',
+    targetType: 'project',
+    targetId: 'PRZ-2026-0001',
+    ...overrides,
+  };
+}
+
+export function sampleAdminCustomer(overrides: Partial<AdminCustomer> = {}): AdminCustomer {
+  return {
+    id: 'user-1',
+    name: 'Asha Rao',
+    email: 'asha@example.com',
+    phone: '+91 98866 07720',
+    status: 'active',
+    projectCount: 2,
+    createdAt: '2026-10-01T05:00:00.000Z',
+    lastLoginAt: '2026-10-23T13:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function sampleContactMessage(
+  overrides: Partial<AdminContactMessage> = {},
+): AdminContactMessage {
+  return {
+    id: 'message-1',
+    name: 'Ravi Kumar',
+    email: 'ravi@example.com',
+    phone: '98866 07720',
+    websiteType: 'business-websites',
+    websiteTypeTitle: 'Business Websites',
+    packageKey: 'professional-website',
+    packageName: 'Professional Website',
+    message: 'Hello, I would like a website for my sweet shop.\nCan you share the cost?',
+    status: 'new',
+    createdAt: '2026-10-23T13:30:00.000Z',
+    ...overrides,
+  };
+}
+
+export function sampleAdminCategory(overrides: Partial<AdminCategory> = {}): AdminCategory {
+  return { ...sampleCategories[0]!, sortOrder: 10, active: true, ...overrides };
+}
+
+export function sampleAdminPackage(overrides: Partial<AdminPackage> = {}): AdminPackage {
+  return { ...samplePackages[1]!, sortOrder: 20, active: true, ...overrides };
+}
+
+/** Any list the API sends in pages. */
+export function pageOf<T>(items: T[], total = items.length, page = 1, limit = 20) {
+  return { items, page, limit, total };
+}

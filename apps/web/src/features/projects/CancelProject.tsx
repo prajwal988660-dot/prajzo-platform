@@ -1,13 +1,10 @@
-import { projectResponseSchema, type ProjectDetail } from '@prajzo/shared';
+import type { ProjectDetail } from '@prajzo/shared';
 import { useState } from 'react';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { TextAreaField } from '../../components/ui/Field';
-import { ApiError, apiRequest } from '../../lib/api';
-import { submitErrorMessage } from '../../lib/form-errors';
-
-type State = { kind: 'idle' } | { kind: 'working' } | { kind: 'failed'; message: string };
+import { useProjectAction, type Notice } from './use-project-action';
 
 /**
  * Cancelling a project that is still early. It asks first, because it can't be undone, and the
@@ -15,39 +12,18 @@ type State = { kind: 'idle' } | { kind: 'working' } | { kind: 'failed'; message:
  */
 export function CancelProject({
   reference,
-  onCancelled,
+  onDone,
   onOutOfDate,
 }: {
   reference: string;
-  onCancelled: (project: ProjectDetail) => void;
+  onDone: (project: ProjectDetail, notice: Notice) => void;
   /** The project changed while the page was open, so the page should load it again. */
-  onOutOfDate: () => void;
+  onOutOfDate: (message: string) => void;
 }) {
   const [asking, setAsking] = useState(false);
   const [reason, setReason] = useState('');
-  const [state, setState] = useState<State>({ kind: 'idle' });
-
-  const cancel = async () => {
-    setState({ kind: 'working' });
-    try {
-      const { project } = await apiRequest(
-        `/v1/project-requests/${encodeURIComponent(reference)}/actions`,
-        projectResponseSchema,
-        {
-          method: 'POST',
-          body: JSON.stringify({ action: 'cancel', note: reason.trim() || undefined }),
-        },
-      );
-      onCancelled(project);
-    } catch (error) {
-      setState({
-        kind: 'failed',
-        message: submitErrorMessage(error, 'Something went wrong. Please try again.'),
-      });
-      // Someone may have moved the project on while this page was open: show how it is now.
-      if (error instanceof ApiError && error.status === 409) onOutOfDate();
-    }
-  };
+  const { state, run, reset } = useProjectAction(reference, onDone, onOutOfDate);
+  const working = state.kind === 'working';
 
   return (
     <section aria-labelledby="cancel-heading">
@@ -88,17 +64,25 @@ export function CancelProject({
               <Button
                 variant="primary"
                 className="bg-rose-700 hover:bg-rose-800"
-                loading={state.kind === 'working'}
-                onClick={() => void cancel()}
+                loading={working}
+                onClick={() =>
+                  void run(
+                    { action: 'cancel', note: reason.trim() || undefined },
+                    {
+                      title: 'Your project has been cancelled',
+                      text: "No further work will be done on it. You're welcome to start a new project at any time.",
+                    },
+                  )
+                }
               >
-                {state.kind === 'working' ? 'Cancelling…' : 'Yes, cancel this project'}
+                {working ? 'Cancelling…' : 'Yes, cancel this project'}
               </Button>
               <Button
                 variant="ghost"
-                disabled={state.kind === 'working'}
+                disabled={working}
                 onClick={() => {
                   setAsking(false);
-                  setState({ kind: 'idle' });
+                  reset();
                 }}
               >
                 Keep my project
