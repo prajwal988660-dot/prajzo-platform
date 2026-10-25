@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 25 October 2026 (Phase 5 done, waiting for your approval)
+Last updated: 25 October 2026 (Phase 6 started)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -209,22 +209,28 @@ Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 - [x] Looked at by eye at 390, 768 and 1280 px: 72 screenshots (24 pages and states at each width). The main pages were checked at all three widths and the problems found were fixed (cards two across on a phone, dropdown text, baseline of the request details)
 - [x] Docs updated: decisions D-043 to D-050, architecture (data model, API, workflow), setup (a walk-through of the admin area), environment, roadmap, README
 - [ ] **Your action:** create your administrator account ([SETUP.md](SETUP.md), section 3) and try the admin area with the walk-through right after it
-- [ ] **(gate)** Approval for Phase 6
+- [x] **(gate)** Approval for Phase 6: you said "start Phase 6" on 25 October. Pull request #6 for Phase 5 is still open
 
 ## Phase 6: Hardening and quality
 
+Started 25 October 2026 ("start Phase 6"). The plan below comes from looking first at what already exists: strict security headers, safe cookies, an origin check, rate limits on sign-in, contact and projects, a build that checks itself and a staging password were all in place. What was missing is listed here.
+
 - [ ] Security review:
-  - [ ] Security headers and content security policy
-  - [ ] Cookies and sessions
-  - [ ] Rate limits
-  - [ ] `npm audit`
-- [ ] Code protection checked on the real production build: no source maps, no development code, the staging password covers every file, right-click blocking leaves form fields working
-- [ ] Full end-to-end suite green
-- [ ] Every page checked at 390, 768 and 1280 px
-- [ ] Automated accessibility checks (axe) plus a manual keyboard pass, including where focus goes after moving between pages of a list (it returns to the top of the page)
-- [ ] Performance: code splitting, image sizes, Lighthouse check
-- [ ] SEO titles and descriptions, Open Graph images, favicons
-- [ ] Error logging; database backup and restore rehearsed
+  - [ ] Dependency audit: the one high-severity finding (`body-parser`) fixed; an audit step in the GitHub checks
+  - [ ] Security headers and content security policy: confirmed in a real browser on the production build (no policy violations on any page); a Permissions-Policy added; tests that every kind of response carries the headers
+  - [ ] Cookies and sessions: the `__Host-` cookie name in production; an absolute limit on how long a session can last (a session that is used every day can no longer live for ever); tests
+  - [ ] Rate limits: an overall limit per address on the API (including the database health check), a limit on the admin area, and a clear note on `TRUST_PROXY` (without it, behind a host's proxy every visitor looks like one address); tests
+  - [ ] A scan that no secret (the database password, the session secret) was ever committed
+- [ ] Code protection checked on the real production build (D-037), as an automated test that also runs on GitHub: every file needs the staging password and none leaks without it; no source maps or development code; right-click blocking leaves form fields and the keyboard working
+- [ ] Every page checked at 320, 390, 768 and 1280 px: an automated check that nothing scrolls sideways or is clipped, on public, account and admin pages, plus a look at the screenshots
+- [ ] Accessibility: axe checks on the production build too; a keyboard pass written as tests (skip link, tab order, the phone menu, where focus goes after changing page and after moving between pages of a list, what right-click blocking does to the menu key)
+- [ ] Performance: compression; images at the size they are shown (the logo file is 800 px wide and shown about 150 px wide); Lighthouse on the production build before and after, with the scores recorded
+- [ ] SEO and sharing: a title and description for every page; `robots.txt` and `sitemap.xml`; canonical addresses; a social preview (Open Graph and Twitter) with an image; favicons and a web manifest; structured data for the business; private and unknown pages kept out of search results
+- [ ] Error logging: a clear fatal log for crashes; browser errors reported to a small endpoint that logs them (with a note in the Privacy Policy); the request id on every log line
+- [ ] Database backup and restore: scripts, a rehearsal on a throw-away database with realistic data (contents compared), and a how-to
+- [ ] Full end-to-end suite green, on this PC and on GitHub
+- [ ] Docs updated: decisions, the security section of the architecture, environment, setup, and a how-to for operations
+- [ ] **Your action:** rehearse the backup and restore on your own Atlas database once it connects (steps in the how-to)
 - [ ] **(gate)** Approval for Phase 7
 
 ## Phase 7: Deployment
