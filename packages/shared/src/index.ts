@@ -1,3 +1,6 @@
+// First on purpose: it must run before any schema is created (see the file).
+import './zod-config';
+
 export * from './api/errors';
 export * from './api/health';
 export * from './admin/audit';
