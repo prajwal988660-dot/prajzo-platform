@@ -1,7 +1,7 @@
 import { apiErrorBodySchema, okResponseSchema, sessionResponseSchema } from '@prajzo/shared';
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCaptureMailer } from '../../services/mailer';
 import {
   browser,
@@ -178,7 +178,7 @@ describe('signing in', () => {
     expect(cookie).toMatch(/Expires=/i); // lasts for a set time, not just until the browser closes
   });
 
-  it('marks the cookie Secure in production (behind a trusted proxy that speaks https)', async () => {
+  it('uses the __Host- cookie in production: Secure, whole site, no Domain (behind a proxy that speaks https)', async () => {
     const { app } = newApp({
       NODE_ENV: 'production',
       APP_ORIGIN: 'https://prajzo.example',
@@ -190,7 +190,19 @@ describe('signing in', () => {
       .send(customerInput);
 
     expect(response.status).toBe(201);
-    expect(setCookieHeader(response)).toMatch(/Secure/i);
+    const cookie = setCookieHeader(response);
+    // Browsers accept a cookie with this name only if it has exactly these attributes.
+    expect(cookie).toMatch(/^__Host-prajzo\.sid=/);
+    expect(cookie).toMatch(/; Secure/i);
+    expect(cookie).toMatch(/; Path=\/(;|$)/);
+    expect(cookie).not.toMatch(/Domain=/i);
+    expect(cookie).toMatch(/HttpOnly/i);
+    expect(cookie).toMatch(/SameSite=Lax/i);
+  });
+
+  it('keeps the plain cookie name while developing and testing', async () => {
+    const { app } = newApp();
+    expect(setCookieHeader(await signUp(browser(app)))).toMatch(/^prajzo\.sid=/);
   });
 
   it('refuses a disabled account with a clear message, but only after the right password', async () => {
@@ -684,5 +696,112 @@ describe('the database connection itself', () => {
   it('is the in-memory test database, not a real one', () => {
     expect(mongoose.connection.host).toBeTruthy();
     expect(mongoose.connection.name).toBe('prajzo-test');
+  });
+});
+
+describe('how long a sign-in can last in total', () => {
+  const HOUR = 60 * 60 * 1000;
+  const DAY = 24 * HOUR;
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /**
+   * Visits at each of the given moments (milliseconds after `start`), as someone who keeps using
+   * the site would, and says whether they were still signed in at the last one. A visit that finds
+   * them signed out stops the walk.
+   */
+  async function stillSignedInAfter(
+    agent: ReturnType<typeof browser>,
+    start: number,
+    visits: number[],
+  ) {
+    let signedIn = true;
+    for (const moment of visits) {
+      vi.setSystemTime(start + moment);
+      const answer = sessionResponseSchema.parse((await agent.get('/api/v1/auth/me')).body);
+      signedIn = answer.user !== null;
+      if (!signedIn) break;
+    }
+    return signedIn;
+  }
+
+  const every = (step: number, until: number) =>
+    Array.from({ length: Math.floor(until / step) }, (_, index) => (index + 1) * step);
+
+  it('ends a customer sign-in after 60 days, even one used every ten days', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const { app } = newApp();
+    const agent = browser(app);
+    await signUp(agent);
+    const start = Date.now();
+
+    expect(await stillSignedInAfter(agent, start, every(10 * DAY, 60 * DAY))).toBe(true);
+    expect(await stillSignedInAfter(agent, start, [60 * DAY + HOUR])).toBe(false);
+    // It is really over: the guarded routes refuse too, and the stored session is gone.
+    expect((await agent.get('/api/v1/project-requests')).status).toBe(401);
+    expect(await sessionsCollection().countDocuments()).toBe(0);
+  });
+
+  it('ends an administrator sign-in after 24 hours, even one used every six hours', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const { app } = newApp();
+    await createAdminUser({ name: 'Boss', email: 'boss@example.com', password: strongPassword });
+    const agent = browser(app);
+    const login = await agent
+      .post('/api/v1/auth/admin/login')
+      .send({ email: 'boss@example.com', password: strongPassword });
+    expect(login.status).toBe(200);
+    const start = Date.now();
+
+    expect(await stillSignedInAfter(agent, start, every(6 * HOUR, 24 * HOUR))).toBe(true);
+    expect((await agent.get('/api/v1/admin/overview')).status).toBe(200);
+    expect(await stillSignedInAfter(agent, start, [24 * HOUR + 60_000])).toBe(false);
+    expect((await agent.get('/api/v1/admin/overview')).status).toBe(401);
+  });
+
+  it('can be set shorter, and tells the browser to forget the cookie when it ends', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const { app } = newApp({ SESSION_TTL_DAYS: '2', SESSION_MAX_DAYS: '3' });
+    const agent = browser(app);
+    await signUp(agent);
+    const start = Date.now();
+
+    expect(await stillSignedInAfter(agent, start, every(DAY, 3 * DAY))).toBe(true);
+    vi.setSystemTime(start + 3 * DAY + HOUR);
+    const over = await agent.get('/api/v1/auth/me');
+    expect(sessionResponseSchema.parse(over.body).user).toBeNull();
+    expect(setCookieHeader(over)).toMatch(/^prajzo\.sid=;/);
+  });
+
+  it('signs out a session that was made before this limit existed', async () => {
+    const { app } = newApp();
+    const agent = browser(app);
+    await signUp(agent);
+    await sessionsCollection().updateMany({}, { $unset: { 'session.startedAt': '' } });
+
+    const answer = await agent.get('/api/v1/auth/me');
+
+    expect(sessionResponseSchema.parse(answer.body).user).toBeNull();
+    expect((await agent.get('/api/v1/project-requests')).status).toBe(401);
+  });
+
+  it('starts the clock again from a new sign-in', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const { app } = newApp({ SESSION_TTL_DAYS: '2', SESSION_MAX_DAYS: '3' });
+    const agent = browser(app);
+    await signUp(agent);
+    vi.setSystemTime(Date.now() + 3 * DAY + HOUR);
+    expect(sessionResponseSchema.parse((await agent.get('/api/v1/auth/me')).body).user).toBeNull();
+
+    const again = await agent
+      .post('/api/v1/auth/login')
+      .send({ email: 'asha@example.com', password: strongPassword });
+    expect(again.status).toBe(200);
+    vi.setSystemTime(Date.now() + DAY);
+    expect(
+      sessionResponseSchema.parse((await agent.get('/api/v1/auth/me')).body).user,
+    ).not.toBeNull();
   });
 });

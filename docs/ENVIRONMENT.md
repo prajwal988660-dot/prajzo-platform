@@ -27,6 +27,8 @@ Secrets and settings live in environment variables, never in code.
 | `PROJECT_ACTION_RATE_LIMIT_MAX` | `60` | No | Things one customer may do to their projects per hour: accept or decline a quote, answer a question, ask for a revision, cancel |
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
+| `SESSION_MAX_DAYS` | `60` | No | The longest a customer's sign-in can last in total, however often it is used. Not shorter than `SESSION_TTL_DAYS` |
+| `ADMIN_SESSION_MAX_HOURS` | `24` | No | The longest an administrator's sign-in can last in total. Not shorter than `ADMIN_SESSION_TTL_HOURS` |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
 | `STAGING_PASSWORD` | (unset) | No | Set it only on a staging site. Every page, file and API request then asks for a username and password. At least 12 characters. Leave it unset on the live site (D-037) |
 | `STAGING_USER` | `preview` | No | The username that goes with `STAGING_PASSWORD`: letters, digits, dots, dashes and underscores |

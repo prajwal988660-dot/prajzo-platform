@@ -1,7 +1,7 @@
 import type { Express } from 'express';
 import mongoose from 'mongoose';
 import request from 'supertest';
-import { sessionCookieName } from '../modules/auth/session';
+import { productionSessionCookieName, sessionCookieName } from '../modules/auth/session';
 
 export const customerInput = {
   name: 'Asha Rao',
@@ -36,10 +36,17 @@ export function sessionCookieOf(response: { headers: Record<string, unknown> }):
   return match ? (match.split(';')[0]?.slice(sessionCookieName.length + 1) ?? null) : null;
 }
 
+/** The whole Set-Cookie line for the session cookie (whichever name it has here), or ''. */
 export function setCookieHeader(response: { headers: Record<string, unknown> }): string {
   const header = response.headers['set-cookie'];
   const cookies = Array.isArray(header) ? (header as string[]) : [];
-  return cookies.find((cookie) => cookie.startsWith(`${sessionCookieName}=`)) ?? '';
+  return (
+    cookies.find(
+      (cookie) =>
+        cookie.startsWith(`${sessionCookieName}=`) ||
+        cookie.startsWith(`${productionSessionCookieName}=`),
+    ) ?? ''
+  );
 }
 
 /** Direct access to the stored sessions, for tests about expiry and sign-out. */

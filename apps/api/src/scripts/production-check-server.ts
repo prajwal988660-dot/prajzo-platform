@@ -77,6 +77,8 @@ const server = spawn(process.execPath, [serverFile], {
     CONTACT_RATE_LIMIT_MAX: '1000',
     PROJECT_REQUEST_RATE_LIMIT_MAX: '1000',
     PROJECT_ACTION_RATE_LIMIT_MAX: '10000',
+    API_RATE_LIMIT_MAX: '100000',
+    ADMIN_RATE_LIMIT_MAX: '100000',
   },
 });
 

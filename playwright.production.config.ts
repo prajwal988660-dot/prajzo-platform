@@ -40,8 +40,9 @@ function serverFor(port: number, password: string) {
   };
 }
 
-// The tests act as the host's proxy would: it handles https and says so to the server.
-const behindProxy = { 'X-Forwarded-Proto': 'https' };
+// The tests act as the host's proxy would: it handles https, says so to the server, and passes on
+// the address of the visitor (here an address from the range reserved for documentation).
+const behindProxy = { 'X-Forwarded-Proto': 'https', 'X-Forwarded-For': '198.51.100.7' };
 
 export default defineConfig({
   testDir: 'e2e-production',

@@ -35,6 +35,11 @@ test.describe('security headers', () => {
       expect(headers['strict-transport-security'], note).toMatch(
         /^max-age=\d{7,}; includeSubDomains$/,
       );
+      // The browser features the site never uses are switched off, even for code that got in.
+      for (const feature of ['camera', 'microphone', 'geolocation', 'payment', 'usb']) {
+        expect(headers['permissions-policy'], note).toContain(`${feature}=()`);
+      }
+      expect(headers['permissions-policy'], note).not.toMatch(/=\(\*\)|=\*/);
       // Nothing that tells a stranger what software is running.
       expect(headers['x-powered-by'], note).toBeUndefined();
       expect(headers['server'], note).toBeUndefined();

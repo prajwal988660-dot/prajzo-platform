@@ -67,6 +67,27 @@ describe('parseEnv', () => {
     expect(problemsFor({ ...valid, PORT: '99999' }).join('\n')).toMatch(/PORT/);
   });
 
+  it('limits how long a sign-in can last in total, by default 60 days and 24 hours', () => {
+    const env = parseEnv(valid);
+    expect(env.SESSION_MAX_DAYS).toBe(60);
+    expect(env.ADMIN_SESSION_MAX_HOURS).toBe(24);
+    expect(
+      parseEnv({ ...valid, SESSION_MAX_DAYS: '90', ADMIN_SESSION_MAX_HOURS: '12' }),
+    ).toMatchObject({
+      SESSION_MAX_DAYS: 90,
+      ADMIN_SESSION_MAX_HOURS: 12,
+    });
+  });
+
+  it('refuses a total limit shorter than the idle limit, naming the setting', () => {
+    expect(problemsFor({ ...valid, SESSION_TTL_DAYS: '14', SESSION_MAX_DAYS: '7' })).toEqual([
+      'SESSION_MAX_DAYS must not be shorter than SESSION_TTL_DAYS',
+    ]);
+    expect(
+      problemsFor({ ...valid, ADMIN_SESSION_TTL_HOURS: '8', ADMIN_SESSION_MAX_HOURS: '4' }),
+    ).toEqual(['ADMIN_SESSION_MAX_HOURS must not be shorter than ADMIN_SESSION_TTL_HOURS']);
+  });
+
   it('requires a long session secret without echoing the value', () => {
     const problems = problemsFor({ ...valid, SESSION_SECRET: 'tiny-secret' });
     expect(problems.join('\n')).toMatch(/SESSION_SECRET must be at least 32 characters/);

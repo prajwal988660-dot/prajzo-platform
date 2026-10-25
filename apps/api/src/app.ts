@@ -8,6 +8,7 @@ import type { Logger } from './lib/logger';
 import { apiNotFound, errorHandler } from './middleware/error-handler';
 import { noStore } from './middleware/no-store';
 import { originCheck } from './middleware/origin-check';
+import { apiRateLimit, proxyCheck } from './middleware/rate-limits';
 import { securityHeaders } from './middleware/security-headers';
 import { createStagingGate } from './middleware/staging-gate';
 import { adminRouter } from './modules/admin/admin.routes';
@@ -35,6 +36,7 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   app.set('trust proxy', env.TRUST_PROXY ? 1 : false);
 
   app.use(securityHeaders(env));
+  app.use(proxyCheck(env, logger));
   app.use(
     pinoHttp({
       logger,
@@ -52,6 +54,8 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
     app.use(createStagingGate({ user: env.STAGING_USER, password: env.STAGING_PASSWORD }));
   }
 
+  // The overall limit comes before the body is read, so a flood of large requests is refused cheaply.
+  app.use('/api', apiRateLimit(env.API_RATE_LIMIT_MAX));
   app.use(express.json({ limit: '100kb' }));
 
   const v1 = Router();
@@ -68,7 +72,14 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
     notifyEmail: env.ADMIN_NOTIFY_EMAIL ?? siteContact.email,
     appOrigin: env.APP_ORIGIN,
   });
-  v1.use('/admin', adminRouter({ sessions: accounts.sessions, effects }));
+  v1.use(
+    '/admin',
+    adminRouter({
+      sessions: accounts.sessions,
+      effects,
+      rateLimitMax: env.ADMIN_RATE_LIMIT_MAX,
+    }),
+  );
   v1.use(
     '/project-requests',
     projectRequestRouter({
