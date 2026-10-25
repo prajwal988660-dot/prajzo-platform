@@ -1,0 +1,31 @@
+name: Dependency audit
+
+# Looks for known security problems in the packages Prajzo depends on. It runs every Monday, when
+# the list of dependencies changes, and on request. It is separate from CI on purpose: a newly
+# published advisory shouldn't turn an unrelated pull request red.
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  pull_request:
+    paths: ['package.json', 'package-lock.json', 'apps/*/package.json', 'packages/*/package.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit (high severity and above)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # Everything that ships to visitors, including its own dependencies.
+      - run: npm audit --omit=dev --audit-level=high
+      # Tools used only while building and testing: reported, but they can't reach a visitor.
+      - run: npm audit --audit-level=high
+        continue-on-error: true
