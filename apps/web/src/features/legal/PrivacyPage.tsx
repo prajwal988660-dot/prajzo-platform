@@ -1,9 +1,9 @@
 import { siteContact, siteLinks } from '@prajzo/shared';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { LegalPage } from './LegalPage';
 
 export function PrivacyPage() {
-  usePageTitle('Privacy Policy');
+  usePageMeta('/privacy');
   return (
     <LegalPage eyebrow="Legal" title="Privacy Policy" updated="23 October 2026">
       <section>

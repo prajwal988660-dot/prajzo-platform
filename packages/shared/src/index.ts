@@ -18,4 +18,5 @@ export * from './projects/admin-projects';
 export * from './projects/project-request';
 export * from './projects/status';
 export * from './site';
+export * from './site-pages';
 export * from './text';

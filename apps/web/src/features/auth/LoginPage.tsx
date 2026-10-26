@@ -8,14 +8,14 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { PasswordField, TextField } from '../../components/ui/Field';
 import { submitErrorMessage } from '../../lib/form-errors';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useAuth } from './auth-context';
 import { AuthPageShell } from './AuthPageShell';
 
 const linkClass = 'font-medium text-brand-indigo underline underline-offset-2';
 
 export function LoginPage() {
-  usePageTitle('Sign in');
+  usePageMeta('/login');
   const auth = useAuth();
   const [searchParams] = useSearchParams();
   const [failure, setFailure] = useState<string | null>(null);

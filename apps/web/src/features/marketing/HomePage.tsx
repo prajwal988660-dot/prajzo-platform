@@ -5,7 +5,7 @@ import { Badge } from '../../components/ui/Badge';
 import { ButtonLink } from '../../components/ui/Button';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
 import { SectionHeading } from '../../components/ui/SectionHeading';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
 import { CallToActionBand } from './components/CallToActionBand';
 import { CategoryCard } from './components/CategoryCard';
@@ -19,7 +19,7 @@ import { customizationOptions, generalFaqs, reasonsToChoose } from './content';
 const customizationIcons = [Layers, Palette, Type, Puzzle] as const;
 
 export function HomePage() {
-  usePageTitle();
+  usePageMeta('/');
   return (
     <>
       <Hero />

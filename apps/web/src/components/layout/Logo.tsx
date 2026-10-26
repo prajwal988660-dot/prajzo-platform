@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import logoUrl from '../../assets/prajzo-logo.webp';
 import { cx } from '../../lib/cx';
 
 export function Logo({ className }: { className?: string }) {
@@ -10,13 +11,7 @@ export function Logo({ className }: { className?: string }) {
         className,
       )}
     >
-      <img
-        src="/brand/prajzo-logo.png"
-        alt="Prajzo home"
-        width={800}
-        height={147}
-        className="h-7 w-auto"
-      />
+      <img src={logoUrl} alt="Prajzo home" width={320} height={59} className="h-7 w-auto" />
     </Link>
   );
 }

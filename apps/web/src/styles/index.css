@@ -40,8 +40,30 @@
     text-wrap: pretty;
   }
 
+  /*
+   * Text that people type (a name, a project title, a message) can hold a long word or web address
+   * with no spaces in it. Left alone, it stretches its box, and with it the whole page, sideways.
+   * With "anywhere" such text breaks at any letter when there is nowhere else to break, and
+   * (unlike "break-word") boxes in a row or a grid are allowed to shrink around it. Ordinary text
+   * is not affected: it still wraps between words. This covers every page, including ones added
+   * later.
+   */
+  main {
+    overflow-wrap: anywhere;
+  }
+
   ::selection {
     @apply bg-brand-indigo text-white;
+  }
+
+  /*
+   * A heading, or a list, that the app focused only to show where the page is (after moving to
+   * another page, or to another page of a list). It isn't a control, so it gets no focus ring.
+   */
+  h1[tabindex='-1']:focus,
+  ul[tabindex='-1']:focus,
+  ol[tabindex='-1']:focus {
+    outline: none;
   }
 }
 

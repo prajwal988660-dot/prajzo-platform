@@ -136,7 +136,9 @@ export function SiteHeader({
               </>
             )}
             {callToAction && (
-              <ButtonLink to={callToAction.to} size="sm" className="ml-1 hidden sm:inline-flex">
+              // "max-sm:hidden", not "hidden sm:inline-flex": a button's own display style would win
+              // over a plain "hidden", and the button would show (and overflow) on small phones.
+              <ButtonLink to={callToAction.to} size="sm" className="ml-1 max-sm:hidden">
                 {callToAction.label}
               </ButtonLink>
             )}

@@ -7,10 +7,15 @@
  * - CSS or JavaScript that isn't minified
  * - scripts or styles without a content hash in their name
  *
+ * It also checks the page shell that the server builds every page from (D-053): the block the
+ * server fills with each page's title and description is there, every icon, the manifest and
+ * the font the page points to exists, the sharing picture is the right size, and both typefaces
+ * are preloaded.
+ *
  * Runs after `vite build` (see the "build" script in package.json), so `npm run build` and
  * `npm run check` fail when any of this stops being true.
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,6 +45,98 @@ function looksMinified(text) {
   return text.length / text.split('\n').length > 200;
 }
 
+const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+/** The width and height of a PNG file, or null if it isn't one. */
+function pngSize(file) {
+  const bytes = readFileSync(file);
+  if (bytes.length < 24 || !bytes.subarray(0, 8).equals(pngSignature)) return null;
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+}
+
+/** The picture shown when a page is shared must be this size (see site-pages.ts, sharingImage). */
+const sharingImageSize = { width: 1200, height: 630 };
+
+/** Typefaces that every page uses, and so are downloaded together with the page's code. */
+const preloadedFonts = [
+  { name: 'inter', pattern: /inter-latin-wght-normal-/ },
+  { name: 'sora', pattern: /sora-latin-wght-normal-/ },
+];
+
+/** What the server relies on in index.html, and the files that the page points to. */
+function checkPageShell(distDir, html) {
+  const problems = [];
+  const fileFor = (address) => path.join(distDir, address.split(/[?#]/)[0].replace(/^\//, ''));
+  const exists = (address) => existsSync(fileFor(address));
+
+  const start = html.indexOf('<!--page-head-->');
+  const end = html.indexOf('<!--/page-head-->');
+  if (start < 0 || end < start || html.indexOf('<!--page-head-->', start + 1) >= 0) {
+    problems.push(
+      'index.html must have exactly one <!--page-head--> ... <!--/page-head--> block, which the server fills with each page title and description',
+    );
+  }
+
+  const links = [...html.matchAll(/<link\b[^>]*>/g)].map((match) => match[0]);
+  const attribute = (tag, name) => new RegExp(`\\b${name}="([^"]*)"`).exec(tag)?.[1];
+  const preloaded = [];
+  for (const tag of links) {
+    const rel = attribute(tag, 'rel') ?? '';
+    const href = attribute(tag, 'href');
+    if (!href?.startsWith('/')) continue;
+    if (/\b(?:icon|apple-touch-icon|manifest|stylesheet|modulepreload|preload)\b/.test(rel)) {
+      if (!exists(href)) problems.push(`index.html points to ${href}, which is not in the build`);
+      if (rel === 'preload' && attribute(tag, 'as') === 'font') preloaded.push(href);
+    }
+  }
+  for (const { name, pattern } of preloadedFonts) {
+    if (!preloaded.some((href) => pattern.test(href))) {
+      problems.push(`index.html does not preload the ${name} typeface`);
+    }
+  }
+  for (const [, source] of html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)) {
+    if (source.startsWith('/') && !exists(source)) {
+      problems.push(`index.html points to ${source}, which is not in the build`);
+    }
+  }
+
+  const sharing = path.join(distDir, 'og-image.png');
+  if (!existsSync(sharing)) {
+    problems.push('og-image.png (the picture shown when a page is shared) is missing');
+  } else {
+    const size = pngSize(sharing);
+    if (!size || size.width !== sharingImageSize.width || size.height !== sharingImageSize.height) {
+      problems.push(
+        `og-image.png must be a ${sharingImageSize.width}x${sharingImageSize.height} PNG picture`,
+      );
+    }
+  }
+
+  const manifestFile = path.join(distDir, 'site.webmanifest');
+  if (!existsSync(manifestFile)) {
+    problems.push('site.webmanifest is missing from the build');
+  } else {
+    try {
+      const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
+      for (const icon of manifest.icons ?? []) {
+        const [width, height] = String(icon.sizes).split('x').map(Number);
+        const size = exists(icon.src) ? pngSize(fileFor(icon.src)) : null;
+        if (!size)
+          problems.push(`site.webmanifest lists ${icon.src}, which is not a PNG in the build`);
+        else if (size.width !== width || size.height !== height) {
+          problems.push(
+            `${icon.src} is ${size.width}x${size.height}, but site.webmanifest says ${icon.sizes}`,
+          );
+        }
+      }
+      if (!manifest.icons?.length) problems.push('site.webmanifest lists no icons');
+    } catch {
+      problems.push('site.webmanifest is not valid JSON');
+    }
+  }
+  return problems;
+}
+
 /** Returns what is wrong with a built web app (an empty list means it passes). */
 export function checkProductionBuild(distDir) {
   let files;
@@ -52,6 +149,10 @@ export function checkProductionBuild(distDir) {
   const problems = [];
   if (!files.includes(path.join(distDir, 'index.html'))) {
     problems.push('index.html is missing from the build');
+  } else {
+    problems.push(
+      ...checkPageShell(distDir, readFileSync(path.join(distDir, 'index.html'), 'utf8')),
+    );
   }
 
   for (const file of files) {

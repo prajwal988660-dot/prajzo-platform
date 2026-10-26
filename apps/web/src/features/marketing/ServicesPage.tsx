@@ -3,14 +3,14 @@ import { Container } from '../../components/layout/Container';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ButtonLink } from '../../components/ui/Button';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
 import { CallToActionBand } from './components/CallToActionBand';
 import { CategoryCard } from './components/CategoryCard';
 import { PageIntro } from './components/PageIntro';
 
 export function ServicesPage() {
-  usePageTitle('Services');
+  usePageMeta('/services');
   const categories = useApi('/v1/categories', categoryListSchema);
 
   return (
@@ -24,7 +24,10 @@ export function ServicesPage() {
 
       <section aria-label="Website categories" className="py-14 sm:py-20">
         <Container>
-          {categories.status === 'loading' && <LoadingBlock label="Loading services" />}
+          {/* Tall enough that what follows starts below the screen, so it can't be seen jumping. */}
+          {categories.status === 'loading' && (
+            <LoadingBlock label="Loading services" className="min-h-[70svh]" />
+          )}
           {categories.status === 'error' && (
             <LoadError message={categories.error.message} onRetry={categories.retry} />
           )}
@@ -38,7 +41,7 @@ export function ServicesPage() {
           {categories.status === 'success' && categories.data.items.length > 0 && (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {categories.data.items.map((category) => (
-                <CategoryCard key={category.key} category={category} detailed />
+                <CategoryCard key={category.key} category={category} detailed headingLevel={2} />
               ))}
             </div>
           )}

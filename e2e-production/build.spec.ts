@@ -83,8 +83,14 @@ test.describe('the files a visitor downloads', () => {
     for (const [, source] of html.matchAll(/<link\b[^>]*\bhref="([^"]+\.css)"/g)) {
       expect(source).toMatch(/^\/assets\//);
     }
-    // Nothing is loaded from anywhere else.
-    expect(html).not.toMatch(/(?:src|href)="https?:\/\//);
+    // Nothing is loaded from anywhere else. (The canonical address and the sharing details name
+    // the website's own public address, but nothing is fetched from them.)
+    expect(html).not.toMatch(/\ssrc="https?:\/\//);
+    for (const [link] of html.matchAll(/<link\b[^>]*>/g)) {
+      if (/rel="(?:stylesheet|modulepreload|preload|icon|apple-touch-icon|manifest)"/.test(link)) {
+        expect(link).not.toMatch(/href="https?:\/\//);
+      }
+    }
   });
 });
 
@@ -108,11 +114,11 @@ test.describe('addresses that are not part of the site', () => {
     }
   });
 
-  test('a made-up page address still opens the app, which shows its own "not found" page', async ({
+  test('a made-up page address starts the app, which shows its own "not found" page, with the status 404', async ({
     request,
   }) => {
     const response = await request.get('/some/page/that/does/not/exist');
-    expect(response.status()).toBe(200);
+    expect(response.status()).toBe(404);
     expect(await response.text()).toContain('<div id="root">');
   });
 

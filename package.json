@@ -22,6 +22,7 @@
     "format:check": "prettier --check .",
     "audit": "npm audit --omit=dev --audit-level=high",
     "scan:secrets": "node scripts/scan-for-secrets.mjs",
+    "brand:images": "node scripts/make-brand-images.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",

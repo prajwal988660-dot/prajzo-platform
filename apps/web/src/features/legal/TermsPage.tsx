@@ -1,10 +1,10 @@
 import { siteContact, siteLinks } from '@prajzo/shared';
 import { Link } from 'react-router';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { LegalPage } from './LegalPage';
 
 export function TermsPage() {
-  usePageTitle('Terms and Conditions');
+  usePageMeta('/terms');
   return (
     <LegalPage eyebrow="Legal" title="Terms and Conditions" updated="23 October 2026">
       <section>

@@ -4,7 +4,7 @@ import { Container } from '../../components/layout/Container';
 import { Alert } from '../../components/ui/Alert';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
 import { useAuth } from '../auth/auth-context';
 import { PageIntro } from '../marketing/components/PageIntro';
@@ -21,7 +21,7 @@ const steps = [
  * their projects are kept in their account and they can follow them.
  */
 export function StartProjectPage() {
-  usePageTitle('Start a Project');
+  usePageMeta('/start-project');
 
   return (
     <>

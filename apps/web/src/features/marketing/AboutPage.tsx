@@ -2,7 +2,7 @@ import { Gauge, HeartHandshake, MessagesSquare, ShieldCheck } from 'lucide-react
 import { Container } from '../../components/layout/Container';
 import { ButtonLink } from '../../components/ui/Button';
 import { SectionHeading } from '../../components/ui/SectionHeading';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { CallToActionBand } from './components/CallToActionBand';
 import { PageIntro } from './components/PageIntro';
 
@@ -30,7 +30,7 @@ const values = [
 ] as const;
 
 export function AboutPage() {
-  usePageTitle('About Us');
+  usePageMeta('/about');
   return (
     <>
       <PageIntro eyebrow="About us" title="We build websites that work for you">

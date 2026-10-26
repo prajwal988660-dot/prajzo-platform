@@ -14,13 +14,13 @@ import { Button, ButtonLink } from '../../components/ui/Button';
 import { PasswordField } from '../../components/ui/Field';
 import { apiRequest } from '../../lib/api';
 import { applyServerFieldErrors, submitErrorMessage } from '../../lib/form-errors';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { AuthPageShell } from './AuthPageShell';
 
 const linkClass = 'font-medium text-brand-indigo underline underline-offset-2';
 
 export function ResetPasswordPage() {
-  usePageTitle('Choose a new password');
+  usePageMeta('/reset-password');
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? '';
   const [outcome, setOutcome] = useState<

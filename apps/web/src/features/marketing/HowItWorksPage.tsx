@@ -1,7 +1,7 @@
 import { CircleCheck } from 'lucide-react';
 import { Container } from '../../components/layout/Container';
 import { SectionHeading } from '../../components/ui/SectionHeading';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { CallToActionBand } from './components/CallToActionBand';
 import { DeliveryHighlights } from './components/DeliveryHighlights';
 import { PageIntro } from './components/PageIntro';
@@ -9,7 +9,7 @@ import { ProcessSteps } from './components/ProcessSteps';
 import { contentChecklist } from './content';
 
 export function HowItWorksPage() {
-  usePageTitle('How It Works');
+  usePageMeta('/how-it-works');
   return (
     <>
       <PageIntro eyebrow="How it works" title="A clear path from idea to launch">

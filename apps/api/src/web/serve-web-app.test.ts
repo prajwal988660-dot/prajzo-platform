@@ -54,7 +54,8 @@ describe('serving the built web app in production', () => {
     mkdirSync(path.join(distDir, 'assets'));
     writeFileSync(
       path.join(distDir, 'index.html'),
-      '<!doctype html><title>Prajzo</title><div id="root"></div>',
+      '<!doctype html><html><head><!--page-head--><title>Default</title><!--/page-head--></head>' +
+        '<body><div id="root"></div></body></html>',
     );
     writeFileSync(path.join(distDir, 'assets', 'index-abc123.js'), 'console.log("app");');
     // Big enough to be worth compressing, and repetitive so it shrinks a lot.
@@ -77,13 +78,62 @@ describe('serving the built web app in production', () => {
     rmSync(distDir, { recursive: true, force: true });
   });
 
-  it('serves the web app for the home page and for client-side routes', async () => {
-    for (const url of ['/', '/services', '/templates/portfolio']) {
+  it('serves the web app for the pages of the website, each with its own title', async () => {
+    for (const [url, title] of [
+      ['/', 'Prajzo · Web development studio'],
+      ['/services', 'Services · Prajzo'],
+      ['/login', 'Sign in · Prajzo'],
+    ]) {
+      const response = await request(app).get(url ?? '');
+      expect(response.status, url).toBe(200);
+      expect(response.text, url).toContain('<div id="root">');
+      expect(response.text, url).toContain(`<title>${title}</title>`);
+      expect(response.headers['cache-control'], url).toBe('no-cache');
+      expect(response.headers['content-type'], url).toMatch(/text\/html/);
+    }
+  });
+
+  it('opens the web app for private areas, and tells search engines to keep them out', async () => {
+    for (const url of [
+      '/account',
+      '/account/projects/PRZ-2026-0001',
+      '/admin',
+      '/admin/projects',
+    ]) {
       const response = await request(app).get(url);
       expect(response.status, url).toBe(200);
       expect(response.text, url).toContain('<div id="root">');
+      expect(response.headers['x-robots-tag'], url).toBe('noindex, nofollow');
+    }
+    // Public pages are not marked.
+    expect((await request(app).get('/services')).headers['x-robots-tag']).toBeUndefined();
+  });
+
+  it('answers 404 for an address that is nothing, and still starts the app so it can say so', async () => {
+    for (const url of ['/templates/portfolio', '/no-such-page', '/services/extra']) {
+      const response = await request(app).get(url);
+      expect(response.status, url).toBe(404);
+      expect(response.text, url).toContain('<div id="root">');
+      expect(response.text, url).toContain('<title>Page not found · Prajzo</title>');
+      expect(response.headers['x-robots-tag'], url).toBe('noindex, nofollow');
       expect(response.headers['cache-control'], url).toBe('no-cache');
     }
+    expect((await request(app).head('/no-such-page')).status).toBe(404);
+  });
+
+  it('serves robots.txt and sitemap.xml, written from the website address', async () => {
+    const robots = await request(app).get('/robots.txt');
+    expect(robots.status).toBe(200);
+    expect(robots.headers['content-type']).toMatch(/text\/plain/);
+    expect(robots.text).toContain('Sitemap: https://prajzo.example/sitemap.xml');
+    expect(robots.text).toContain('Disallow: /api/');
+
+    const sitemap = await request(app).get('/sitemap.xml');
+    expect(sitemap.status).toBe(200);
+    expect(sitemap.headers['content-type']).toMatch(/application\/xml/);
+    expect(sitemap.text).toContain('<loc>https://prajzo.example/services</loc>');
+    expect(sitemap.text).not.toContain('/login');
+    expect(robots.headers['cache-control']).toBe('no-cache');
   });
 
   it('caches hashed assets for a year', async () => {
@@ -100,7 +150,7 @@ describe('serving the built web app in production', () => {
   it('gives a real 404, not the web app, for files and hidden files that do not exist', async () => {
     for (const url of [
       '/missing.png',
-      '/robots.txt',
+      '/robots.json',
       '/.env',
       '/.git/config',
       '/a/b/backup.sql',
@@ -110,7 +160,7 @@ describe('serving the built web app in production', () => {
       expect(response.status, url).toBe(404);
       expect(response.text, url).not.toContain('<div id="root">');
     }
-    // Pages with no dot in them are still the app's, even deep ones.
+    // Pages with no dot in them are still the app's, even deep private ones.
     expect((await request(app).get('/account/projects/PRZ-2026-0001')).status).toBe(200);
   });
 
@@ -169,6 +219,7 @@ describe('serving the built web app in production', () => {
     const home = await request(localHosting).get('/contact');
     expect(home.status).toBe(200);
     expect(home.text).toContain('<div id="root">');
+    expect(home.text).toContain('<title>Contact Us · Prajzo</title>');
     // Plain http on your own computer: no HSTS and no forced https upgrade.
     expect(home.headers['strict-transport-security']).toBeUndefined();
     expect(home.headers['content-security-policy']).not.toContain('upgrade-insecure-requests');

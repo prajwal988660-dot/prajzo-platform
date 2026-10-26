@@ -20,13 +20,13 @@ import { CheckboxField, SelectField, TextAreaField, TextField } from '../../comp
 import { LoadingBlock } from '../../components/ui/LoadStates';
 import { ApiError, apiRequest } from '../../lib/api';
 import { describePrice } from '../../lib/format';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
 import { ContactOptions } from './components/ContactOptions';
 import { PageIntro } from './components/PageIntro';
 
 export function ContactPage() {
-  usePageTitle('Contact Us');
+  usePageMeta('/contact');
   const [searchParams] = useSearchParams();
   const categories = useApi('/v1/categories', categoryListSchema);
   const packages = useApi('/v1/packages', servicePackageListSchema);

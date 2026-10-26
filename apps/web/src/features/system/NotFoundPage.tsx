@@ -1,10 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
 import { Container } from '../../components/layout/Container';
 import { ButtonLink } from '../../components/ui/Button';
+import { useNoIndex } from '../../lib/use-no-index';
 import { usePageTitle } from '../../lib/use-page-title';
 
 export function NotFoundPage() {
   usePageTitle('Page not found');
+  useNoIndex(); // an address that is nothing must not be listed
   return (
     <Container className="flex flex-col items-center py-24 text-center sm:py-32">
       <p

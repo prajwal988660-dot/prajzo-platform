@@ -15,16 +15,35 @@ import { watchForProblems } from './helpers';
  * only in force on the production build, so this is the only place that can catch them.
  */
 
-async function expectCleanPage(page: Page, address: string, heading?: string | RegExp) {
-  const watching = watchForProblems(page, () => false);
-  await page.goto(address);
+async function expectCleanPage(
+  page: Page,
+  address: string,
+  heading?: string | RegExp,
+  /** For the one page that is meant to be answered with 404: the "not found" page itself. */
+  expectedStatus = 200,
+) {
+  const watching = watchForProblems(
+    page,
+    (status, url) => status === expectedStatus && url.endsWith(address),
+  );
+  const response = await page.goto(address);
+  expect(response?.status(), address).toBe(expectedStatus);
   await expect(
     heading
       ? page.getByRole('heading', { name: heading }).first()
       : page.getByRole('heading', { level: 1 }),
   ).toBeVisible();
   await page.waitForLoadState('networkidle');
-  expect(watching.problems(), address).toEqual([]);
+  // Chrome writes one console error for an answer that is not a success, even a page that is
+  // meant to be one, such as the "not found" page. That one message is expected, nothing else.
+  const problems = watching.problems();
+  if (expectedStatus !== 200) {
+    const expected = `console error: Failed to load resource: the server responded with a status of ${expectedStatus}`;
+    const index = problems.findIndex((problem) => problem.startsWith(expected));
+    expect(index, `${address} should log the ${expectedStatus} once`).toBeGreaterThanOrEqual(0);
+    problems.splice(index, 1);
+  }
+  expect(problems, address).toEqual([]);
 }
 
 const publicPages = [
@@ -48,7 +67,13 @@ const publicPages = [
 test.describe('public pages', () => {
   for (const address of publicPages) {
     test(`${address} opens with no browser complaints`, async ({ page }) => {
-      await expectCleanPage(page, address);
+      // The one made-up address is answered with 404; the app still shows its page for it.
+      await expectCleanPage(
+        page,
+        address,
+        undefined,
+        address === '/page-that-does-not-exist' ? 404 : 200,
+      );
     });
   }
 
