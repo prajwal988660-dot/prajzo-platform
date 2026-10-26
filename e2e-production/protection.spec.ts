@@ -55,6 +55,37 @@ test.describe('right-click blocking on the production build', () => {
     expect(new URL(page.url()).pathname).toBe('/about');
   });
 
+  test('the keyboard Menu key is treated like a right-click: blocked on content, not in form fields', async ({
+    page,
+  }) => {
+    await page.goto('/contact');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const seen: { target: string; prevented: boolean }[] = [];
+    await page.exposeFunction('recordMenu', (target: string, prevented: boolean) =>
+      seen.push({ target, prevented }),
+    );
+    await page.evaluate(() => {
+      // Added after the page's own listener, so it sees the final answer.
+      document.addEventListener('contextmenu', (event) =>
+        (
+          window as unknown as { recordMenu: (target: string, prevented: boolean) => void }
+        ).recordMenu((event.target as Element).tagName.toLowerCase(), event.defaultPrevented),
+      );
+    });
+
+    await page.getByRole('link', { name: 'Services' }).first().focus();
+    await page.keyboard.press('ContextMenu');
+    await page.getByLabel(/Your name/).focus();
+    await page.keyboard.press('ContextMenu');
+
+    await expect
+      .poll(() => seen)
+      .toEqual([
+        { target: 'a', prevented: true },
+        { target: 'input', prevented: false },
+      ]);
+  });
+
   test('images cannot be dragged out of the page', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

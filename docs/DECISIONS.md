@@ -467,3 +467,65 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - Order is a number ("lower comes first"), not drag and drop.
   - The public catalogue is cached for 60 seconds, so a change reaches the website within about a minute.
 - **Considered and not done:** deleting (it would break old projects' links), and drag-and-drop ordering (more code than a number is worth for a handful of items).
+
+### D-051: The sign-in cookie, and how long a sign-in can last
+
+- **Decision:**
+  - In production the cookie is called `__Host-prajzo.sid`. A browser only accepts a cookie with that prefix if it is `Secure`, covers the whole site and has no `Domain`, so another address of the site (a subdomain, a forgotten test site) can't plant a cookie that this site would believe. It is still `HttpOnly` and `SameSite=Lax`. On your own computer it keeps the plain name, `prajzo.sid`. Signing out deletes it with the same attributes.
+  - A sign-in now ends after a fixed total time however often it is used: customers 60 days (`SESSION_MAX_DAYS`), administrators 24 hours (`ADMIN_SESSION_MAX_HOURS`). The existing "not used for 14 days / 8 hours" limits still apply. When a sign-in ends, its stored session is deleted and the browser is told to forget the cookie.
+- **Why:** a session that is renewed every time it is used never ended, so a stolen or forgotten sign-in could live for ever.
+- **Cost:** administrators sign in at least once a day, customers about every two months. Sessions made before this change have no start time and are ended, so everyone signs in once more after the upgrade.
+- **Checked:** unit tests with a moved clock, and in a real Chrome on the production build (attributes, what the browser keeps, that a cookie planted under the old name signs nobody in, that sign-out deletes it).
+
+### D-052: Secrets are scanned for
+
+- **Decision:** `npm run scan:secrets` (also the first step of `npm run check`, and in GitHub with the whole history) looks for a real `.env` being tracked, well-known secret formats, database addresses with a real password in them, and **the actual values in your own local `.env` files** (the database password, the session secret) in every tracked file, every new file, and with `--history` every commit on every branch. It prints only names and places, never a secret, so its output can be pasted anywhere.
+- **Result when it was added:** 310 files and all 34 commits on every branch were clean. The real database password and session secret appear nowhere in git.
+- **Invented passwords** used by tests (to prove a password is hidden in error messages) are listed in the script as a deliberate decision. Never add a real one.
+- **Limits:** it can't see GitHub pull request text or a chat. The database password that was pasted into a chat early on should still be changed before the site goes live (Phase 7).
+
+### D-053: What search engines and link previews are told
+
+- **Decision:**
+  - One table (`packages/shared/src/site-pages.ts`) says what each page is called, how it is described and whether it may be listed. The server writes it into each page's HTML (title, description, canonical address, Open Graph and Twitter details, and for the home page the business's name, logo, email, phone and Instagram as structured data), and the web app uses the same table when a visitor moves between pages. A test compares the app's routes with the table, in both directions.
+  - `robots.txt` and `sitemap.xml` are written from the public address (`APP_ORIGIN`). The sitemap lists only the nine public pages and invents no "last changed" dates. `robots.txt` blocks `/api/` and does not name `/admin` or `/account`.
+  - Sign-in pages and private areas (`/account`, `/admin`) are marked "do not list", with a header and a tag. An address that is nothing now answers **404** (the app still starts and shows its own "Page not found" page); before it answered 200.
+- **Why:** link previews (WhatsApp, LinkedIn, X) and many crawlers don't run JavaScript, so the details have to be in the HTML the server sends. One table means the page, the sitemap and the server can't disagree.
+- **Needs:** `APP_ORIGIN` must be the real address in production, or canonical addresses and the sitemap point at the wrong place.
+- **Not done on purpose:** no address, opening hours, ratings or prices in the structured data (the site doesn't state them), and no per-page sharing pictures (one picture for the whole site).
+
+### D-054: Brand images, typefaces and the logo
+
+- **Decision:**
+  - Every icon (tab, iPhone and iPad home screen, install, maskable) and the 1200x630 sharing picture are made from the original artwork by `npm run brand:images`, and can be made again whenever the artwork changes. The build fails if the page shell, an icon, the manifest or the sharing picture is missing or the wrong size.
+  - The header logo is a 320 px WebP (9.5 KB), imported so its name carries a content hash and it is cached for a year. It was an 800 px PNG (90 KB) shown 150 px wide.
+  - Only the Latin parts of the two typefaces are loaded, and both are preloaded. The rupee sign is drawn by the visitor's system font instead of an 85 KB download (the "Latin extended" file exists in the typeface only for that one character here).
+- **Result (Lighthouse, mobile, production build, same five pages before and after):** the home page's layout shift went from 0.124 to 0.000 and image savings from 86 KiB to 7 KiB; performance 83 to 92 became 89 to 94 and first paint about 0.4 s earlier, measured before the layout fixes in D-057.
+- **Cost:** the rupee sign looks slightly different from the surrounding digits.
+
+### D-055: Overall rate limits, and the proxy setting
+
+- **Decision:**
+  - An overall limit on the API: 600 requests a minute per connection, checked before the request body is read. The plain "is it running" health check is exempt: a flood must never be able to make a host think the site is down and restart it. The readiness check, which asks the database, is limited like everything else.
+  - A limit on the admin area: 1200 requests per 15 minutes **per administrator**, applied after the administrator check, so people who aren't signed in as an administrator can't use up an administrator's allowance.
+  - Both limits depend on seeing each visitor's real address, which depends on `TRUST_PROXY`. Both mistakes are silent (everyone sharing one allowance behind a proxy with it off; visitors able to claim any address with it on and no proxy), so in production the first request that shows the setting is wrong is logged once.
+- **Why:** the existing limits protect sign-in, forms and project actions, but nothing stopped one address using up the database with ordinary requests.
+
+### D-056: The production build is checked in a real browser
+
+- **Decision:** `npm run test:production` (and a GitHub job) builds the site and runs the **built** server in production mode, twice: once behind the staging password and once open. It checks that every file, page and API route needs the password and nothing leaks without it, that every page of every kind (visitor, customer, administrator) opens with no browser complaint, the security headers and cookies, compression, caching, no source maps or development code, and that right-click blocking leaves form fields and the keyboard alone.
+- **What it found and fixed the first time it ran** (the development servers hide all of these):
+  1. The staging password's guess limit counted every error the site answered a signed-in tester, so twenty broken links locked a tester out for 15 minutes. Now only wrong guesses count (20 per address in 15 minutes; after that even the right password is refused for a while).
+  2. Every page reported a content security policy violation: the form library tried to build faster checkers with `new Function`. It is now switched off in browsers.
+  3. A missing file (`/.env`, `/missing.png`) was answered with the web app and "200 OK". It is now a real 404.
+  4. Pages, scripts and styles were not compressed. Now Brotli or gzip (several times smaller).
+  5. API answers were kept or not by accident: the catalogue's "keep for a minute" overwrote the staging site's "never keep". The API now says "never keep" by default, and only the catalogue says otherwise, and not on staging.
+
+### D-057: Moving around the site, and text people type
+
+- **Decision:**
+  - After a visitor moves to another page, keyboard focus (and a screen reader) goes to the new page's main heading; after Previous or Next on a list, to the list. Typing in a filter box keeps its focus. Tested with the keyboard alone, on a computer and a phone-sized screen.
+  - Text that people type (a name, a project title, a message) can hold a long word or web address with no spaces. One rule on the page content area lets it break at any letter when there is nowhere else to, and boxes in a row or grid may shrink around it, so it can never stretch a page sideways. This covers pages added later.
+  - Every page is opened at 320, 390, 768 and 1280 px, with deliberately long text in every field a visitor can fill, and fails if the page scrolls sideways or anything sticks out of the screen.
+- **What that found:** the header's "Start a Project" button was meant to be hidden on small phones, but its own display style beat `hidden`, so at 320 px it pushed every page 48 px sideways; a contact message with one long web address made the admin messages page 2,600 px wide; and the current section of the admin menu was half hidden on a phone.
+- **Right-click blocking and the keyboard:** blocking works on the browser's "context menu" event, which the keyboard's Menu key also produces, so it is blocked on page content too. Form fields keep their menu in both cases.

@@ -20,8 +20,10 @@ Secrets and settings live in environment variables, never in code.
 | `MONGODB_URI` | `mongodb://127.0.0.1:27017/prajzo` | Yes | Local server, or your Atlas connection string (Q2) |
 | `SESSION_SECRET` | 64 random hex characters | Yes | Generate one with the command below; use a different value in production |
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
-| `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
+| `TRUST_PROXY` | `false` | No | Set to `true` when the site sits behind exactly one proxy, as on most hosts (production). Every rate limit counts requests by the visitor's address; without this, behind a proxy everyone looks like the proxy and shares one allowance, and with it on and no proxy a visitor can claim any address. In production the first request that shows the setting is wrong is written to the log (D-055) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+| `API_RATE_LIMIT_MAX` | `600` | No | The overall limit: API requests of any kind allowed per connection every minute. The plain health check is never counted |
+| `ADMIN_RATE_LIMIT_MAX` | `1200` | No | Requests one administrator may make to the admin area every 15 minutes, counted per account |
 | `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
 | `PROJECT_REQUEST_RATE_LIMIT_MAX` | `10` | No | Project requests one customer may send per hour |
 | `PROJECT_ACTION_RATE_LIMIT_MAX` | `60` | No | Things one customer may do to their projects per hour: accept or decline a quote, answer a question, ask for a revision, cancel |

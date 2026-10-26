@@ -70,9 +70,16 @@ export default defineConfig({
     },
     {
       name: 'live',
-      testMatch: ['build', 'headers', 'cookies', 'pages', 'protection', 'seo', 'performance'].map(
-        (name) => `**/${name}.spec.ts`,
-      ),
+      testMatch: [
+        'build',
+        'headers',
+        'cookies',
+        'pages',
+        'protection',
+        'seo',
+        'accessibility',
+        'performance',
+      ].map((name) => `**/${name}.spec.ts`),
       use: {
         ...devices['Desktop Chrome'],
         ...browser,
