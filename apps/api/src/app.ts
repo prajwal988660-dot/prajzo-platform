@@ -16,6 +16,7 @@ import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { clientErrorsRouter } from './modules/client-errors/client-errors.routes';
 import { contactRouter } from './modules/contact/contact.routes';
+import { demoSubmissionsRouter } from './modules/demos/demo-submissions.routes';
 import { healthRouter } from './modules/health/health.routes';
 import { createProjectEffects } from './modules/projects/project-effects';
 import { projectRequestRouter } from './modules/projects/project-request.routes';
@@ -99,6 +100,12 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
     }),
   );
 
+  v1.use(
+    demoSubmissionsRouter({
+      rateLimitMax: env.DEMO_SUBMISSION_RATE_LIMIT_MAX,
+      keepDays: env.DEMO_SUBMISSION_TTL_DAYS,
+    }),
+  );
   v1.use(clientErrorsRouter({ rateLimitMax: env.CLIENT_ERROR_RATE_LIMIT_MAX }));
 
   app.use('/api', healthRouter({ checkDatabase }));
