@@ -11,6 +11,7 @@ export * from './admin/overview';
 export * from './api/pagination';
 export * from './auth';
 export * from './catalogue/catalogue';
+export * from './catalogue/templates';
 export * from './client-error';
 export * from './contact';
 export * from './dates';

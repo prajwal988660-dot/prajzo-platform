@@ -4,6 +4,10 @@ import {
   adminCustomerDetailSchema,
   adminCustomerListQuerySchema,
   adminCustomerListSchema,
+  adminDemoSubmissionListSchema,
+  adminDemoSubmissionQuerySchema,
+  adminDemoSubmissionResponseSchema,
+  adminDemoSubmissionUpdateSchema,
   adminDeliveryDateRequestSchema,
   adminMessageListQuerySchema,
   adminMessageListSchema,
@@ -16,6 +20,9 @@ import {
   adminProjectListQuerySchema,
   adminProjectListSchema,
   adminStatusChangeSchema,
+  adminTemplateInputSchema,
+  adminTemplateListSchema,
+  adminTemplateResponseSchema,
   auditListQuerySchema,
   auditListSchema,
   categoryCreateSchema,
@@ -53,6 +60,12 @@ import {
 import { getCustomer, listCustomers } from './admin-customers.service';
 import { listMessages, updateMessageStatus } from './admin-messages.service';
 import { getAdminOverview } from './admin-overview.service';
+import {
+  listAdminTemplates,
+  listDemoSubmissions,
+  updateDemoSubmissionStatus,
+  updateTemplate,
+} from '../templates/templates.service';
 
 /** A piece of the address (a reference, an id, a key). Anything but plain text counts as "not found". */
 const param = (req: Request, name: string): string => {
@@ -255,6 +268,52 @@ export function adminRouter({
       targetId: servicePackage.key,
     });
     res.json(adminPackageResponseSchema.parse({ package: servicePackage }));
+  });
+
+  // ---------- Templates: the catalogue listing around each design (D-005)
+  router.get('/templates', async (_req, res) => {
+    res.json(adminTemplateListSchema.parse({ items: await listAdminTemplates() }));
+  });
+
+  router.patch('/templates/:key', async (req, res) => {
+    const admin = currentUser(res.locals);
+    const key = keyParam(req, 'template');
+    const input = adminTemplateInputSchema.parse(req.body);
+    const { template, summary } = await updateTemplate(key, input);
+    await effects.audit(req, {
+      actorId: admin._id,
+      actorName: admin.name,
+      actorRole: 'admin',
+      action: 'template.updated',
+      summary,
+      targetType: 'template',
+      targetId: template.key,
+    });
+    res.json(adminTemplateResponseSchema.parse({ template }));
+  });
+
+  // ---------- Messages sent from the live demos (deleted by themselves after 7 days)
+  router.get('/demo-submissions', async (req, res) => {
+    const query = adminDemoSubmissionQuerySchema.parse(req.query);
+    res.json(adminDemoSubmissionListSchema.parse(await listDemoSubmissions(query)));
+  });
+
+  router.patch('/demo-submissions/:id', async (req, res) => {
+    const admin = currentUser(res.locals);
+    const input = adminDemoSubmissionUpdateSchema.parse(req.body);
+    const { submission, before } = await updateDemoSubmissionStatus(param(req, 'id'), input.status);
+    if (before !== submission.status) {
+      await effects.audit(req, {
+        actorId: admin._id,
+        actorName: admin.name,
+        actorRole: 'admin',
+        action: 'demo-submission.status',
+        summary: `Marked the demo message from ${submission.name} as ${submission.status}`,
+        targetType: 'demo-submission',
+        targetId: submission.id,
+      });
+    }
+    res.json(adminDemoSubmissionResponseSchema.parse({ submission }));
   });
 
   return router;

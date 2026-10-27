@@ -20,6 +20,7 @@ import { demoSubmissionsRouter } from './modules/demos/demo-submissions.routes';
 import { healthRouter } from './modules/health/health.routes';
 import { createProjectEffects } from './modules/projects/project-effects';
 import { projectRequestRouter } from './modules/projects/project-request.routes';
+import { templatesRouter } from './modules/templates/templates.routes';
 import type { Mailer } from './services/mailer';
 import { serveWebApp } from './web/serve-web-app';
 
@@ -92,6 +93,7 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
     }),
   );
   v1.use(catalogueRouter({ publicCaching: !env.STAGING_PASSWORD }));
+  v1.use(templatesRouter());
   v1.use(
     contactRouter({
       mailer,
