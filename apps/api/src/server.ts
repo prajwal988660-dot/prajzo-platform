@@ -9,6 +9,7 @@ import {
   pingDatabase,
   watchConnection,
 } from './db/connection';
+import { installFatalErrorHandlers } from './lib/fatal-errors';
 import { createLogger } from './lib/logger';
 import { ensureCatalogueDefaults } from './modules/catalogue/catalogue.service';
 import { createConsoleMailer } from './services/mailer';
@@ -32,6 +33,7 @@ function readSettings(): Env {
 function main(): void {
   const env = readSettings();
   const logger = createLogger(env);
+  installFatalErrorHandlers(logger);
   const mailer = createConsoleMailer(logger, { showBody: env.NODE_ENV === 'development' });
   const app = createApp({ env, logger, checkDatabase: () => pingDatabase(), mailer });
   const server = createServer(app);

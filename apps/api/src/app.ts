@@ -14,6 +14,7 @@ import { createStagingGate } from './middleware/staging-gate';
 import { adminRouter } from './modules/admin/admin.routes';
 import { createAuthRouters } from './modules/auth/auth.routes';
 import { catalogueRouter } from './modules/catalogue/catalogue.routes';
+import { clientErrorsRouter } from './modules/client-errors/client-errors.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { healthRouter } from './modules/health/health.routes';
 import { createProjectEffects } from './modules/projects/project-effects';
@@ -97,6 +98,8 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
       rateLimitMax: env.CONTACT_RATE_LIMIT_MAX,
     }),
   );
+
+  v1.use(clientErrorsRouter({ rateLimitMax: env.CLIENT_ERROR_RATE_LIMIT_MAX }));
 
   app.use('/api', healthRouter({ checkDatabase }));
   app.use('/api/v1', v1);

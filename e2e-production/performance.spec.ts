@@ -35,7 +35,7 @@ async function firstVisit(page: Page, address: string) {
     const headers = Object.fromEntries(
       Object.entries(event.response.headers).map(([name, value]) => [name.toLowerCase(), value]),
     );
-    encodings.set(event.requestId, headers['content-encoding'] as string | undefined);
+    encodings.set(event.requestId, headers['content-encoding']);
   });
   client.on('Network.loadingFinished', (event) =>
     sizes.set(event.requestId, event.encodedDataLength),

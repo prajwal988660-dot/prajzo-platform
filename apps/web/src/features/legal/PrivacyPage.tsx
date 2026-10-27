@@ -5,7 +5,7 @@ import { LegalPage } from './LegalPage';
 export function PrivacyPage() {
   usePageMeta('/privacy');
   return (
-    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="23 October 2026">
+    <LegalPage eyebrow="Legal" title="Privacy Policy" updated="27 October 2026">
       <section>
         <h2>Who we are</h2>
         <p>
@@ -35,7 +35,10 @@ export function PrivacyPage() {
           </li>
           <li>
             <strong>When you visit this website:</strong> basic technical information needed to run
-            and protect it, such as your IP address and browser type in our server logs.
+            and protect it, such as your IP address and browser type in our server logs. If a page
+            breaks in your browser, it sends us a short error report (the error, the page's address
+            without any search terms, and your browser type) so we can fix it. It never includes
+            what you typed.
           </li>
         </ul>
         <p>We don't ask for sensitive information, and we don't take payments on this website.</p>

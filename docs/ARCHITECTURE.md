@@ -389,7 +389,7 @@ The workflow also enforces these rules:
   - signed-in users only
 - **Secrets:** environment variables only. `.env` is never committed, `.env.example` lists the keys, and the API refuses to start with bad settings. `npm run scan:secrets` looks through every file and, in CI, the whole git history, for secret formats, a tracked `.env` and the real values from your local `.env`, and prints only names and places (D-052).
 - **Search and sharing (D-053):** one table of pages says what each page is called and described as and which are listed; the server writes it into each page's HTML, with `robots.txt` and `sitemap.xml`. Unknown addresses answer 404; private areas and sign-in pages are kept out of search results. Structured data states only what the site already shows.
-- **Logs:** request IDs; passwords, cookies and tokens are redacted.
+- **Logs:** request IDs; passwords, cookies and tokens are redacted. A crash of the API is logged as fatal before the process exits; crashes in visitors' browsers are sent to `POST /api/v1/client-errors` and logged as warnings, page path only, rate-limited (D-058).
 - **Errors:** safe messages only; no stack traces in production.
 - **Personal data:**
   - collect the minimum

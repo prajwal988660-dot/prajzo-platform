@@ -56,7 +56,9 @@ export default defineConfig({
   projects: [
     {
       name: 'staging',
-      testMatch: ['gate', 'build', 'pages', 'protection'].map((name) => `**/${name}.spec.ts`),
+      testMatch: ['gate', 'build', 'pages', 'protection', 'error-reporting'].map(
+        (name) => `**/${name}.spec.ts`,
+      ),
       use: {
         ...devices['Desktop Chrome'],
         ...browser,
@@ -79,6 +81,7 @@ export default defineConfig({
         'seo',
         'accessibility',
         'performance',
+        'error-reporting',
       ].map((name) => `**/${name}.spec.ts`),
       use: {
         ...devices['Desktop Chrome'],

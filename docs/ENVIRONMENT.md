@@ -58,6 +58,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 |---|---|---|
 | 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where Prajzo's own notifications go: contact-form messages, new project requests, and what customers do to their projects (accept or decline a quote, answer, ask for changes, say it looks good, cancel). In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
+| 6 (added) | `CLIENT_ERROR_RATE_LIMIT_MAX` (default `20`) | Browser error reports allowed per connection every 15 minutes (D-058) |
 | Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
 | 8 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
 | 9 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development (with the builder) |

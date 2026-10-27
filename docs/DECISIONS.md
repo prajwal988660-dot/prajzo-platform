@@ -529,3 +529,15 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - Every page is opened at 320, 390, 768 and 1280 px, with deliberately long text in every field a visitor can fill, and fails if the page scrolls sideways or anything sticks out of the screen.
 - **What that found:** the header's "Start a Project" button was meant to be hidden on small phones, but its own display style beat `hidden`, so at 320 px it pushed every page 48 px sideways; a contact message with one long web address made the admin messages page 2,600 px wide; and the current section of the admin menu was half hidden on a phone.
 - **Right-click blocking and the keyboard:** blocking works on the browser's "context menu" event, which the keyboard's Menu key also produces, so it is blocked on page content too. Form fields keep their menu in both cases.
+
+### D-058: Crashes are logged, in the API and in visitors' browsers
+
+- **Decision:**
+  - An error nothing caught, or a promise rejection nothing handled, is written to the API's log as **fatal** (with the error and its stack), the log is flushed, and the process exits with code 1 so the host (or `npm run host:local`) starts it again. Continuing after such an error would leave the server in an unknown state. If flushing hangs, it exits after two seconds anyway.
+  - In production builds the website sends crashes in a visitor's browser to `POST /api/v1/client-errors`: errors nothing caught, promise rejections nothing handled, and pages that crash while drawing (the router catches those, so they are reported from the "Something went wrong" page). Each becomes one warning in the server log with the request id and browser type. Nothing is stored in the database.
+  - A report holds the error, its stack, the script and line, and the page's **path only**: never the query string or `#` part (a password-reset link carries its token there), never form contents or cookies. The server refuses anything else.
+  - Limits: each distinct error is sent once per page load, at most 5 per page load; the endpoint takes 20 reports per connection every 15 minutes (`CLIENT_ERROR_RATE_LIMIT_MAX`), plus the origin check and the overall API limit.
+  - Errors from scripts on other websites ("Script error." with no details) are skipped.
+- **Request ids:** every log line written while answering a request carries that request's id (also sent to the browser as `X-Request-Id`), including these reports and every 500 error. A test checks it.
+- **Privacy:** the Privacy Policy says that a broken page sends a short error report and what it contains.
+- **Why:** before this, a page that broke for a visitor left no trace anywhere Prajzo could see, and a crash of the API reached only standard error as a bare stack, outside the structured log.

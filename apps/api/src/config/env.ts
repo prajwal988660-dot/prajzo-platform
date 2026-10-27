@@ -81,6 +81,8 @@ const envSchema = z
     PROJECT_REQUEST_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
     // Things one customer may do to their projects per hour: accept a quote, answer, cancel…
     PROJECT_ACTION_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(10_000).default(60),
+    // Browser error reports allowed per connection every 15 minutes (D-058).
+    CLIENT_ERROR_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(20),
     // Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes.
     AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
     // The overall limit: API requests of any kind allowed per connection every minute. It keeps
