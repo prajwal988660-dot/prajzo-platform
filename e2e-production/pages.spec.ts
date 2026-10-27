@@ -56,6 +56,7 @@ const publicPages = [
   '/start-project',
   '/privacy',
   '/terms',
+  '/demo/portfolio',
   '/login',
   '/register',
   '/forgot-password',

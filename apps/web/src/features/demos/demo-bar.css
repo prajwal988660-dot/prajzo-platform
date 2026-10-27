@@ -1,0 +1,53 @@
+/*
+ * The bar on every live demo (D-014). Prajzo's own colours, not the demo's, so it always reads as
+ * "this is Prajzo telling you something", whatever look the demo has.
+ */
+.demo-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 1.25rem;
+  padding: 0.55rem max(1rem, env(safe-area-inset-right, 0px)) 0.55rem
+    max(1rem, env(safe-area-inset-left, 0px));
+  background: #0a1b46;
+  color: #ffffff;
+  font:
+    400 0.85rem/1.4 'Inter Variable',
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+.demo-bar p {
+  margin: 0;
+}
+.demo-bar-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+.demo-bar a {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.demo-bar a:focus-visible {
+  outline: 3px solid #04bbff;
+  outline-offset: 2px;
+}
+/* In-page links scroll the section clear of the bar and the site's own header. */
+.demo-page {
+  --demo-bar-height: 2.6rem;
+}
+.demo-page .ps-section {
+  scroll-margin-top: calc(var(--demo-bar-height) + 1rem);
+}
+@media (max-width: 520px) {
+  .demo-page {
+    --demo-bar-height: 4.4rem;
+  }
+}

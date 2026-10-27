@@ -108,6 +108,7 @@ for (const width of widths) {
       '/start-project',
       '/privacy',
       '/terms',
+      '/demo/portfolio',
       '/login',
       '/register',
       '/forgot-password',

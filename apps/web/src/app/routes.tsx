@@ -111,6 +111,19 @@ const customerPages: RouteObject = {
   ],
 };
 
+/**
+ * One live demo per template built so far (D-007), each at its own fixed address so the server
+ * knows it exists. Business, Event, Catalogue and Forms are added in Phases 10 to 13.
+ */
+const demoPages: RouteObject[] = (['portfolio'] as const).map((key) => ({
+  path: `demo/${key}`,
+  errorElement: <RouteErrorPage />,
+  lazy: async () => {
+    const { DemoPage } = await import('../features/demos/DemoPage');
+    return { Component: () => <DemoPage templateKey={key} /> };
+  },
+}));
+
 /** Development-only pages; they are left out of production builds entirely. */
 const developmentRoutes: RouteObject[] = import.meta.env.DEV
   ? [
@@ -148,6 +161,8 @@ export const routes: RouteObject[] = [
           },
         ],
       },
+      // Live demos: the demo's own website under a demo bar, without Prajzo's header and footer.
+      ...demoPages,
       {
         // The administration area: its own plain frame.
         path: 'admin',

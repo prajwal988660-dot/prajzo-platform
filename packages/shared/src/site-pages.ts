@@ -111,6 +111,14 @@ export const sitePages = {
       'Choose a new password for your Prajzo account, using the link we sent to your email.',
     index: false,
   },
+  // Live demos are kept out of search results: the people in them are made up, and someone
+  // searching for a name should never land on one (D-063). The Templates page is listed instead.
+  '/demo/portfolio': {
+    name: 'Portfolio demo',
+    description:
+      'A live demo of the Prajzo Portfolio template: a one-page portfolio for a fictional product designer, with a contact form that works.',
+    index: false,
+  },
 } as const satisfies Record<string, PageMeta>;
 
 export type SitePagePath = keyof typeof sitePages;
