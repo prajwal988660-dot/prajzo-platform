@@ -8,6 +8,7 @@ Two files in the project folder can be **double-clicked** instead of typing comm
 |---|---|
 | `Create admin account.cmd` | Creates an administrator, or sets a new password for one |
 | `Back up the database.cmd` | Makes a backup in `apps/api/backups/` |
+| `Set up email.cmd` | Turns on real email sending through contact@prajzo.com (section 6) |
 
 ## 1. Backups (D-059)
 
@@ -67,3 +68,11 @@ If only `sessions` differs, someone used the website during the rehearsal: run i
 - Create one, or set a new password: double-click `Create admin account.cmd`, or run `npm run admin:create -w @prajzo/api` in a terminal window. The password stays invisible while you type it.
 - Administrators are signed out after 8 hours idle and 24 hours in total (D-051).
 - There is no sign-up page for administrators and no "forgot password" for them; this command is the only way.
+
+## 6. Email (D-060)
+
+- **Turn on real sending:** double-click `Set up email.cmd` (or `npm run mail:setup -w @prajzo/api`). Give the mailbox (Enter for contact@prajzo.com), Enter for Hostinger's server, then the mailbox password (invisible while you type). It checks the password with Hostinger before saving, and can send you a test email. Restart the website afterwards.
+- **Changed the mailbox password in Hostinger?** Run it again, or the website stops sending.
+- **Check it is working:** the log says `Email sending is ready` at startup. `Email sending is NOT working` names what to check.
+- **Turn sending off again:** set `MAIL_TRANSPORT=console` in `apps/api/.env`.
+- **Spam:** prajzo.com already has SPF, DKIM and DMARC for Hostinger Mail. After a few weeks of real mail, DMARC can be tightened from `p=none` to `p=quarantine` in Hostinger's DNS settings.

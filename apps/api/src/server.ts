@@ -10,9 +10,9 @@ import {
   watchConnection,
 } from './db/connection';
 import { installFatalErrorHandlers } from './lib/fatal-errors';
-import { createLogger } from './lib/logger';
+import { createLogger, type Logger } from './lib/logger';
 import { ensureCatalogueDefaults } from './modules/catalogue/catalogue.service';
-import { createConsoleMailer } from './services/mailer';
+import { createConsoleMailer, createSmtpMailer, type Mailer } from './services/mailer';
 
 function readSettings(): Env {
   try {
@@ -30,11 +30,32 @@ function readSettings(): Env {
   }
 }
 
+function createMailer(env: Env, logger: Logger): Mailer {
+  if (env.MAIL_TRANSPORT === 'console') {
+    if (env.NODE_ENV === 'production') {
+      logger.warn('MAIL_TRANSPORT is "console": emails are NOT being sent (docs/ENVIRONMENT.md)');
+    }
+    return createConsoleMailer(logger, { showBody: env.NODE_ENV === 'development' });
+  }
+  const mailer = createSmtpMailer(env);
+  // A wrong password or a blocked port shows up in the log at once, not at the first email.
+  mailer
+    .verify()
+    .then(() => logger.info({ host: env.SMTP_HOST, user: env.SMTP_USER }, 'Email sending is ready'))
+    .catch((error: unknown) => {
+      logger.error(
+        { host: env.SMTP_HOST, user: env.SMTP_USER, reason: describeError(error) },
+        'Email sending is NOT working: check SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASSWORD',
+      );
+    });
+  return mailer;
+}
+
 function main(): void {
   const env = readSettings();
   const logger = createLogger(env);
   installFatalErrorHandlers(logger);
-  const mailer = createConsoleMailer(logger, { showBody: env.NODE_ENV === 'development' });
+  const mailer = createMailer(env, logger);
   const app = createApp({ env, logger, checkDatabase: () => pingDatabase(), mailer });
   const server = createServer(app);
   const stopConnecting = new AbortController();

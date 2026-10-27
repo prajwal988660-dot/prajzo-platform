@@ -92,6 +92,21 @@ const envSchema = z
     // can't be used to copy everything out in one go). Counted per account, not per connection.
     ADMIN_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(100_000).default(1200),
     // How long a customer stays signed in without visiting, and the (shorter) idle limit for admins.
+    // Email (D-060): "console" prints emails to the log; "smtp" really sends them through your
+    // mailbox (Hostinger: smtp.hostinger.com, port 465, the mailbox address and its password).
+    MAIL_TRANSPORT: z.enum(['console', 'smtp']).default('console'),
+    SMTP_HOST: z.string().trim().min(1).optional(),
+    // 465 = encrypted from the start; 587 = upgraded with STARTTLS (required, never plain text).
+    SMTP_PORT: z.coerce
+      .number()
+      .int()
+      .refine((port) => port === 465 || port === 587, 'must be 465 or 587')
+      .default(465),
+    SMTP_USER: z.email('must be the full mailbox address').optional(),
+    SMTP_PASSWORD: z.string().min(1).optional(),
+    // The sender people see. The address defaults to SMTP_USER (most providers insist on it).
+    MAIL_FROM: z.email('must be an email address').optional(),
+    MAIL_FROM_NAME: z.string().trim().min(1).max(60).default('Prajzo'),
     SESSION_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(14),
     ADMIN_SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(72).default(8),
     // The longest a session can last in total, however often it is used, so a stolen or forgotten
@@ -113,6 +128,17 @@ const envSchema = z
         path: ['ADMIN_SESSION_MAX_HOURS'],
         message: 'must not be shorter than ADMIN_SESSION_TTL_HOURS',
       });
+    }
+    if (env.MAIL_TRANSPORT === 'smtp') {
+      for (const name of ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD'] as const) {
+        if (!env[name]) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [name],
+            message: 'is required when MAIL_TRANSPORT=smtp (see docs/ENVIRONMENT.md)',
+          });
+        }
+      }
     }
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {
       ctx.addIssue({

@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 27 October 2026 (Phase 6: backups done; full test run, then the Phase 7 gate)
+Last updated: 27 October 2026 (Phase 7 started: email sending built; waiting on the Hostinger plan)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -235,11 +235,20 @@ Started 25 October 2026 ("start Phase 6"). The plan below comes from looking fir
 
 ## Phase 7: Deployment
 
+Started 27 October 2026 ("continue building", with your answers: prajzo.com is live, the plan type is unknown, the mailbox exists). Found: prajzo.com is a fresh WordPress install on Hostinger shared hosting (only the sample "Hello world!" post), DNS is at Hostinger, and Hostinger Mail is set up with SPF, DKIM and DMARC.
+
 - [ ] Your choices and accounts: domain, hosting, MongoDB Atlas, email provider
+  - [x] Domain prajzo.com and its DNS at Hostinger; email at Hostinger Mail (contact@prajzo.com)
+  - [ ] **Your answer:** the Hostinger plan (it decides whether the Node.js app can run on Hostinger itself)
+  - [ ] **Your answer:** may the WordPress site at prajzo.com be replaced?
+  - [ ] **Your action:** change the Atlas database password before the database is opened to the host
 - [ ] Production settings documented; secrets set only on the host
 - [ ] Staging site deployed behind the staging password and checked on the real host
 - [ ] Production build deployed; HTTPS working; health checks passing; no staging password on the live site
 - [ ] Email domain records (SPF, DKIM) verified; account and project emails really sent
+  - [x] SPF, DKIM (3 keys) and DMARC records checked in DNS (D-060)
+  - [x] Real sending through the mailbox (SMTP, encrypted only), tested against a real SMTP server; `npm run mail:setup -w @prajzo/api` / **Set up email.cmd** saves the password safely
+  - [ ] **Your action:** run **Set up email.cmd** with the contact@prajzo.com password and send the test email
 - [ ] Backups scheduled; monitoring and alerts on
 - [ ] Live smoke test passed on the real address
 - [ ] Known limitations and remaining manual tasks listed

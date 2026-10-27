@@ -553,3 +553,17 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Proof:** a test builds realistic data through the API (two customers, a quote accepted, a contact message, sessions, the activity log) plus every awkward BSON type, backs it up, restores it into another database, and compares every document and index. The same rehearsal (`db:rehearse`) passed on the real Atlas database on 27 October 2026 (9 collections, 22 documents).
 - **Not yet:** scheduled backups and where they are kept are part of Phase 7 (hosting). Atlas's free tier keeps no backups of its own.
 - **How-to:** [OPERATIONS.md](OPERATIONS.md).
+
+---
+
+## Phase 7 decisions (27 October 2026)
+
+### D-060: Email is sent through the contact@prajzo.com mailbox
+
+- **Found:** prajzo.com's email is on Hostinger Mail, and its records are already right: SPF (`include:_spf.mail.hostinger.com`), three DKIM keys (`hostingermail-a/b/c`) and DMARC (`p=none`). Mail sent through Hostinger's own server as contact@prajzo.com passes those checks, so it is far less likely to land in spam than mail from the web server.
+- **Decision:** the API sends through SMTP (`nodemailer`) as the mailbox: `smtp.hostinger.com`, port 465, signed in as contact@prajzo.com. `MAIL_TRANSPORT=console` (the default) keeps printing emails to the log, so development and tests never send by accident.
+- **Safety:**
+  - The connection is always encrypted (465 from the start, 587 only with STARTTLS); the server's certificate is always checked; port 25 and plain text are refused by the settings check. A test proves the password is never sent to a server that can't encrypt.
+  - At startup the API signs in once without sending, and logs "Email sending is ready" or exactly which settings to check. A failed email never fails what the person did (it was already so: each caller logs it).
+  - `npm run mail:setup` (or **Set up email.cmd**) asks for the password with the typing hidden, checks it with the mail server, and only then writes it to `apps/api/.env`. The password never goes through chat, the screen or a log. The secret scan already covers any setting named `*PASSWORD*`.
+- **Later:** DMARC can move from `p=none` to `quarantine` once real mail has been seen passing for a few weeks (a DNS change in Hostinger; noted in OPERATIONS.md).

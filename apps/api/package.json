@@ -12,6 +12,7 @@
     "host:stop": "node scripts/host-stop.mjs",
     "seed": "tsx src/scripts/seed.ts",
     "admin:create": "tsx src/scripts/admin-create.ts",
+    "mail:setup": "tsx src/scripts/mail-setup.ts",
     "db:backup": "tsx src/scripts/db-backup.ts",
     "db:restore": "tsx src/scripts/db-restore.ts",
     "db:rehearse": "tsx src/scripts/db-rehearse.ts",
@@ -30,6 +31,7 @@
     "helmet": "^8.3.0",
     "mongodb": "~7.7.0",
     "mongoose": "^9.11.2",
+    "nodemailer": "~10.1.0",
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",
     "zod": "^4.6.7"
@@ -38,10 +40,13 @@
     "@types/compression": "^1.8.1",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
+    "@types/nodemailer": "~8.0.2",
+    "@types/smtp-server": "~3.5.13",
     "@types/supertest": "^7.2.1",
     "esbuild": "^0.28.2",
     "mongodb-memory-server": "^11.3.0",
     "pino-pretty": "^13.2.0",
+    "smtp-server": "~3.19.21",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15"
   }
