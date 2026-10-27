@@ -45,7 +45,7 @@ async function categoryTitles(keys: string[]): Promise<Map<string, string>> {
 }
 
 function toEntry(entry: EntryDocument, titles: Map<string, string>): TemplateEntry {
-  const key = entry.key as TemplateKey;
+  const key = entry.key;
   return {
     key,
     name: entry.name,
@@ -168,7 +168,7 @@ type SubmissionDocument = DemoSubmissionRecord & { id: string; createdAt: Date }
 function toSubmission(submission: SubmissionDocument): AdminDemoSubmission {
   return {
     id: submission.id,
-    template: submission.template as TemplateKey,
+    template: submission.template,
     name: submission.name,
     email: submission.email,
     message: submission.message,
