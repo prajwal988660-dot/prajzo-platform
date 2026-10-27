@@ -20,7 +20,7 @@ export function DemoPage({ templateKey }: { templateKey: TemplateKey }) {
       <SkipLink target="site-main" />
       <aside className="demo-bar" aria-label="About this demo">
         <p>
-          <strong>Demo website by Prajzo.</strong>{' '}
+          <strong>Demo website by Prajzo, for evaluation only.</strong>{' '}
           <span>Everyone and everything in it is made up.</span>
         </p>
         <nav aria-label="Demo" className="demo-bar-links">

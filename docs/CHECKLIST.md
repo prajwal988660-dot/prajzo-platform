@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 28 October 2026 (Phase 7 paused; Phase 8 started)
+Last updated: 28 October 2026 (Phase 8: Portfolio demo live locally; Templates pages next)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -263,29 +263,29 @@ Started 27 October 2026 ("continue building", with your answers: prajzo.com is l
 
 Started 28 October 2026, on branch `phase-8-template-engine` (stacked on Phase 7).
 
-- [ ] Website configuration schema and its validation, shared by web and API
-- [ ] Template definition format with pages, sections, variants, design options and a default configuration
-- [ ] Site renderer with demo, preview and review modes; theme values applied as CSS variables
-- [ ] Demo-submission API: validated, rate-limited, deleted automatically after 7 days
-- [ ] Your approval of the Portfolio design brief
-- [ ] Portfolio template:
-  - [ ] Navigation, hero, profile introduction
-  - [ ] Skills, projects, experience and education
-  - [ ] Contact form, social links, footer
-- [ ] Clearly fictional demo content; demo bar on the live demo
-- [ ] Contact form shows success only after the server confirms, and a clear error state otherwise
+- [x] Website configuration schema and its validation, shared by web and API (bb27f4d, 21 tests)
+- [x] Template definition format with pages, sections, variants, design options and a default configuration
+- [x] Site renderer with demo, preview and review modes; theme values applied as CSS variables (85a8137)
+- [x] Demo-submission API: validated, rate-limited, deleted automatically after 7 days (288042e)
+- [ ] Your approval of the Portfolio design brief ([the brief](https://claude.ai/artifact/9TzQoAxTyzdSeQN1rZkznH); built with look A, Daylight, until you choose)
+- [x] Portfolio template:
+  - [x] Navigation, hero, profile introduction
+  - [x] Skills, projects, experience and education
+  - [x] Contact form, social links, footer
+- [x] Clearly fictional demo content; demo bar on the live demo
+- [x] Contact form shows success only after the server confirms, and a clear error state otherwise
 - [ ] Templates and Live Demos page, showing the preview, category, description, features and "View Live Demo"
 - [ ] Template Details page and Our Projects page
 - [ ] Template catalogue model and public API; preview-image capture script
 - [ ] For admins (moved here from the admin dashboard phase): template management and the demo-submissions inbox
-- [ ] Demo bar says "for evaluation only"; the code protections of [D-037](DECISIONS.md) apply
+- [x] Demo bar says "for evaluation only"; the code protections of [D-037](DECISIONS.md) apply
 - [ ] Home: the featured templates and demo projects sections switch on; the "Explore Templates" button appears
 - [ ] Tests:
-  - [ ] Configuration validation (unit)
-  - [ ] Key sections (component)
-  - [ ] Form states
+  - [x] Configuration validation (unit)
+  - [x] Key sections (component)
+  - [x] Form states
   - [ ] End to end: Templates → View Live Demo → contact form
-- [ ] Responsive check at 390, 768 and 1280 px; keyboard check
+- [x] Responsive check at 390, 768 and 1280 px; keyboard check
 - [ ] Summary with the tests that ran
 - [ ] **(gate)** Demo approval before Phase 9
 

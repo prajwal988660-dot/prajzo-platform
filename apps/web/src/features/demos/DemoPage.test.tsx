@@ -26,7 +26,7 @@ describe('the Portfolio live demo (/demo/portfolio)', () => {
   it('says it is a demo, and that everyone in it is made up', async () => {
     await openDemo();
     const bar = screen.getByRole('complementary', { name: 'About this demo' });
-    expect(bar).toHaveTextContent('Demo website by Prajzo.');
+    expect(bar).toHaveTextContent('Demo website by Prajzo, for evaluation only.');
     expect(bar).toHaveTextContent('Everyone and everything in it is made up.');
     expect(within(bar).getByRole('link', { name: 'Back to Prajzo' })).toHaveAttribute('href', '/');
     await waitFor(() => expect(document.title).toBe('Portfolio demo · Prajzo'));

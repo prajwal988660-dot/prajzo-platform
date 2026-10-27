@@ -587,3 +587,11 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **What stays ready:** real email (D-060), the hosting settings and password tools and DEPLOYMENT.md (D-061). They work for either host; only the final steps in DEPLOYMENT.md change if Hostinger Business is chosen.
 - **Order now:** Phase 8 (template engine and the Portfolio demo), then 9 (builder), 10 to 13 (the other demos), 14 (submit a design as a project), then back to Phase 7 to go live with everything. Each phase keeps its own branch, pull request and your approval; each demo's design brief is approved before its code.
 - **prajzo.com** keeps showing the empty WordPress site until then.
+
+### D-063: How the live demos are built and shown
+
+- **One renderer, layouts by the site's own width.** Every design is drawn by `apps/web/src/site-renderer`. Layouts change with the width of the site itself (CSS container queries), not the browser window, so the builder's phone, tablet and computer previews (Phase 9) show exactly what those devices show. Checked at 320, 390, 768 and 1280 px like every other page.
+- **Kept out of search results.** The demos are listed (`noindex`) nowhere: the people in them are made up, and someone searching for a name should never land on one. The Templates page, which presents them, is listed instead.
+- **Light for the rest of the site.** Templates have their own import path (`@prajzo/shared/templates`) and each demo typeface is loaded only when a design uses it, so the main website downloads none of it. Checked in the build: the demo's content is only in the demo page's file.
+- **Nothing contacts anyone.** Email, phone, WhatsApp, social and outside links on a demo are buttons that say what would happen on a real site. The contact form really sends, to the demo inbox only (D-014).
+- **The Portfolio design brief** (Daylight, Night Shift, Botanical; Tara Vaidya; nine sections) was built while waiting for your choice of starting look, which is a one-line change. Two accent colours were darkened slightly so small accent text meets WCAG AA in every look.
