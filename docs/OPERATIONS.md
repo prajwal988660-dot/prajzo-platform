@@ -9,6 +9,8 @@ Two files in the project folder can be **double-clicked** instead of typing comm
 | `Create admin account.cmd` | Creates an administrator, or sets a new password for one |
 | `Back up the database.cmd` | Makes a backup in `apps/api/backups/` |
 | `Set up email.cmd` | Turns on real email sending through contact@prajzo.com (section 6) |
+| `Change database password.cmd` | Puts a new Atlas password into this computer's settings, after checking it connects |
+| `Prepare staging settings.cmd`, `Prepare live settings.cmd` | Make the settings files for Render ([DEPLOYMENT.md](DEPLOYMENT.md)) |
 
 ## 1. Backups (D-059)
 

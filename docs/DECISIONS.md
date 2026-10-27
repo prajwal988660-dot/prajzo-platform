@@ -567,3 +567,16 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - At startup the API signs in once without sending, and logs "Email sending is ready" or exactly which settings to check. A failed email never fails what the person did (it was already so: each caller logs it).
   - `npm run mail:setup` (or **Set up email.cmd**) asks for the password with the typing hidden, checks it with the mail server, and only then writes it to `apps/api/.env`. The password never goes through chat, the screen or a log. The secret scan already covers any setting named `*PASSWORD*`.
 - **Later:** DMARC can move from `p=none` to `quarantine` once real mail has been seen passing for a few weeks (a DNS change in Hostinger; noted in OPERATIONS.md).
+
+### D-061: The website runs on Render; domain, DNS and email stay at Hostinger
+
+- **Found:** the Hostinger plan is **Premium Web Hosting**, which says "No Web Apps": it runs PHP (the WordPress now at prajzo.com) but not a Node.js app.
+- **Your choice (27 October 2026):** option A of three (A: Render for the app; B: upgrade Hostinger to Business; C: a Hostinger VPS), and the new site **replaces the WordPress site** at prajzo.com.
+- **Decision:**
+  - Two Render services in Singapore: `prajzo-staging` (free plan, behind the staging password, at staging.prajzo.com) and `prajzo-live` (Starter plan, always on, at prajzo.com and www). Nothing is created on the paid plan without asking.
+  - Separate databases on the same Atlas cluster: `prajzo-staging` and `prajzo-live`. Development keeps `prajzo`.
+  - Secrets never pass through chat: `Prepare staging/live settings.cmd` writes a file with new random secrets (session secret, staging password) that is pasted into Render's "Add from .env". The files are ignored by git.
+  - The database password is changed before the database is opened to Render (`Change database password.cmd`), and Atlas allows **Render's outbound IP ranges** rather than everywhere (0.0.0.0/0).
+  - DNS stays at Hostinger. Going live changes only the web records (A, AAAA, www); the email records are left alone.
+- **Why Render:** made for apps like this one (automatic restarts, health checks, logs, deploys from GitHub without downtime), and Claude has a direct connection to the account, so setting it up needs few steps from you. About US$7 a month for the live site.
+- **How-to:** [DEPLOYMENT.md](DEPLOYMENT.md).

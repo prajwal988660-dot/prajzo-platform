@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 27 October 2026 (Phase 7 started: email sending built; waiting on the Hostinger plan)
+Last updated: 27 October 2026 (Phase 7: Render chosen; staging set-up next)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -239,10 +239,13 @@ Started 27 October 2026 ("continue building", with your answers: prajzo.com is l
 
 - [ ] Your choices and accounts: domain, hosting, MongoDB Atlas, email provider
   - [x] Domain prajzo.com and its DNS at Hostinger; email at Hostinger Mail (contact@prajzo.com)
-  - [ ] **Your answer:** the Hostinger plan (it decides whether the Node.js app can run on Hostinger itself)
-  - [ ] **Your answer:** may the WordPress site at prajzo.com be replaced?
+  - [x] Hostinger plan: Premium ("No Web Apps"); you chose Render for the website, with domain, DNS and email staying at Hostinger (D-061)
+  - [x] The new site replaces the WordPress site at prajzo.com (your answer, 27 October)
+  - [ ] **Your action:** give Render access to the private repository (DEPLOYMENT.md, step 3)
   - [ ] **Your action:** change the Atlas database password before the database is opened to the host
 - [ ] Production settings documented; secrets set only on the host
+  - [x] [DEPLOYMENT.md](DEPLOYMENT.md); settings files made on your PC with new secrets and pasted into Render (`Prepare staging/live settings.cmd`), never sent through chat
+  - [x] `Change database password.cmd` checks a new Atlas password before saving it
 - [ ] Staging site deployed behind the staging password and checked on the real host
 - [ ] Production build deployed; HTTPS working; health checks passing; no staging password on the live site
 - [ ] Email domain records (SPF, DKIM) verified; account and project emails really sent
