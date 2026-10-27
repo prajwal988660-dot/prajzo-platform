@@ -10,7 +10,8 @@ import type { Env } from '../config/env';
 export const permissionsPolicy = [
   'accelerometer=()',
   'autoplay=()',
-  'bluetooth=()',
+  // No `bluetooth`: Chrome on Linux doesn't know it and prints a warning on every page. Web
+  // Bluetooth always asks the visitor to pick a device anyway, and no other site's scripts run here.
   'camera=()',
   'display-capture=()',
   'encrypted-media=()',
