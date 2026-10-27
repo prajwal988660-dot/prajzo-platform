@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 27 October 2026 (Phase 7: Render chosen; staging set-up next)
+Last updated: 28 October 2026 (Phase 7 paused; Phase 8 started)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -235,6 +235,8 @@ Started 25 October 2026 ("start Phase 6"). The plan below comes from looking fir
 
 ## Phase 7: Deployment
 
+**Paused 28 October 2026 at your request** ("skip this phase of hosting and keep building the remaining phases"), D-062. Ready and tested: real email, the settings tools, the deployment how-to. Left: choosing Render (with the GitHub invite and a dollar card) or upgrading Hostinger to Business, then staging, then going live.
+
 Started 27 October 2026 ("continue building", with your answers: prajzo.com is live, the plan type is unknown, the mailbox exists). Found: prajzo.com is a fresh WordPress install on Hostinger shared hosting (only the sample "Hello world!" post), DNS is at Hostinger, and Hostinger Mail is set up with SPF, DKIM and DMARC.
 
 - [ ] Your choices and accounts: domain, hosting, MongoDB Atlas, email provider
@@ -258,6 +260,8 @@ Started 27 October 2026 ("continue building", with your answers: prajzo.com is l
 - [ ] **(gate)** Approval for Phase 8: the main website is online
 
 ## Phase 8: Template engine + Demo 1 (Portfolio, `/demo/portfolio`)
+
+Started 28 October 2026, on branch `phase-8-template-engine` (stacked on Phase 7).
 
 - [ ] Website configuration schema and its validation, shared by web and API
 - [ ] Template definition format with pages, sections, variants, design options and a default configuration

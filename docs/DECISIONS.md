@@ -580,3 +580,10 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
   - DNS stays at Hostinger. Going live changes only the web records (A, AAAA, www); the email records are left alone.
 - **Why Render:** made for apps like this one (automatic restarts, health checks, logs, deploys from GitHub without downtime), and Claude has a direct connection to the account, so setting it up needs few steps from you. About US$7 a month for the live site.
 - **How-to:** [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### D-062: Hosting paused; the demos and builder come next
+
+- **Your choice (28 October 2026):** "skip this phase of hosting and keep building the remaining phases". Still open: Render (needs a read-only GitHub invite for the account Render is linked to, and a card that accepts a monthly charge in US dollars) or upgrading Hostinger to Business (Node.js apps, billed in rupees, connects to prajwal988660-dot directly).
+- **What stays ready:** real email (D-060), the hosting settings and password tools and DEPLOYMENT.md (D-061). They work for either host; only the final steps in DEPLOYMENT.md change if Hostinger Business is chosen.
+- **Order now:** Phase 8 (template engine and the Portfolio demo), then 9 (builder), 10 to 13 (the other demos), 14 (submit a design as a project), then back to Phase 7 to go live with everything. Each phase keeps its own branch, pull request and your approval; each demo's design brief is approved before its code.
+- **prajzo.com** keeps showing the empty WordPress site until then.
