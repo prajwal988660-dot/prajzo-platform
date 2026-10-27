@@ -16,8 +16,29 @@ export type TemplateKey = (typeof templateKeys)[number];
  * Typefaces a design may use. Each is self-hosted (D-019), so adding one means adding its
  * font package to the web app as well as its id here.
  */
-export const fontIds = ['inter', 'sora'] as const;
+export const fontIds = [
+  'inter',
+  'sora',
+  'bricolage-grotesque',
+  'figtree',
+  'fraunces',
+  'manrope',
+  'dm-serif-display',
+  'dm-sans',
+] as const;
 export type FontId = (typeof fontIds)[number];
+
+/** How each typeface is named to people (in the builder) and what kind of letters it has. */
+export const fontCatalogue: Record<FontId, { name: string; kind: 'sans' | 'serif' }> = {
+  inter: { name: 'Inter', kind: 'sans' },
+  sora: { name: 'Sora', kind: 'sans' },
+  'bricolage-grotesque': { name: 'Bricolage Grotesque', kind: 'sans' },
+  figtree: { name: 'Figtree', kind: 'sans' },
+  fraunces: { name: 'Fraunces', kind: 'serif' },
+  manrope: { name: 'Manrope', kind: 'sans' },
+  'dm-serif-display': { name: 'DM Serif Display', kind: 'serif' },
+  'dm-sans': { name: 'DM Sans', kind: 'sans' },
+};
 
 export const buttonStyles = ['pill', 'rounded', 'square'] as const;
 export const spacings = ['compact', 'comfortable', 'spacious'] as const;

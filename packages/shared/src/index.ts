@@ -22,4 +22,5 @@ export * from './projects/status';
 export * from './site';
 export * from './site-config';
 export * from './site-pages';
+export * from './templates';
 export * from './text';
