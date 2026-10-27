@@ -312,7 +312,7 @@ function MessageCard({
             Interested in: <span className="text-ink">{interest}</span>
           </p>
         )}
-        <p className="whitespace-pre-line break-words text-ink">{message.message}</p>
+        <p className="whitespace-pre-line text-ink">{message.message}</p>
 
         <div className="flex flex-wrap items-center gap-3">
           <a

@@ -1,3 +1,6 @@
+// First on purpose: it must run before any schema is created (see the file).
+import './zod-config';
+
 export * from './api/errors';
 export * from './api/health';
 export * from './admin/audit';
@@ -8,6 +11,7 @@ export * from './admin/overview';
 export * from './api/pagination';
 export * from './auth';
 export * from './catalogue/catalogue';
+export * from './client-error';
 export * from './contact';
 export * from './dates';
 export * from './money';
@@ -15,4 +19,5 @@ export * from './projects/admin-projects';
 export * from './projects/project-request';
 export * from './projects/status';
 export * from './site';
+export * from './site-pages';
 export * from './text';

@@ -295,7 +295,8 @@ All routes are under `/api/v1` except the health checks. List endpoints take `?p
 
 | Who | Method and path | Purpose |
 |---|---|---|
-| Anyone | `GET /api/health`, `GET /api/health/ready` | Liveness; readiness including the database |
+| Anyone | `GET /api/health`, `GET /api/health/ready` | Liveness; readiness including the database. The first is never rate-limited, so a flood can't make a host think the site is down |
+| Anyone | `GET /robots.txt`, `GET /sitemap.xml` | For search engines, written from the public address (outside `/api`; the server that serves the web app, D-053) |
 | Anyone | `GET /categories`, `GET /packages` | Service catalogue and packages |
 | Anyone | `GET /templates`, `GET /templates/:key` | Published templates |
 | Anyone | `POST /contact` | Contact message (rate-limited) |
@@ -352,11 +353,11 @@ The workflow also enforces these rules:
 
 - **Sessions:**
   - stored in MongoDB
-  - cookie `prajzo.sid` is `HttpOnly`, `SameSite=Lax`, and `Secure` in production
+  - the cookie is `HttpOnly` and `SameSite=Lax`. In production it is called `__Host-prajzo.sid` and is `Secure`, covers the whole site and has no `Domain`: browsers refuse a cookie with that prefix unless all of that is true, so another address of the site can't plant one (D-051). On your own computer it is `prajzo.sid`
   - a new session ID is issued at login
-  - logging out destroys the session
+  - logging out destroys the session and deletes the cookie
   - a password change or reset ends the user's other sessions
-  - admin sessions are shorter
+  - admin sessions are shorter, and every session also has a total lifetime however often it is used (customers 60 days, administrators 24 hours), so a stolen or forgotten sign-in can't live for ever
 - **Forged requests (CSRF):** blocked by four measures together:
   - everything is served from the same address
   - cookies are `SameSite=Lax`
@@ -371,8 +372,14 @@ The workflow also enforces these rules:
   - every request body, query and route parameter is validated with Zod
   - unknown fields are dropped
   - Mongoose `sanitizeFilter` blocks query-operator injection
-- **Rate limits:** login, registration, password reset, contact, demo submissions and uploads.
-- **Headers:** helmet sets HSTS in production, `nosniff`, and a content security policy without inline scripts. Framing is limited to the same site, for the preview.
+- **Rate limits (D-055):**
+  - sign-in, registration, password reset, contact, project requests and customer project actions each have their own limit
+  - an overall limit on the API per connection (600 a minute), checked before the request body is read; the plain health check is exempt
+  - a limit on the admin area per administrator (1200 per 15 minutes), applied after the administrator check so strangers can't use it up
+  - demo submissions and uploads join them when those arrive
+  - they depend on seeing each visitor's real address: behind a host's proxy `TRUST_PROXY` must be on, and the first request that shows it is wrong is logged
+- **Staging password (D-037, D-056):** every page, file and API request needs it; only wrong guesses count against the 20 allowed per address every 15 minutes, never what the site itself answers.
+- **Headers:** helmet sets HSTS in production, `nosniff`, and a content security policy without inline scripts or `eval`. Framing is limited to the same site, for the preview. A `Permissions-Policy` switches off the camera, microphone, location, payment, USB and similar features. Every kind of answer carries them (tested in a real browser on the production build). API answers are never stored by default; only the public catalogue may be kept for a minute, and not on a staging site.
 - **Uploads:**
   - JPEG, PNG and WebP only, at most 5 MB
   - the real file type is checked from the file's content
@@ -380,8 +387,9 @@ The workflow also enforces these rules:
   - files get random names
   - SVG is refused
   - signed-in users only
-- **Secrets:** environment variables only. `.env` is never committed, `.env.example` lists the keys, and the API refuses to start with bad settings.
-- **Logs:** request IDs; passwords, cookies and tokens are redacted.
+- **Secrets:** environment variables only. `.env` is never committed, `.env.example` lists the keys, and the API refuses to start with bad settings. `npm run scan:secrets` looks through every file and, in CI, the whole git history, for secret formats, a tracked `.env` and the real values from your local `.env`, and prints only names and places (D-052).
+- **Search and sharing (D-053):** one table of pages says what each page is called and described as and which are listed; the server writes it into each page's HTML, with `robots.txt` and `sitemap.xml`. Unknown addresses answer 404; private areas and sign-in pages are kept out of search results. Structured data states only what the site already shows.
+- **Logs:** request IDs; passwords, cookies and tokens are redacted. A crash of the API is logged as fatal before the process exits; crashes in visitors' browsers are sent to `POST /api/v1/client-errors` and logged as warnings, page path only, rate-limited (D-058).
 - **Errors:** safe messages only; no stack traces in production.
 - **Personal data:**
   - collect the minimum
@@ -414,7 +422,9 @@ The workflow also enforces these rules:
 | API integration | Vitest, Supertest, mongodb-memory-server | Every route, both successes and failures: invalid input, duplicate email, not signed in, wrong role, someone else's record, unknown template, wrong file type, oversized file, expired session, database errors |
 | Components | Vitest, Testing Library, jsdom | Form validation and messages, builder editors, renderer sections drawing a configuration |
 | End to end | Playwright on the installed Chrome | Navigation; contact form; Templates → Live Demo; Customize This Design → edit → preview → save; demo forms; register and login; submit a project; admin status changes |
-| Responsive and accessibility | Playwright screenshots at 390, 768 and 1280 px; axe | Every page and every demo |
+| Responsive and accessibility | Playwright at 320, 390, 768 and 1280 px with deliberately long unbroken text; axe; keyboard-only tests | Every page of the website, account and admin area: nothing scrolls sideways or sticks out of the screen; focus lands on the new page's heading and on a list after changing its page; every demo (later) |
+| Production build | Playwright against the built server in production mode, twice (behind the staging password and open) | Strict policy with no violations on any page, every header on every kind of answer, cookies, compression, the staging password covering everything, no source maps, search and sharing details, icons, typefaces |
+| Tooling | Vitest | The secrets scan and the build check |
 | Build | `npm run check` | Type check, lint, unit and integration tests, production build |
 
 Tests use an in-memory MongoDB that is created and thrown away for each test file, so they never touch your data. A feature is reported as passing only after its tests have actually run.

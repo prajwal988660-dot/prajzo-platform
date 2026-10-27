@@ -28,6 +28,7 @@ import {
 import { Router, type Request } from 'express';
 import { AppError } from '../../lib/errors';
 import { noStore } from '../../middleware/no-store';
+import { adminRateLimit } from '../../middleware/rate-limits';
 import { requireDatabase } from '../../middleware/require-database';
 import { listAudit } from '../audit/audit.service';
 import { createGuards, currentUser } from '../auth/guards';
@@ -74,13 +75,19 @@ function keyParam(req: Request, what: string): string {
 export function adminRouter({
   sessions,
   effects,
+  rateLimitMax,
 }: {
   sessions: Sessions;
   effects: ProjectEffects;
+  /** Requests one administrator may make every 15 minutes. */
+  rateLimitMax: number;
 }): Router {
   const router = Router();
   const { requireAdmin } = createGuards(sessions);
+  // The limit comes after the administrator check: people who are not signed in as one never reach
+  // it, so they can't use up an administrator's allowance.
   router.use(noStore, requireDatabase, sessions.middleware, requireAdmin);
+  router.use(adminRateLimit(rateLimitMax));
 
   // ---------- Overview and activity
   router.get('/overview', async (_req, res) => {

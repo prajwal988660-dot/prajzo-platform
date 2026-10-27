@@ -81,13 +81,39 @@ const envSchema = z
     PROJECT_REQUEST_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
     // Things one customer may do to their projects per hour: accept a quote, answer, cancel…
     PROJECT_ACTION_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(10_000).default(60),
+    // Browser error reports allowed per connection every 15 minutes (D-058).
+    CLIENT_ERROR_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(20),
     // Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes.
     AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(10),
+    // The overall limit: API requests of any kind allowed per connection every minute. It keeps
+    // one visitor, script or scanner from using up the database for everyone else.
+    API_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(100_000).default(600),
+    // Requests one administrator may make to the admin area every 15 minutes (a stolen sign-in
+    // can't be used to copy everything out in one go). Counted per account, not per connection.
+    ADMIN_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(100_000).default(1200),
     // How long a customer stays signed in without visiting, and the (shorter) idle limit for admins.
     SESSION_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(14),
     ADMIN_SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(72).default(8),
+    // The longest a session can last in total, however often it is used, so a stolen or forgotten
+    // sign-in can't live for ever. Never shorter than the idle limits above.
+    SESSION_MAX_DAYS: z.coerce.number().int().min(1).max(365).default(60),
+    ADMIN_SESSION_MAX_HOURS: z.coerce.number().int().min(1).max(168).default(24),
   })
   .superRefine((env, ctx) => {
+    if (env.SESSION_MAX_DAYS < env.SESSION_TTL_DAYS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SESSION_MAX_DAYS'],
+        message: 'must not be shorter than SESSION_TTL_DAYS',
+      });
+    }
+    if (env.ADMIN_SESSION_MAX_HOURS < env.ADMIN_SESSION_TTL_HOURS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADMIN_SESSION_MAX_HOURS'],
+        message: 'must not be shorter than ADMIN_SESSION_TTL_HOURS',
+      });
+    }
     if (env.NODE_ENV === 'production' && !env.APP_ORIGIN.startsWith('https://')) {
       ctx.addIssue({
         code: 'custom',

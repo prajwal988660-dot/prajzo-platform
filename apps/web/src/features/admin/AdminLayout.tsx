@@ -1,7 +1,8 @@
 import { LogOut } from 'lucide-react';
-import { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { Container } from '../../components/layout/Container';
+import { FocusOnNavigation } from '../../components/layout/FocusOnNavigation';
 import { Logo } from '../../components/layout/Logo';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
@@ -23,6 +24,16 @@ const sections = [
 export function AdminLayout() {
   useNoIndex();
   const { user, signOut } = useAuth();
+  const { pathname } = useLocation();
+  const signedIn = Boolean(user);
+
+  // On a phone the section menu scrolls sideways, and the current section can be half hidden.
+  useEffect(() => {
+    if (!signedIn) return;
+    document
+      .querySelector('nav[aria-label="Administration"] [aria-current="page"]')
+      ?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
+  }, [pathname, signedIn]);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -101,6 +112,8 @@ export function AdminLayout() {
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Outlet />
       </main>
+      <FocusOnNavigation />
+      <ScrollRestoration />
     </div>
   );
 }

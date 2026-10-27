@@ -1,7 +1,7 @@
 import { categoryListSchema, servicePackageListSchema } from '@prajzo/shared';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { startTestDatabase, testApp } from '../../test/helpers';
+import { startTestDatabase, testApp, testEnv } from '../../test/helpers';
 import { CategoryModel, ServicePackageModel } from './catalogue.models';
 import { ensureCatalogueDefaults } from './catalogue.service';
 
@@ -26,6 +26,24 @@ describe('service catalogue API', () => {
     expect(items[0]?.title).toBe('Forms and Landing Pages');
     expect(items.at(-1)?.title).toBe('Custom Website Development');
     expect(items.every((item) => item.useCases.length > 0)).toBe(true);
+  });
+
+  it('may be kept for a minute by browsers and caches, but only when it was a success', async () => {
+    for (const address of ['/api/v1/categories', '/api/v1/packages']) {
+      const response = await request(testApp()).get(address);
+      expect(response.status, address).toBe(200);
+      expect(response.headers['cache-control'], address).toBe('public, max-age=60');
+    }
+  });
+
+  it('is never kept by a shared cache on a staging site, whatever it normally allows', async () => {
+    const password = 'a-long-staging-password';
+    const staging = testApp({ env: testEnv({ STAGING_PASSWORD: password }) });
+    for (const address of ['/api/v1/categories', '/api/v1/packages']) {
+      const response = await request(staging).get(address).auth('preview', password);
+      expect(response.status, address).toBe(200);
+      expect(response.headers['cache-control'], address).toBe('private, no-store');
+    }
   });
 
   it('lists the three packages with their low starting prices', async () => {

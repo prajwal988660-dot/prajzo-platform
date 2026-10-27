@@ -66,6 +66,7 @@ const routes = discoverRoutes(
       notifyEmail: 'contact@prajzo.com',
       appOrigin: env.APP_ORIGIN,
     }),
+    rateLimitMax: env.ADMIN_RATE_LIMIT_MAX,
   }),
 );
 

@@ -43,6 +43,9 @@ const env = parseEnv({
   AUTH_RATE_LIMIT_MAX: '100',
   PROJECT_REQUEST_RATE_LIMIT_MAX: '100',
   PROJECT_ACTION_RATE_LIMIT_MAX: '1000',
+  // Many tests share one address and one administrator; the limits have their own tests.
+  API_RATE_LIMIT_MAX: '100000',
+  ADMIN_RATE_LIMIT_MAX: '100000',
 });
 
 await connectDatabase(env.MONGODB_URI);

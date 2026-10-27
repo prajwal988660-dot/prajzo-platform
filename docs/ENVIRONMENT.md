@@ -20,13 +20,17 @@ Secrets and settings live in environment variables, never in code.
 | `MONGODB_URI` | `mongodb://127.0.0.1:27017/prajzo` | Yes | Local server, or your Atlas connection string (Q2) |
 | `SESSION_SECRET` | 64 random hex characters | Yes | Generate one with the command below; use a different value in production |
 | `LOG_LEVEL` | `info` | No | `debug`, `info`, `warn` or `error` |
-| `TRUST_PROXY` | `false` | No | Set to `true` only behind a hosting provider's proxy (production) |
+| `TRUST_PROXY` | `false` | No | Set to `true` when the site sits behind exactly one proxy, as on most hosts (production). Every rate limit counts requests by the visitor's address; without this, behind a proxy everyone looks like the proxy and shares one allowance, and with it on and no proxy a visitor can claim any address. In production the first request that shows the setting is wrong is written to the log (D-055) |
 | `WEB_DIST_DIR` | (unset) | No | Production only: where the built web app is. Defaults to `apps/web/dist` |
+| `API_RATE_LIMIT_MAX` | `600` | No | The overall limit: API requests of any kind allowed per connection every minute. The plain health check is never counted |
+| `ADMIN_RATE_LIMIT_MAX` | `1200` | No | Requests one administrator may make to the admin area every 15 minutes, counted per account |
 | `AUTH_RATE_LIMIT_MAX` | `10` | No | Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes (failed sign-ins are also counted per email address) |
 | `PROJECT_REQUEST_RATE_LIMIT_MAX` | `10` | No | Project requests one customer may send per hour |
 | `PROJECT_ACTION_RATE_LIMIT_MAX` | `60` | No | Things one customer may do to their projects per hour: accept or decline a quote, answer a question, ask for a revision, cancel |
 | `SESSION_TTL_DAYS` | `14` | No | How many days a customer stays signed in without visiting |
 | `ADMIN_SESSION_TTL_HOURS` | `8` | No | How many hours an administrator stays signed in without visiting |
+| `SESSION_MAX_DAYS` | `60` | No | The longest a customer's sign-in can last in total, however often it is used. Not shorter than `SESSION_TTL_DAYS` |
+| `ADMIN_SESSION_MAX_HOURS` | `24` | No | The longest an administrator's sign-in can last in total. Not shorter than `ADMIN_SESSION_TTL_HOURS` |
 | `SERVE_WEB_APP` | (unset) | No | `true` makes the API also serve the built website, as in production. `npm run host:local` sets it for you; leave it unset otherwise |
 | `STAGING_PASSWORD` | (unset) | No | Set it only on a staging site. Every page, file and API request then asks for a username and password. At least 12 characters. Leave it unset on the live site (D-037) |
 | `STAGING_USER` | `preview` | No | The username that goes with `STAGING_PASSWORD`: letters, digits, dots, dashes and underscores |
@@ -54,6 +58,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 |---|---|---|
 | 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where Prajzo's own notifications go: contact-form messages, new project requests, and what customers do to their projects (accept or decline a quote, answer, ask for changes, say it looks good, cancel). In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
+| 6 (added) | `CLIENT_ERROR_RATE_LIMIT_MAX` (default `20`) | Browser error reports allowed per connection every 15 minutes (D-058) |
 | Later | `MAIL_TRANSPORT` (`console` / `smtp`), `MAIL_FROM` | Real email sending through your provider |
 | 8 | `DEMO_SUBMISSION_TTL_DAYS` (default `7`) | How long demo form submissions are kept |
 | 9 | `STORAGE_DRIVER` (`local`), `UPLOAD_DIR`, `MAX_UPLOAD_MB` (default `5`) | Image uploads in development (with the builder) |

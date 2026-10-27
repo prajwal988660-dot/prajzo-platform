@@ -37,7 +37,7 @@ npm run dev
 
 To see Prajzo the way visitors will, hosted on your own computer as one optimized site, run `npm run host:local` and open http://localhost:8080 (stop it with `npm run host:stop`). Details are in [docs/SETUP.md](docs/SETUP.md).
 
-Create your own administrator account once (it asks for the details and hides the password): `npm run admin:create -w @prajzo/api`. See [docs/SETUP.md](docs/SETUP.md), section 3.
+Create your own administrator account once (it asks for the details and hides the password): `npm run admin:create -w @prajzo/api`. See [docs/SETUP.md](docs/SETUP.md), section 3. Or double-click `Create admin account.cmd`. Backups, restores and what to do when something breaks: [docs/OPERATIONS.md](docs/OPERATIONS.md).
 
 Before every commit, and at the end of every phase:
 

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ConfigError, parseEnv } from '../config/env';
 import { testApp, testEnv } from '../test/helpers';
 
@@ -184,6 +184,77 @@ describe('staging password', () => {
       expect((await request(app).get('/').auth(user, password)).status).toBe(200);
     }
     expect((await request(app).get('/').auth(user, 'wrong')).status).toBe(401);
+  });
+
+  it("doesn't count what the site itself answers to a correct request, however many errors", async () => {
+    const app = stagingApp();
+    // A tester on the staging site mistypes things, follows a broken link, and sends a form with
+    // mistakes. Each of those is an error answer from the site, not a wrong guess at the password.
+    for (let mistake = 0; mistake < 60; mistake += 1) {
+      const missing = await request(app).get('/api/v1/nope').auth(user, password);
+      expect(missing.status).toBe(404);
+      expect(missing.text).not.toContain('Too many');
+      const asset = await request(app).get('/assets/missing.js').auth(user, password);
+      expect(asset.status).toBe(404);
+      const brokenRequest = await request(app)
+        .post('/api/v1/nope')
+        .auth(user, password)
+        .set('Content-Type', 'application/json')
+        .send('{ this is not json');
+      expect(brokenRequest.status).toBe(400);
+    }
+    expect((await request(app).get('/').auth(user, password)).status).toBe(200);
+  });
+
+  it("doesn't count or delay correct requests made at the same moment", async () => {
+    const app = stagingApp();
+    // A page can ask for dozens of files at once.
+    const answers = await Promise.all(
+      Array.from({ length: 80 }, () => request(app).get('/').auth(user, password)),
+    );
+    expect(answers.map((answer) => answer.status)).toEqual(Array<number>(80).fill(200));
+  });
+
+  it('counts guesses for each address on its own, as seen through a proxy', async () => {
+    const app = stagingApp({ TRUST_PROXY: 'true' });
+    const from = (address: string) => (guess: string) =>
+      request(app).get('/').set('X-Forwarded-For', address).auth(user, guess);
+    const guesser = from('203.0.113.7');
+    const bystander = from('203.0.113.8');
+
+    for (let guess = 1; guess <= 20; guess += 1) {
+      expect((await guesser(`wrong-${guess}`)).status).toBe(401);
+    }
+    expect((await guesser(password)).status).toBe(429);
+    // Another visitor is untouched, and can still make a mistake of their own.
+    expect((await bystander(password)).status).toBe(200);
+    expect((await bystander('wrong')).status).toBe(401);
+  });
+
+  describe('when a block ends', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('says how long to wait, and lets the right password in again afterwards', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      const app = stagingApp();
+      for (let guess = 1; guess <= 20; guess += 1) {
+        await request(app).get('/').auth(user, `wrong-${guess}`);
+      }
+
+      const blocked = await request(app).get('/').auth(user, password);
+      expect(blocked.status).toBe(429);
+      expect(Number(blocked.headers['retry-after'])).toBeGreaterThan(14 * 60);
+      expect(Number(blocked.headers['retry-after'])).toBeLessThanOrEqual(15 * 60);
+
+      vi.setSystemTime(Date.now() + 14 * 60 * 1000);
+      expect((await request(app).get('/').auth(user, password)).status).toBe(429);
+      vi.setSystemTime(Date.now() + 61 * 1000);
+      expect((await request(app).get('/').auth(user, password)).status).toBe(200);
+      // The allowance starts again from nothing.
+      expect((await request(app).get('/').auth(user, 'wrong-again')).status).toBe(401);
+    });
   });
 
   it('is completely off when no password is set', async () => {

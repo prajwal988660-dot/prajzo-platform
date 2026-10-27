@@ -28,7 +28,7 @@ import {
   updateProfile,
 } from './auth.service';
 import { createGuards, currentUser } from './guards';
-import { createSessions, hasSessionCookie, sessionCookieName } from './session';
+import { createSessions } from './session';
 
 export type AuthDeps = { env: Env; logger: Logger; mailer: Mailer };
 
@@ -112,18 +112,21 @@ export function createAuthRouters(deps: AuthDeps) {
     '/me',
     // Visitors without a session cookie are simply "not signed in": no database needed.
     (req, res, next) =>
-      hasSessionCookie(req) ? next() : void res.json({ user: null } satisfies SessionResponse),
+      sessions.hasCookie(req) ? next() : void res.json({ user: null } satisfies SessionResponse),
     requireDatabase,
     sessions.middleware,
     async (req, res) => {
-      const userId = req.session.userId;
+      const hadSession = Boolean(req.session.userId);
+      const userId = await sessions.currentUserId(req);
       const user = userId ? await findUserById(userId) : null;
       if (userId && (!user || user.status !== 'active')) await sessions.end(req);
-      res.json(
-        user && user.status === 'active'
-          ? signedIn(user)
-          : ({ user: null } satisfies SessionResponse),
-      );
+      if (user && user.status === 'active') {
+        res.json(signedIn(user));
+        return;
+      }
+      // The sign-in is over (too old, or the account is gone): stop the browser sending it.
+      if (hadSession) sessions.clearCookie(res);
+      res.json({ user: null } satisfies SessionResponse);
     },
   );
 
@@ -157,7 +160,7 @@ export function createAuthRouters(deps: AuthDeps) {
   auth.post(
     '/logout',
     (req, res, next) => {
-      if (!hasSessionCookie(req)) {
+      if (!sessions.hasCookie(req)) {
         res.status(204).end();
         return;
       }
@@ -167,7 +170,7 @@ export function createAuthRouters(deps: AuthDeps) {
     sessions.middleware,
     async (req, res) => {
       await sessions.end(req);
-      res.clearCookie(sessionCookieName, { path: '/' });
+      sessions.clearCookie(res);
       res.status(204).end();
     },
   );

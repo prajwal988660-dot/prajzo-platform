@@ -13,13 +13,13 @@ import { Button } from '../../components/ui/Button';
 import { TextField } from '../../components/ui/Field';
 import { apiRequest } from '../../lib/api';
 import { submitErrorMessage } from '../../lib/form-errors';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { AuthPageShell } from './AuthPageShell';
 
 const linkClass = 'font-medium text-brand-indigo underline underline-offset-2';
 
 export function ForgotPasswordPage() {
-  usePageTitle('Reset your password');
+  usePageMeta('/forgot-password');
   const [outcome, setOutcome] = useState<
     { kind: 'idle' } | { kind: 'sent'; message: string } | { kind: 'failed'; message: string }
   >({ kind: 'idle' });

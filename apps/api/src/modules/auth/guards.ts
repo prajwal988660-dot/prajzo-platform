@@ -22,7 +22,7 @@ export function createGuards(sessions: Sessions): {
   requireAdmin: RequestHandler;
 } {
   async function signedInUser(req: Request): Promise<UserDocument> {
-    const userId = req.session.userId;
+    const userId = await sessions.currentUserId(req); // null too once a session is too old
     const user = userId ? await findUserById(userId) : null;
     if (!user || user.status !== 'active') {
       if (userId) await sessions.end(req); // the account is gone or disabled

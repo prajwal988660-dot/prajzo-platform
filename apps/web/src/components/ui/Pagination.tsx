@@ -1,5 +1,16 @@
-import { Link, useSearchParams } from 'react-router';
+import { useEffect, useRef } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { buttonClasses } from './Button';
+
+/**
+ * When the visitor uses "Previous" or "Next", the list below is replaced. Keyboard focus is then
+ * moved to the new list, so they can carry on from its first item and a screen reader says what
+ * is there. The list is the element just above the page links. This is remembered for a few
+ * seconds, and only for the page it happened on, because the page links may be taken off the
+ * screen while the next page loads.
+ */
+let paging: { pathname: string; at: number } | null = null;
+const HOW_LONG_TO_WAIT_MS = 8000;
 
 /**
  * "Previous / Page 2 of 5 / Next" for a list. The page number lives in the address (?page=2), and
@@ -16,6 +27,19 @@ export function Pagination({
   label: string;
 }) {
   const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
+  const links = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (paging?.pathname !== pathname || Date.now() - paging.at > HOW_LONG_TO_WAIT_MS) return;
+    const list = links.current?.previousElementSibling;
+    if (!(list instanceof HTMLElement)) return;
+    paging = null;
+    if (!list.hasAttribute('tabindex')) list.setAttribute('tabindex', '-1');
+    // The router has already scrolled to the top of the new page; don't scroll again.
+    list.focus({ preventScroll: true });
+  }, [page, pathname]);
+
   if (totalPages <= 1) return null;
 
   const to = (target: number) => {
@@ -25,9 +49,13 @@ export function Pagination({
   };
 
   return (
-    <nav aria-label={label} className="flex items-center justify-between gap-3">
+    <nav ref={links} aria-label={label} className="flex items-center justify-between gap-3">
       {page > 1 ? (
-        <Link to={to(page - 1)} className={buttonClasses({ variant: 'secondary' })}>
+        <Link
+          to={to(page - 1)}
+          onClick={() => (paging = { pathname, at: Date.now() })}
+          className={buttonClasses({ variant: 'secondary' })}
+        >
           Previous
         </Link>
       ) : (
@@ -37,7 +65,11 @@ export function Pagination({
         Page {page} of {totalPages}
       </p>
       {page < totalPages ? (
-        <Link to={to(page + 1)} className={buttonClasses({ variant: 'secondary' })}>
+        <Link
+          to={to(page + 1)}
+          onClick={() => (paging = { pathname, at: Date.now() })}
+          className={buttonClasses({ variant: 'secondary' })}
+        >
           Next
         </Link>
       ) : (

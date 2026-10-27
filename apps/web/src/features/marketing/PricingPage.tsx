@@ -5,7 +5,7 @@ import { ButtonLink } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
 import { SectionHeading } from '../../components/ui/SectionHeading';
-import { usePageTitle } from '../../lib/use-page-title';
+import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
 import { CallToActionBand } from './components/CallToActionBand';
 import { FaqList } from './components/FaqList';
@@ -14,7 +14,7 @@ import { PageIntro } from './components/PageIntro';
 import { pricingFaqs } from './content';
 
 export function PricingPage() {
-  usePageTitle('Pricing and Plans');
+  usePageMeta('/pricing');
   const packages = useApi('/v1/packages', servicePackageListSchema);
 
   return (
@@ -28,7 +28,10 @@ export function PricingPage() {
 
       <section aria-label="Packages" className="py-14 sm:py-20">
         <Container>
-          {packages.status === 'loading' && <LoadingBlock label="Loading packages" />}
+          {/* Tall enough that what follows starts below the screen, so it can't be seen jumping. */}
+          {packages.status === 'loading' && (
+            <LoadingBlock label="Loading packages" className="min-h-[70svh]" />
+          )}
           {packages.status === 'error' && (
             <LoadError message={packages.error.message} onRetry={packages.retry} />
           )}
@@ -46,6 +49,7 @@ export function PricingPage() {
                   key={servicePackage.key}
                   servicePackage={servicePackage}
                   highlighted={servicePackage.key === 'professional-website'}
+                  headingLevel={2}
                 />
               ))}
             </div>

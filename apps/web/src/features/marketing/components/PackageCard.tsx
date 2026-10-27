@@ -4,9 +4,19 @@ import { ButtonLink } from '../../../components/ui/Button';
 import { cx } from '../../../lib/cx';
 import { describePrice } from '../../../lib/format';
 
-type PackageCardProps = { servicePackage: ServicePackage; highlighted?: boolean };
+type PackageCardProps = {
+  servicePackage: ServicePackage;
+  highlighted?: boolean;
+  /** 2 when the page has no section heading above the cards (the Pricing page), 3 when it has. */
+  headingLevel?: 2 | 3;
+};
 
-export function PackageCard({ servicePackage, highlighted = false }: PackageCardProps) {
+export function PackageCard({
+  servicePackage,
+  highlighted = false,
+  headingLevel = 3,
+}: PackageCardProps) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
   const price = describePrice(servicePackage);
   const tier = deliveryTierLabels[servicePackage.deliveryTier];
 
@@ -22,7 +32,7 @@ export function PackageCard({ servicePackage, highlighted = false }: PackageCard
           Recommended
         </span>
       )}
-      <h3 className="text-xl font-semibold">{servicePackage.name}</h3>
+      <Heading className="text-xl font-semibold">{servicePackage.name}</Heading>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-slate-600">
         {servicePackage.summary}
       </p>

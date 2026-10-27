@@ -20,10 +20,14 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "audit": "npm audit --omit=dev --audit-level=high",
+    "scan:secrets": "node scripts/scan-for-secrets.mjs",
+    "brand:images": "node scripts/make-brand-images.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build"
+    "test:production": "npm run build && playwright test -c playwright.production.config.ts",
+    "check": "npm run scan:secrets && npm run typecheck && npm run lint && npm run format:check && npm run test && npm run build"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

@@ -10,7 +10,7 @@ export function Detail({ term, children }: { term: string; children: ReactNode }
   return (
     <div className="grid gap-1 border-b border-slate-100 py-4 sm:grid-cols-[11rem_1fr] sm:items-baseline sm:gap-4">
       <dt className="text-sm font-medium text-slate-600">{term}</dt>
-      <dd className="min-w-0 break-words text-ink">{children}</dd>
+      <dd className="min-w-0 text-ink">{children}</dd>
     </div>
   );
 }

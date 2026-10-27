@@ -42,12 +42,20 @@ export default defineConfig([
     files: [
       'apps/api/**/*.{ts,js,mjs}',
       'apps/web/scripts/**/*.mjs',
+      'scripts/**/*.mjs',
       'packages/**/*.ts',
       'e2e/**/*.ts',
+      'e2e-production/**/*.ts',
       '*.{js,ts}',
       'apps/*/*.config.ts',
       'packages/*/*.config.ts',
     ],
     languageOptions: { globals: globals.node },
+  },
+
+  // This script draws its pictures inside a browser page, so it uses browser code as well.
+  {
+    files: ['scripts/make-brand-images.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ]);

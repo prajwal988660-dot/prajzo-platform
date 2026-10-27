@@ -10,9 +10,17 @@ type CategoryCardProps = {
   /** Shows the use cases and delivery category (Services page). */
   detailed?: boolean;
   className?: string;
+  /** 2 when the page has no section heading above the cards (the Services page), 3 when it has. */
+  headingLevel?: 2 | 3;
 };
 
-export function CategoryCard({ category, detailed = false, className }: CategoryCardProps) {
+export function CategoryCard({
+  category,
+  detailed = false,
+  className,
+  headingLevel = 3,
+}: CategoryCardProps) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
   const tier = deliveryTierLabels[category.deliveryTier];
   return (
     <article
@@ -24,7 +32,7 @@ export function CategoryCard({ category, detailed = false, className }: Category
       <span className="grid size-11 place-items-center rounded-xl bg-indigo-50 text-brand-indigo">
         <CategoryIcon name={category.icon} className="size-5" />
       </span>
-      <h3 className="mt-4 text-lg font-semibold leading-snug">{category.title}</h3>
+      <Heading className="mt-4 text-lg font-semibold leading-snug">{category.title}</Heading>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-slate-600">{category.description}</p>
 
       {detailed && (
