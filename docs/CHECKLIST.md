@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 27 October 2026 (Phase 6: error logging done; backup and restore next)
+Last updated: 27 October 2026 (Phase 6: backups done; full test run, then the Phase 7 gate)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -227,10 +227,10 @@ Started 25 October 2026 ("start Phase 6"). The plan below comes from looking fir
 - [x] Performance: compression; images at the size they are shown (the logo file is 800 px wide and shown about 150 px wide); Lighthouse on the production build before and after, with the scores recorded
 - [x] SEO and sharing: a title and description for every page; `robots.txt` and `sitemap.xml`; canonical addresses; a social preview (Open Graph and Twitter) with an image; favicons and a web manifest; structured data for the business; private and unknown pages kept out of search results
 - [x] Error logging: a clear fatal log for crashes; browser errors reported to a small endpoint that logs them (with a note in the Privacy Policy); the request id on every log line (D-058)
-- [ ] Database backup and restore: scripts, a rehearsal on a throw-away database with realistic data (contents compared), and a how-to
+- [x] Database backup and restore: scripts, a rehearsal on a throw-away database with realistic data (contents compared), and a how-to (D-059, [OPERATIONS.md](OPERATIONS.md))
 - [ ] Full end-to-end suite green, on this PC and on GitHub
-- [ ] Docs updated: decisions, the security section of the architecture, environment, setup, and a how-to for operations
-- [ ] **Your action:** rehearse the backup and restore on your own Atlas database once it connects (steps in the how-to)
+- [x] Docs updated: decisions, the security section of the architecture, environment, setup, and a how-to for operations ([OPERATIONS.md](OPERATIONS.md) added)
+- [x] **Your action:** rehearse the backup and restore on your own Atlas database once it connects (steps in the how-to) (done 27 October 2026 on the Atlas database: 9 collections, 22 documents, identical)
 - [ ] **(gate)** Approval for Phase 7
 
 ## Phase 7: Deployment

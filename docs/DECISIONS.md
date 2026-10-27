@@ -541,3 +541,15 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Request ids:** every log line written while answering a request carries that request's id (also sent to the browser as `X-Request-Id`), including these reports and every 500 error. A test checks it.
 - **Privacy:** the Privacy Policy says that a broken page sends a short error report and what it contains.
 - **Why:** before this, a page that broke for a visitor left no trace anywhere Prajzo could see, and a crash of the API reached only standard error as a bare stack, outside the structured log.
+
+### D-059: Database backups without mongodump
+
+- **Decision:** `npm run db:backup`, `db:restore` and `db:rehearse` (in `@prajzo/api`) use the MongoDB driver the API already has, not `mongodump`, which is not installed on this PC and isn't available on shared hosting. A backup is a folder: one gzipped file per collection, one document per line in canonical Extended JSON (so dates, ObjectIds, Decimal128 and 64-bit numbers keep their exact types), and a `manifest.json` with each collection's count, options, indexes and SHA-256.
+- **Safety:**
+  - A restore checks every checksum before writing anything, and every count after.
+  - It refuses to write into a collection that already has data unless `--replace` is given, and always needs `--into <database>`, so the database being restored is always named, never assumed.
+  - A backup never overwrites an existing folder. The manifest can't point at files outside its folder.
+  - `apps/api/backups/` is ignored by git; the how-to says a backup holds personal data and old ones must be deleted.
+- **Proof:** a test builds realistic data through the API (two customers, a quote accepted, a contact message, sessions, the activity log) plus every awkward BSON type, backs it up, restores it into another database, and compares every document and index. The same rehearsal (`db:rehearse`) passed on the real Atlas database on 27 October 2026 (9 collections, 22 documents).
+- **Not yet:** scheduled backups and where they are kept are part of Phase 7 (hosting). Atlas's free tier keeps no backups of its own.
+- **How-to:** [OPERATIONS.md](OPERATIONS.md).

@@ -69,6 +69,7 @@ Run these from the repository root (`C:\dev\mine\prajzo`).
 | `npm run test:e2e` | End-to-end tests in Chrome, desktop and phone sizes. Starts its own API with a throw-away database, so your Atlas data is never touched. Takes about 2 minutes |
 | `SCREENSHOTS=1 npm run test:e2e -- screenshots --project desktop` | Saves full-page screenshots of every page at 390, 768 and 1280 px in `test-results/screens/` |
 | `npm run admin:create -w @prajzo/api` | Creates your administrator account, or sets a new password for one (see section 3) |
+| `npm run db:backup -w @prajzo/api` / `db:restore` / `db:rehearse` | Backs up the database, restores a backup, or proves a backup restores exactly. See [OPERATIONS.md](OPERATIONS.md) |
 | `npm run seed -w @prajzo/api` | Rewrites the default categories and packages (prices) in your database from `catalogue.defaults.ts`. An empty database gets them automatically when the API starts |
 
 Planned commands, added in the phase that needs them:

@@ -12,6 +12,9 @@
     "host:stop": "node scripts/host-stop.mjs",
     "seed": "tsx src/scripts/seed.ts",
     "admin:create": "tsx src/scripts/admin-create.ts",
+    "db:backup": "tsx src/scripts/db-backup.ts",
+    "db:restore": "tsx src/scripts/db-restore.ts",
+    "db:rehearse": "tsx src/scripts/db-rehearse.ts",
     "e2e:server": "tsx src/scripts/e2e-server.ts",
     "production-check:server": "tsx src/scripts/production-check-server.ts",
     "typecheck": "tsc -p tsconfig.json"

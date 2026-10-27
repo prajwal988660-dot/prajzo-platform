@@ -19,6 +19,7 @@ blob-report/
 # Local data, uploads and local-host logs
 apps/api/storage/
 apps/api/logs/
+apps/api/backups/
 .data/
 
 # Logs
