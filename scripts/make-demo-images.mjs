@@ -118,7 +118,9 @@ try {
       );
       const target = path.join(dir, picture.file);
       writeFileSync(target, Buffer.from(base64, 'base64'));
-      console.log(`${path.relative(root, target)}  ${String(Math.round(Buffer.byteLength(base64, 'base64') / 1024))} KB`);
+      console.log(
+        `${path.relative(root, target)}  ${String(Math.round(Buffer.byteLength(base64, 'base64') / 1024))} KB`,
+      );
     }
   }
 } finally {
