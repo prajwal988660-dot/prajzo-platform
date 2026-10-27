@@ -16,6 +16,8 @@
     "db:backup": "tsx src/scripts/db-backup.ts",
     "db:restore": "tsx src/scripts/db-restore.ts",
     "db:rehearse": "tsx src/scripts/db-rehearse.ts",
+    "db:password": "tsx src/scripts/db-password.ts",
+    "hosting:settings": "tsx src/scripts/hosting-settings.ts",
     "e2e:server": "tsx src/scripts/e2e-server.ts",
     "production-check:server": "tsx src/scripts/production-check-server.ts",
     "typecheck": "tsc -p tsconfig.json"
