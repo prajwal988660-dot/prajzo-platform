@@ -112,6 +112,8 @@ for (const width of widths) {
       '/templates',
       '/templates/portfolio',
       '/projects',
+      '/build',
+      '/build?template=portfolio',
       '/login',
       '/register',
       '/forgot-password',

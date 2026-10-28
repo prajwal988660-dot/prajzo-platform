@@ -73,7 +73,7 @@ export function PreviewFrame({ config, device }: { config: WebsiteConfig; device
           style={{ transform: `scale(${String(scale)})` }}
         />
       </div>
-      <p className="mt-2 text-center text-xs text-slate-500">
+      <p className="mt-2 text-center text-xs text-slate-600">
         {label}, {width} px wide{scale < 1 ? `, shown at ${String(Math.round(scale * 100))}%` : ''}
       </p>
     </div>
