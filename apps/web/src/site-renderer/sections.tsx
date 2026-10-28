@@ -1,7 +1,15 @@
-import { type Section, type SiteImage, type SiteLink, type WebsiteConfig } from '@prajzo/shared';
+import { type Section, type WebsiteConfig } from '@prajzo/shared';
 import { useId, useState } from 'react';
+import {
+  CtaSection,
+  GallerySection,
+  HighlightsSection,
+  ServicesSection,
+  TestimonialsSection,
+} from './business-sections';
 import { useSite } from './context';
 import { DemoAction } from './DemoAction';
+import { SectionShell, SiteAction, SiteImageTag } from './parts';
 import { SiteContactForm } from './SiteContactForm';
 
 /**
@@ -17,38 +25,12 @@ const navLabels: Partial<Record<Section['type'], string>> = {
   skills: 'Skills',
   projects: 'Work',
   experience: 'Experience',
+  services: 'Services',
+  highlights: 'Why us',
+  gallery: 'Work',
+  testimonials: 'Reviews',
   contact: 'Contact',
 };
-
-function SiteImageTag({ image, className }: { image: SiteImage; className?: string }) {
-  return (
-    <img
-      className={className}
-      src={image.src}
-      alt={image.decorative ? '' : image.alt}
-      loading="lazy"
-      decoding="async"
-    />
-  );
-}
-
-/** A link inside the site: in-page links work everywhere; others never leave a demo. */
-function SiteAction({ link, variant }: { link: SiteLink; variant: 'primary' | 'secondary' }) {
-  const { mode } = useSite();
-  const className = `ps-button ps-button-${variant}`;
-  if (link.href.startsWith('#') || mode !== 'demo') {
-    return (
-      <a className={className} href={link.href.startsWith('#') ? link.href : undefined}>
-        {link.label}
-      </a>
-    );
-  }
-  return (
-    <DemoAction className={className} note={`On the real website, this opens ${link.href}.`}>
-      {link.label}
-    </DemoAction>
-  );
-}
 
 function HeaderSection({ section, config }: Props<'header'> & { config: WebsiteConfig }) {
   const [open, setOpen] = useState(false);
@@ -94,54 +76,51 @@ function HeaderSection({ section, config }: Props<'header'> & { config: WebsiteC
   );
 }
 
+/** Hero layouts that sit on a full-width band in the design's main colour (Business). */
+const bandVariants = new Set(['band', 'banner']);
+
 function HeroSection({ section }: Props<'hero'>) {
   const { content } = section;
+  const band = bandVariants.has(section.variant);
+  const withPicture = section.variant === 'split' || section.variant === 'band';
   return (
     <section
-      className="ps-hero ps-inner"
-      data-variant={section.variant}
+      className={band ? 'ps-hero-band' : undefined}
       aria-labelledby={`${section.id}-heading`}
     >
-      <div className="ps-hero-text">
-        {content.eyebrow ? <p className="ps-eyebrow">{content.eyebrow}</p> : null}
-        <h1 id={`${section.id}-heading`}>{content.heading}</h1>
-        {content.subheading ? <p className="ps-lead">{content.subheading}</p> : null}
-        {content.primaryAction || content.secondaryAction ? (
-          <div className="ps-actions">
-            {content.primaryAction ? (
-              <SiteAction link={content.primaryAction} variant="primary" />
-            ) : null}
-            {content.secondaryAction ? (
-              <SiteAction link={content.secondaryAction} variant="secondary" />
-            ) : null}
-          </div>
+      <div className="ps-hero ps-inner" data-variant={section.variant}>
+        <div className="ps-hero-text">
+          {content.eyebrow ? <p className="ps-eyebrow">{content.eyebrow}</p> : null}
+          <h1 id={`${section.id}-heading`}>{content.heading}</h1>
+          {content.subheading ? <p className="ps-lead">{content.subheading}</p> : null}
+          {content.primaryAction || content.secondaryAction ? (
+            <div className="ps-actions">
+              {content.primaryAction ? (
+                <SiteAction link={content.primaryAction} variant={band ? 'light' : 'primary'} />
+              ) : null}
+              {content.secondaryAction ? (
+                <SiteAction
+                  link={content.secondaryAction}
+                  variant={band ? 'outline-light' : 'secondary'}
+                />
+              ) : null}
+            </div>
+          ) : null}
+          {content.stats.length ? (
+            <dl className="ps-stats">
+              {content.stats.map((stat) => (
+                <div key={stat.id}>
+                  <dt>{stat.label}</dt>
+                  <dd>{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </div>
+        {content.image && withPicture ? (
+          <SiteImageTag image={content.image} className="ps-hero-image" />
         ) : null}
       </div>
-      {content.image && section.variant === 'split' ? (
-        <SiteImageTag image={content.image} className="ps-hero-image" />
-      ) : null}
-    </section>
-  );
-}
-
-function SectionShell({
-  section,
-  heading,
-  children,
-}: {
-  section: Section;
-  heading: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section
-      id={section.id}
-      className={`ps-section ps-section-${section.type} ps-inner`}
-      data-variant={section.variant}
-      aria-labelledby={`${section.id}-heading`}
-    >
-      <h2 id={`${section.id}-heading`}>{heading}</h2>
-      {children}
     </section>
   );
 }
@@ -410,5 +389,15 @@ export function SiteSection({ section, config }: { section: Section; config: Web
       return <ContactSection section={section} config={config} />;
     case 'footer':
       return <FooterSection section={section} config={config} />;
+    case 'services':
+      return <ServicesSection section={section} />;
+    case 'highlights':
+      return <HighlightsSection section={section} />;
+    case 'gallery':
+      return <GallerySection section={section} />;
+    case 'testimonials':
+      return <TestimonialsSection section={section} />;
+    case 'cta':
+      return <CtaSection section={section} />;
   }
 }
