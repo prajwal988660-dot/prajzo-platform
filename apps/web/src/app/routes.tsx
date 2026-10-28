@@ -269,6 +269,27 @@ export const routes: RouteObject[] = [
                 }),
               },
               {
+                path: 'templates',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminTemplatesPage'))
+                    .AdminTemplatesPage,
+                }),
+              },
+              {
+                path: 'templates/:key',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminTemplateFormPage'))
+                    .AdminTemplateFormPage,
+                }),
+              },
+              {
+                path: 'demo-messages',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminDemoMessagesPage'))
+                    .AdminDemoMessagesPage,
+                }),
+              },
+              {
                 path: 'activity',
                 lazy: async () => ({
                   Component: (await import('../features/admin/AdminActivityPage'))
