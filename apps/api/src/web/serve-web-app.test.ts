@@ -64,6 +64,9 @@ describe('serving the built web app in production', () => {
       'export const row = "the same line again and again";\n'.repeat(400),
     );
     writeFileSync(path.join(distDir, 'assets', 'font-abc123.woff2'), 'w'.repeat(5000));
+    // A live demo's pictures live in a folder with the same address as the demo page.
+    mkdirSync(path.join(distDir, 'demo', 'portfolio'), { recursive: true });
+    writeFileSync(path.join(distDir, 'demo', 'portfolio', 'portrait.webp'), 'RIFF');
     writeFileSync(path.join(distDir, 'favicon.png'), 'png');
 
     const env = testEnv({
@@ -134,6 +137,14 @@ describe('serving the built web app in production', () => {
     expect(sitemap.text).toContain('<loc>https://prajzo.example/services</loc>');
     expect(sitemap.text).not.toContain('/login');
     expect(robots.headers['cache-control']).toBe('no-cache');
+  });
+
+  it('opens a page whose address is also a folder of files, without adding a slash', async () => {
+    const page = await request(app).get('/demo/portfolio');
+    expect(page.status).toBe(200);
+    expect(page.headers.location).toBeUndefined();
+    expect(page.text).toContain('<div id="root">');
+    expect((await request(app).get('/demo/portfolio/portrait.webp')).status).toBe(200);
   });
 
   it('caches hashed assets for a year', async () => {
