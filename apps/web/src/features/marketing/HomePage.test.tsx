@@ -90,6 +90,7 @@ describe('Home page', () => {
       '/services',
       '/templates',
       '/templates/portfolio',
+      '/projects',
       '/demo/portfolio',
       '/how-it-works',
       '/pricing',

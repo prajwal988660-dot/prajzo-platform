@@ -50,6 +50,12 @@ const lazyPages: RouteObject[] = [
     lazy: async () => ({ Component: (await import('../features/legal/TermsPage')).TermsPage }),
   },
   {
+    path: 'projects',
+    lazy: async () => ({
+      Component: (await import('../features/templates/ProjectsPage')).ProjectsPage,
+    }),
+  },
+  {
     path: 'templates',
     lazy: async () => ({
       Component: (await import('../features/templates/TemplatesPage')).TemplatesPage,

@@ -112,3 +112,21 @@ describe('the home page', () => {
     expect(screen.queryByRole('heading', { name: 'Try a live demo' })).not.toBeInTheDocument();
   });
 });
+
+describe('Our Projects (/projects)', () => {
+  it('shows each demo as a case study, plainly labelled as a demonstration', async () => {
+    mockApi(catalogueRoutes());
+    renderApp('/projects');
+    const project = (
+      await screen.findByRole('heading', { level: 2, name: 'Portfolio website' })
+    ).closest('article')!;
+    expect(within(project).getByText('Demonstration project, not a client')).toBeInTheDocument();
+    for (const feature of sampleTemplate.features) {
+      expect(within(project).getByText(feature)).toBeInTheDocument();
+    }
+    expect(
+      within(project).getByRole('link', { name: 'View Live Demo of the Portfolio website' }),
+    ).toHaveAttribute('href', '/demo/portfolio');
+    await waitFor(() => expect(document.title).toBe('Our Projects · Prajzo'));
+  });
+});

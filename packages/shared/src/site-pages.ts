@@ -111,6 +111,12 @@ export const sitePages = {
       'Choose a new password for your Prajzo account, using the link we sent to your email.',
     index: false,
   },
+  '/projects': {
+    name: 'Our Projects',
+    description:
+      'Working demonstration websites built by Prajzo, each one live to try: open it, click around and send its contact form.',
+    index: true,
+  },
   '/templates': {
     name: 'Templates and Live Demos',
     description:

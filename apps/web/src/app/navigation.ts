@@ -12,7 +12,7 @@ export const primaryNavigation: NavItem[] = [
   { label: 'Templates', to: '/templates', available: true },
   { label: 'How It Works', to: '/how-it-works', available: true },
   { label: 'Pricing', to: '/pricing', available: true },
-  { label: 'Projects', to: '/projects', available: false }, // template phases
+  { label: 'Projects', to: '/projects', available: true },
   { label: 'Contact', to: '/contact', available: true },
 ];
 
