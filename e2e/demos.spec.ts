@@ -5,6 +5,19 @@ import { expect, test } from '@playwright/test';
  * real API and database: the form really sends, and nothing contacts anyone.
  */
 test.describe('the Portfolio live demo', () => {
+  test('from the Templates page to the live demo, and its contact form sends', async ({ page }) => {
+    await page.goto('/templates');
+    await expect(page.getByRole('heading', { level: 2, name: 'Portfolio' })).toBeVisible();
+    await page.getByRole('link', { name: 'View Live Demo of the Portfolio template' }).click();
+    await expect(page).toHaveURL(/\/demo\/portfolio$/);
+    const form = page.getByRole('form', { name: 'Contact form' });
+    await form.getByLabel('Name').fill('Asha Test');
+    await form.getByLabel('Email').fill('asha@example.com');
+    await form.getByLabel('Message').fill('I found this on the Templates page and like it.');
+    await form.getByRole('button', { name: 'Send message' }).click();
+    await expect(form.getByRole('status')).toHaveText('Thank you. Your message was received.');
+  });
+
   test('a visitor reads it, uses the navigation and sends the contact form', async ({
     page,
     isMobile,

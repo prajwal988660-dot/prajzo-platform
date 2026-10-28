@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 28 October 2026 (Phase 8: Portfolio demo live locally; Templates pages next)
+Last updated: 28 October 2026 (Phase 8: everything built; end-to-end checks, then your approval)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -274,19 +274,19 @@ Started 28 October 2026, on branch `phase-8-template-engine` (stacked on Phase 7
   - [x] Contact form, social links, footer
 - [x] Clearly fictional demo content; demo bar on the live demo
 - [x] Contact form shows success only after the server confirms, and a clear error state otherwise
-- [ ] Templates and Live Demos page, showing the preview, category, description, features and "View Live Demo"
-- [ ] Template Details page and Our Projects page
-- [ ] Template catalogue model and public API; preview-image capture script
-- [ ] For admins (moved here from the admin dashboard phase): template management and the demo-submissions inbox
+- [x] Templates and Live Demos page, showing the preview, category, description, features and "View Live Demo"
+- [x] Template Details page and Our Projects page
+- [x] Template catalogue model and public API; preview-image capture script (`npm run demo:previews`)
+- [x] For admins (moved here from the admin dashboard phase): template management and the demo-submissions inbox
 - [x] Demo bar says "for evaluation only"; the code protections of [D-037](DECISIONS.md) apply
-- [ ] Home: the featured templates and demo projects sections switch on; the "Explore Templates" button appears
-- [ ] Tests:
+- [x] Home: the featured templates and demo projects sections switch on; the "Explore Templates" button appears
+- [x] Tests:
   - [x] Configuration validation (unit)
   - [x] Key sections (component)
   - [x] Form states
-  - [ ] End to end: Templates → View Live Demo → contact form
+  - [x] End to end: Templates → View Live Demo → contact form (e2e/demos.spec.ts)
 - [x] Responsive check at 390, 768 and 1280 px; keyboard check
-- [ ] Summary with the tests that ran
+- [x] Summary with the tests that ran (pull request #8)
 - [ ] **(gate)** Demo approval before Phase 9
 
 ## Phase 9: Website builder (core)

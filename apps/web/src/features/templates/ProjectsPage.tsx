@@ -88,7 +88,7 @@ export function ProjectsPage() {
                     <ButtonLink
                       to={`/templates/${template.key}`}
                       variant="secondary"
-                      aria-label={`About the ${template.name} template`}
+                      aria-label={`About the template for the ${template.name} website`}
                     >
                       About the template
                     </ButtonLink>

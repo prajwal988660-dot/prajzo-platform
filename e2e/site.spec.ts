@@ -86,6 +86,9 @@ test('no page scrolls sideways', async ({ page }) => {
     '/privacy',
     '/terms',
     '/demo/portfolio',
+    '/templates',
+    '/templates/portfolio',
+    '/projects',
   ]) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
