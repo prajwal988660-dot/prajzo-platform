@@ -1,0 +1,604 @@
+/*
+ * The look of a rendered website (the live demos, the builder preview, the admin review). Every
+ * colour, typeface, button shape and spacing comes from the design's CSS variables (theme.ts).
+ *
+ * Layouts change with the width of the site itself (container queries), not the browser window,
+ * so the builder's 390, 768 and 1280 px previews show exactly what a phone, a tablet and a
+ * computer show. Everything is under .ps-site so it can't touch the rest of the website.
+ */
+
+.ps-site {
+  container: site / inline-size;
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-family: var(--site-font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ps-site h1,
+.ps-site h2,
+.ps-site h3 {
+  font-family: var(--site-font-heading);
+  color: var(--site-text);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0;
+}
+.ps-site p {
+  margin: 0;
+  text-wrap: pretty;
+}
+.ps-site ul,
+.ps-site ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ps-site a {
+  color: inherit;
+}
+.ps-site :focus-visible {
+  outline: 3px solid var(--site-primary);
+  outline-offset: 3px;
+}
+
+.ps-inner {
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@container site (min-width: 640px) {
+  .ps-inner {
+    padding-inline: 2rem;
+  }
+}
+
+/* Buttons */
+.ps-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--site-radius-button);
+  border: 1.5px solid var(--site-primary);
+  font: 600 0.95rem/1.2 var(--site-font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+/* .ps-site in front: links otherwise take the text colour (.ps-site a). */
+.ps-site .ps-button-primary {
+  background: var(--site-primary);
+  color: var(--site-on-primary);
+}
+.ps-site .ps-button-secondary {
+  background: transparent;
+  color: var(--site-text);
+  border-color: var(--site-line);
+}
+.ps-button:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.ps-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.ps-link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--site-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ps-demo-action {
+  display: inline-grid;
+  justify-items: start;
+  gap: 0.4rem;
+}
+.ps-demo-note {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--site-text);
+  background: var(--site-surface);
+  border: 1px solid var(--site-line);
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  max-width: 22rem;
+}
+
+/* Header */
+.ps-header {
+  border-bottom: 1px solid var(--site-line);
+}
+.ps-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 0.85rem;
+}
+.ps-brand {
+  font: 700 1.15rem/1.2 var(--site-font-heading);
+  text-decoration: none;
+  margin-right: auto;
+}
+.ps-nav {
+  display: contents;
+}
+.ps-menu-button {
+  order: 3;
+  background: transparent;
+  color: var(--site-text);
+  border: 1px solid var(--site-line);
+  border-radius: var(--site-radius-button);
+  padding: 0.4rem 0.85rem;
+  min-height: 2.5rem;
+  font: 600 0.9rem var(--site-font-body);
+  cursor: pointer;
+}
+.ps-nav-links {
+  order: 4;
+  flex-basis: 100%;
+  display: none;
+  gap: 0.25rem;
+}
+.ps-nav-links[data-open='true'] {
+  display: grid;
+}
+.ps-nav-links a {
+  display: block;
+  padding: 0.55rem 0.25rem;
+  text-decoration: none;
+  color: var(--site-muted);
+  font-weight: 500;
+}
+.ps-nav-links a:hover {
+  color: var(--site-text);
+}
+.ps-header-action {
+  order: 2;
+}
+.ps-header-action .ps-button {
+  min-height: 2.5rem;
+  padding-block: 0.4rem;
+}
+@container site (max-width: 380px) {
+  .ps-header-action {
+    display: none;
+  }
+}
+@container site (min-width: 760px) {
+  .ps-menu-button {
+    display: none;
+  }
+  .ps-nav-links,
+  .ps-nav-links[data-open='true'] {
+    order: 1;
+    flex-basis: auto;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .ps-header-action {
+    order: 2;
+  }
+}
+
+/* Hero */
+.ps-hero {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+  padding-block: 3rem var(--site-gap);
+}
+.ps-eyebrow {
+  font: 700 0.78rem/1.4 var(--site-font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--site-accent);
+}
+.ps-hero h1 {
+  font-size: clamp(2.1rem, 7.5cqi, 3.9rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-block: 0.75rem 1.1rem;
+}
+.ps-lead {
+  font-size: 1.1rem;
+  color: var(--site-muted);
+  max-width: 36rem;
+}
+.ps-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+.ps-hero-image {
+  width: min(100%, 22rem);
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  justify-self: center;
+  border-radius: 1.25rem;
+  border: 1px solid var(--site-line);
+}
+.ps-hero[data-variant='centered'] {
+  text-align: center;
+  justify-items: center;
+}
+.ps-hero[data-variant='centered'] .ps-lead {
+  margin-inline: auto;
+}
+.ps-hero[data-variant='centered'] .ps-actions {
+  justify-content: center;
+}
+@container site (min-width: 760px) {
+  .ps-hero[data-variant='split'] {
+    grid-template-columns: 1.3fr 1fr;
+    padding-top: 4.5rem;
+  }
+}
+
+/* Sections */
+.ps-section {
+  display: grid;
+  gap: 1.75rem;
+  padding-block: 0 var(--site-gap);
+  scroll-margin-top: 4rem;
+}
+.ps-section h2 {
+  font-size: clamp(1.6rem, 4.5cqi, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ps-intro,
+.ps-prose p {
+  color: var(--site-muted);
+  max-width: 40rem;
+}
+.ps-prose {
+  display: grid;
+  gap: 1rem;
+}
+.ps-about {
+  display: grid;
+  gap: 2rem;
+}
+.ps-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+@container site (min-width: 760px) {
+  .ps-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.ps-fact {
+  background: var(--site-surface);
+  border: 1px solid var(--site-line);
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.15rem;
+}
+.ps-fact dd {
+  margin: 0;
+  font: 700 1.35rem/1.2 var(--site-font-heading);
+}
+.ps-fact dt {
+  color: var(--site-muted);
+  font-size: 0.85rem;
+}
+
+/* Skills */
+.ps-skill-groups {
+  display: grid;
+  gap: 1.75rem;
+}
+@container site (min-width: 760px) {
+  .ps-skill-groups {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+}
+.ps-skill-group h3 {
+  font: 700 0.8rem/1.4 var(--site-font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--site-muted);
+  margin-bottom: 0.75rem;
+}
+.ps-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.ps-chips li {
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--site-radius-button);
+  background: var(--site-surface);
+  border: 1px solid var(--site-line);
+}
+.ps-bars {
+  display: grid;
+  gap: 0.7rem;
+}
+.ps-bars li {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.92rem;
+}
+.ps-bar {
+  display: block;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--site-line);
+  position: relative;
+  overflow: hidden;
+}
+.ps-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--level) * 20%);
+  background: var(--site-primary);
+  border-radius: inherit;
+}
+
+/* Projects */
+.ps-projects {
+  display: grid;
+  gap: 1.25rem;
+}
+.ps-project {
+  height: 100%;
+  background: var(--site-surface);
+  border: 1px solid var(--site-line);
+  border-radius: 1rem;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.ps-project-image {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--site-line);
+}
+.ps-project-body {
+  padding: 1.1rem 1.15rem 1.25rem;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+}
+.ps-project h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.ps-project p {
+  color: var(--site-muted);
+  font-size: 0.95rem;
+}
+.ps-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.ps-tags li {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--site-accent);
+  border: 1px solid var(--site-line);
+  border-radius: var(--site-radius-button);
+  padding: 0.1rem 0.55rem;
+}
+@container site (min-width: 640px) {
+  .ps-section-projects[data-variant='grid'] .ps-projects {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ps-section-projects[data-variant='list'] .ps-project {
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+  .ps-section-projects[data-variant='list'] .ps-project-image {
+    height: 100%;
+    aspect-ratio: auto;
+    border-bottom: 0;
+    border-right: 1px solid var(--site-line);
+  }
+}
+
+/* Experience and education */
+.ps-timeline {
+  display: grid;
+  gap: 1.4rem;
+  max-width: 44rem;
+}
+.ps-timeline li {
+  display: grid;
+  gap: 0.2rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--site-line);
+}
+.ps-timeline h3 {
+  font: 700 1.05rem/1.3 var(--site-font-body);
+}
+.ps-when {
+  font: 700 0.75rem/1.4 var(--site-font-body);
+  color: var(--site-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ps-where {
+  color: var(--site-muted);
+}
+.ps-timeline li > p:last-child:not(.ps-where) {
+  color: var(--site-muted);
+  font-size: 0.95rem;
+}
+/* Contact */
+.ps-contact {
+  background: var(--site-surface);
+  border: 1px solid var(--site-line);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: grid;
+  gap: 2rem;
+}
+@container site (min-width: 760px) {
+  .ps-contact {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    padding: 2.25rem;
+  }
+}
+.ps-contact-text {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.ps-contact-details {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.ps-contact-details li {
+  display: grid;
+  justify-items: start;
+  gap: 0.1rem;
+}
+.ps-detail-kind {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--site-muted);
+}
+
+/* Forms */
+.ps-form {
+  display: grid;
+  gap: 1rem;
+}
+.ps-field {
+  display: grid;
+  gap: 0.35rem;
+}
+.ps-field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.ps-field input,
+.ps-field textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--site-text);
+  background: var(--site-bg);
+  border: 1.5px solid var(--site-line);
+  border-radius: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  min-height: 2.9rem;
+}
+.ps-field textarea {
+  resize: vertical;
+}
+.ps-field input:focus-visible,
+.ps-field textarea:focus-visible {
+  outline: 3px solid var(--site-primary);
+  outline-offset: 1px;
+  border-color: var(--site-primary);
+}
+.ps-field [aria-invalid='true'] {
+  border-color: var(--site-accent);
+}
+.ps-field-error {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--site-accent);
+}
+.ps-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.ps-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+.ps-form-note {
+  font-size: 0.82rem;
+  color: var(--site-muted);
+}
+.ps-form-status {
+  border-radius: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  font-weight: 600;
+  border: 1.5px solid var(--site-line);
+}
+.ps-form-status-sent,
+.ps-form-status-previewed {
+  border-color: var(--site-primary);
+}
+.ps-form-status-failed {
+  border-color: var(--site-accent);
+}
+
+/* Footer */
+.ps-footer {
+  border-top: 1px solid var(--site-line);
+  color: var(--site-muted);
+  font-size: 0.9rem;
+}
+.ps-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.5rem;
+}
+.ps-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Spacing choice also tightens or loosens the hero. */
+.ps-site[data-spacing='compact'] .ps-hero {
+  padding-top: 2rem;
+}
+.ps-site[data-spacing='spacious'] .ps-hero {
+  padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-button {
+    transition: none;
+  }
+  .ps-button:hover {
+    transform: none;
+  }
+}
+
+/* The skip link moves focus here; the whole page doesn't need an outline. */
+.ps-main:focus {
+  outline: none;
+}

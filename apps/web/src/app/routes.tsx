@@ -50,6 +50,26 @@ const lazyPages: RouteObject[] = [
     lazy: async () => ({ Component: (await import('../features/legal/TermsPage')).TermsPage }),
   },
   {
+    path: 'projects',
+    lazy: async () => ({
+      Component: (await import('../features/templates/ProjectsPage')).ProjectsPage,
+    }),
+  },
+  {
+    path: 'templates',
+    lazy: async () => ({
+      Component: (await import('../features/templates/TemplatesPage')).TemplatesPage,
+    }),
+  },
+  // One details page per template built so far, each at a fixed address (like the demos).
+  ...(['portfolio'] as const).map((key) => ({
+    path: `templates/${key}`,
+    lazy: async () => {
+      const { TemplateDetailsPage } = await import('../features/templates/TemplateDetailsPage');
+      return { Component: () => <TemplateDetailsPage templateKey={key} /> };
+    },
+  })),
+  {
     path: 'start-project',
     lazy: async () => ({
       Component: (await import('../features/projects/StartProjectPage')).StartProjectPage,
@@ -111,6 +131,19 @@ const customerPages: RouteObject = {
   ],
 };
 
+/**
+ * One live demo per template built so far (D-007), each at its own fixed address so the server
+ * knows it exists. Business, Event, Catalogue and Forms are added in Phases 10 to 13.
+ */
+const demoPages: RouteObject[] = (['portfolio'] as const).map((key) => ({
+  path: `demo/${key}`,
+  errorElement: <RouteErrorPage />,
+  lazy: async () => {
+    const { DemoPage } = await import('../features/demos/DemoPage');
+    return { Component: () => <DemoPage templateKey={key} /> };
+  },
+}));
+
 /** Development-only pages; they are left out of production builds entirely. */
 const developmentRoutes: RouteObject[] = import.meta.env.DEV
   ? [
@@ -148,6 +181,8 @@ export const routes: RouteObject[] = [
           },
         ],
       },
+      // Live demos: the demo's own website under a demo bar, without Prajzo's header and footer.
+      ...demoPages,
       {
         // The administration area: its own plain frame.
         path: 'admin',
@@ -237,6 +272,27 @@ export const routes: RouteObject[] = [
                 lazy: async () => ({
                   Component: (await import('../features/admin/AdminPackageFormPage'))
                     .AdminPackageFormPage,
+                }),
+              },
+              {
+                path: 'templates',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminTemplatesPage'))
+                    .AdminTemplatesPage,
+                }),
+              },
+              {
+                path: 'templates/:key',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminTemplateFormPage'))
+                    .AdminTemplateFormPage,
+                }),
+              },
+              {
+                path: 'demo-messages',
+                lazy: async () => ({
+                  Component: (await import('../features/admin/AdminDemoMessagesPage'))
+                    .AdminDemoMessagesPage,
                 }),
               },
               {

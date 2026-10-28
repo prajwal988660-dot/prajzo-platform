@@ -5,7 +5,8 @@
   "description": "Schemas, types and rules shared by the Prajzo web app and API",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./templates": "./src/templates/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

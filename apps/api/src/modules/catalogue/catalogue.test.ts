@@ -71,7 +71,7 @@ describe('service catalogue API', () => {
     await ServicePackageModel.updateOne({ key: 'quick-launch' }, { priceAmountPaise: 349_900 });
     const counts = await ensureCatalogueDefaults();
 
-    expect(counts).toEqual({ categories: 15, packages: 3 });
+    expect(counts).toEqual({ categories: 15, packages: 3, templates: 1 });
     const edited = await ServicePackageModel.findOne({ key: 'quick-launch' }).lean();
     expect(edited?.priceAmountPaise).toBe(349_900);
   });

@@ -161,7 +161,7 @@ describe('the head of each page of the website', () => {
 
   it.each([
     '/no-such-page',
-    '/templates/portfolio',
+    '/templates/not-a-template',
     '/accounts',
     '/administrator',
     '/dev/ui',

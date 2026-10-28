@@ -53,9 +53,13 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
   },
 
-  // This script draws its pictures inside a browser page, so it uses browser code as well.
+  // These scripts draw their pictures inside a browser page, so they use browser code as well.
   {
-    files: ['scripts/make-brand-images.mjs'],
+    files: [
+      'scripts/make-brand-images.mjs',
+      'scripts/make-demo-images.mjs',
+      'scripts/capture-demo-previews.mjs',
+    ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ]);

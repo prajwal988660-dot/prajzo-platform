@@ -17,6 +17,8 @@ const sections = [
   { to: '/admin/customers', label: 'Customers', end: false },
   { to: '/admin/messages', label: 'Messages', end: false },
   { to: '/admin/catalogue', label: 'Catalogue', end: false },
+  { to: '/admin/templates', label: 'Templates', end: false },
+  { to: '/admin/demo-messages', label: 'Demo messages', end: false },
   { to: '/admin/activity', label: 'Activity', end: false },
 ];
 

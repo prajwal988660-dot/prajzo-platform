@@ -206,6 +206,8 @@ describe('the admin navigation', () => {
       'Customers',
       'Messages',
       'Catalogue',
+      'Templates',
+      'Demo messages',
       'Activity',
     ]);
     expect(nav.getByRole('link', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');

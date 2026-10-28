@@ -111,6 +111,10 @@ describe('the list of admin routes the tests found', () => {
         'GET /packages',
         'POST /packages',
         'PATCH /packages/:key',
+        'GET /templates',
+        'PATCH /templates/:key',
+        'GET /demo-submissions',
+        'PATCH /demo-submissions/:id',
       ].sort(),
     );
   });

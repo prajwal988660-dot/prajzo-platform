@@ -49,6 +49,9 @@ describe('the table of pages', () => {
       '/start-project',
       '/privacy',
       '/terms',
+      '/projects',
+      '/templates',
+      '/templates/portfolio',
     ]);
     for (const path of ['/login', '/register', '/forgot-password', '/reset-password'] as const) {
       expect(sitePages[path].index, path).toBe(false);

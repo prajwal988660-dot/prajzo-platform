@@ -1,7 +1,14 @@
 import { z } from 'zod';
 import { paginatedSchema, paginationQuerySchema } from '../api/pagination';
 
-export const auditTargetTypes = ['project', 'category', 'package', 'contact-message'] as const;
+export const auditTargetTypes = [
+  'project',
+  'category',
+  'package',
+  'contact-message',
+  'template',
+  'demo-submission',
+] as const;
 export type AuditTargetType = (typeof auditTargetTypes)[number];
 
 /** GET /admin/activity?targetType=&page=&limit= */

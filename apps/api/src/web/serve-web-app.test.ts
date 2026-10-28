@@ -110,7 +110,7 @@ describe('serving the built web app in production', () => {
   });
 
   it('answers 404 for an address that is nothing, and still starts the app so it can say so', async () => {
-    for (const url of ['/templates/portfolio', '/no-such-page', '/services/extra']) {
+    for (const url of ['/templates/not-a-template', '/no-such-page', '/services/extra']) {
       const response = await request(app).get(url);
       expect(response.status, url).toBe(404);
       expect(response.text, url).toContain('<div id="root">');

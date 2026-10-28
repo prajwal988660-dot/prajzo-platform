@@ -20,6 +20,8 @@ const filters: { value: Filter; label: string }[] = [
   { value: 'contact-message', label: 'Messages' },
   { value: 'category', label: 'Categories' },
   { value: 'package', label: 'Packages' },
+  { value: 'template', label: 'Templates' },
+  { value: 'demo-submission', label: 'Demo messages' },
 ];
 
 const isFilter = (value: string | null): value is Filter =>

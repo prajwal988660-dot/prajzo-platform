@@ -14,6 +14,7 @@ import {
   type ProjectSummary,
   type Quote,
   type ServicePackage,
+  type TemplateEntry,
 } from '@prajzo/shared';
 import { vi } from 'vitest';
 
@@ -95,8 +96,32 @@ export const samplePackages: ServicePackage[] = [
  * The endpoints every page needs: the service catalogue (sample data), and "who is signed in"
  * (nobody). Tests add or replace routes on top of these.
  */
+/** The Portfolio template's listing, as GET /api/v1/templates returns it. */
+export const sampleTemplate: TemplateEntry = {
+  key: 'portfolio',
+  name: 'Portfolio',
+  tagline: 'A one-page portfolio for designers, developers and creative professionals.',
+  description:
+    'Introduce yourself, show your best work and let people get in touch, all on one page.',
+  categories: [{ key: 'personal-portfolio', title: 'Personal Portfolio Websites' }],
+  features: [
+    'Hero with your photo',
+    'Skills as chips or bars',
+    'Projects grid',
+    'Contact form',
+    'Social links',
+  ],
+  featured: true,
+  previewImage: {
+    src: '/demo/portfolio/preview.webp',
+    alt: 'The Portfolio demo on a computer screen',
+  },
+  demoPath: '/demo/portfolio',
+};
+
 export function catalogueRoutes(): Record<string, Handler> {
   return {
+    'GET /api/v1/templates': () => jsonResponse(200, { items: [sampleTemplate] }),
     'GET /api/v1/categories': () => jsonResponse(200, { items: sampleCategories }),
     'GET /api/v1/packages': () => jsonResponse(200, { items: samplePackages }),
     'GET /api/v1/auth/me': () => jsonResponse(200, { user: null }),

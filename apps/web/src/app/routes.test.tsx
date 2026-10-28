@@ -65,7 +65,7 @@ describe('app routes', () => {
       within(nav)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Home', 'Services', 'How It Works', 'Pricing', 'Contact']);
+    ).toEqual(['Home', 'Services', 'Templates', 'How It Works', 'Pricing', 'Projects', 'Contact']);
     expect(within(header).getByRole('link', { name: 'Start a Project' })).toHaveAttribute(
       'href',
       '/start-project',

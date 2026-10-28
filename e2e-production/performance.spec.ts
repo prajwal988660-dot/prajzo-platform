@@ -74,9 +74,11 @@ test.describe('what a first visit downloads', () => {
       `Home page, first visit: ${visit.total.toFixed(0)} KB in ${visit.downloads.length} requests\n${summary(visit.downloads)}`,
     );
 
-    // Everything that is text is compressed (Brotli, as this browser asks for it).
-    for (const download of visit.downloads.filter((item) =>
-      ['Document', 'Script', 'Stylesheet'].includes(item.kind),
+    // Everything that is text is compressed (Brotli, as this browser asks for it), except files
+    // under 1 KB: the compression library leaves those alone, as compressing them saves nothing
+    // once the headers are counted. (`bytes` includes the headers, hence 2 KB here.)
+    for (const download of visit.downloads.filter(
+      (item) => ['Document', 'Script', 'Stylesheet'].includes(item.kind) && item.bytes > 2048,
     )) {
       expect(download.encoding, download.url).toBe('br');
     }

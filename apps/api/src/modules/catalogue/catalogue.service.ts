@@ -1,6 +1,7 @@
 import type { Category, ServicePackage } from '@prajzo/shared';
 import { defaultCategories, defaultPackages } from './catalogue.defaults';
 import { CategoryModel, ServicePackageModel } from './catalogue.models';
+import { ensureTemplateEntries } from '../templates/templates.service';
 
 export async function listCategories(): Promise<Category[]> {
   const records = await CategoryModel.find({ active: true })
@@ -62,6 +63,7 @@ export async function isActivePackage(key: string): Promise<boolean> {
 export async function ensureCatalogueDefaults({ overwrite = false } = {}): Promise<{
   categories: number;
   packages: number;
+  templates: number;
 }> {
   const operator = overwrite ? '$set' : '$setOnInsert';
   await CategoryModel.bulkWrite(
@@ -85,5 +87,7 @@ export async function ensureCatalogueDefaults({ overwrite = false } = {}): Promi
   return {
     categories: await CategoryModel.countDocuments(),
     packages: await ServicePackageModel.countDocuments(),
+    // Template listings are only ever added here, even with `overwrite`: admins own them (D-005).
+    templates: await ensureTemplateEntries(),
   };
 }

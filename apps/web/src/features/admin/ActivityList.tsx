@@ -14,6 +14,10 @@ function targetLink(entry: AuditEntry): string | null {
       return `/admin/catalogue/packages/${entry.targetId}`;
     case 'contact-message':
       return '/admin/messages?status=all';
+    case 'template':
+      return `/admin/templates/${entry.targetId}`;
+    case 'demo-submission':
+      return '/admin/demo-messages';
   }
 }
 
