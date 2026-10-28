@@ -43,3 +43,14 @@ export const designUpdateSchema = z
   .refine((change) => change.name !== undefined || change.config !== undefined, {
     message: 'Nothing to change',
   });
+
+/** How many pictures one customer may upload in all (D-012). */
+export const MAX_UPLOADS_PER_CUSTOMER = 200;
+
+/** POST /uploads: the stored picture's address and size. */
+export const uploadResponseSchema = z.object({
+  src: z.string().regex(/^\/uploads\/[0-9a-f-]{36}\.webp$/),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+export type UploadResponse = z.infer<typeof uploadResponseSchema>;

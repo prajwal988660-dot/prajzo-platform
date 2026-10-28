@@ -22,6 +22,7 @@ import { useAuth } from '../auth/auth-context';
 import { clearDraft, readDraft, writeDraft } from './drafts';
 import { PreviewFrame, devices, type Device } from './PreviewFrame';
 import { SaveStep } from './SaveStep';
+import { UploadButton } from './UploadButton';
 import { ContentStep, DesignStep, SectionsStep, SiteStep } from './steps';
 import { useBuilder } from './use-builder';
 
@@ -245,7 +246,21 @@ function Workspace({
       )}
       {step === 'site' && <SiteStep builder={builder} template={template} />}
       {step === 'sections' && <SectionsStep builder={builder} template={template} />}
-      {step === 'content' && <ContentStep builder={builder} template={template} />}
+      {step === 'content' && (
+        <ContentStep
+          builder={builder}
+          template={template}
+          upload={(apply) =>
+            customer ? (
+              <UploadButton onUploaded={apply} />
+            ) : (
+              <span className="text-sm text-slate-600">
+                Sign in to a customer account to upload your own pictures.
+              </span>
+            )
+          }
+        />
+      )}
       {step === 'design' && <DesignStep builder={builder} template={template} />}
       {step === 'save' && (
         <SaveStep builder={builder} template={template} design={design} onSaved={setDesign} />

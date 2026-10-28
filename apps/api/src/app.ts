@@ -22,6 +22,7 @@ import { healthRouter } from './modules/health/health.routes';
 import { createProjectEffects } from './modules/projects/project-effects';
 import { projectRequestRouter } from './modules/projects/project-request.routes';
 import { templatesRouter } from './modules/templates/templates.routes';
+import { serveUploads, uploadsRouter } from './modules/uploads/uploads.routes';
 import type { Mailer } from './services/mailer';
 import { serveWebApp } from './web/serve-web-app';
 
@@ -95,6 +96,14 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   );
   v1.use(catalogueRouter({ publicCaching: !env.STAGING_PASSWORD }));
   v1.use(templatesRouter());
+  const uploadDirectory = env.UPLOAD_DIR ?? path.resolve(process.cwd(), 'storage/uploads');
+  v1.use(
+    uploadsRouter({
+      sessions: accounts.sessions,
+      directory: uploadDirectory,
+      rateLimitMax: env.UPLOAD_RATE_LIMIT_MAX,
+    }),
+  );
   v1.use(
     '/designs',
     designsRouter({
@@ -119,6 +128,8 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   v1.use(clientErrorsRouter({ rateLimitMax: env.CLIENT_ERROR_RATE_LIMIT_MAX }));
 
   app.use('/api', healthRouter({ checkDatabase }));
+  // Uploaded pictures (D-012), in every environment, ahead of the web app.
+  app.use('/uploads', serveUploads(uploadDirectory));
   app.use('/api/v1', v1);
   app.use('/api', apiNotFound);
 
