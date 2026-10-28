@@ -15,7 +15,13 @@ import {
 import { renderApp } from '../../test/render-app';
 
 async function openAccount(extra: Parameters<typeof mockApi>[0] = {}) {
-  mockApi({ ...catalogueRoutes(), ...noProjects, ...signedInAs(sampleCustomer), ...extra });
+  mockApi({
+    ...catalogueRoutes(),
+    ...noProjects,
+    'GET /api/v1/designs': () => jsonResponse(200, { items: [] }),
+    ...signedInAs(sampleCustomer),
+    ...extra,
+  });
   const user = userEvent.setup();
   renderApp('/account');
   await screen.findByRole('heading', { level: 1, name: 'Welcome, Asha' });
@@ -26,7 +32,11 @@ describe('Account page', () => {
   it('is honest that there is nothing to show yet in the two lists', async () => {
     await openAccount();
 
-    expect(screen.getByRole('heading', { name: 'No saved designs yet' })).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'No saved designs yet' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Build your website' })).toHaveAttribute(
+      'href',
+      '/build',
+    );
     expect(await screen.findByRole('heading', { name: 'No projects yet' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Start a project' })).toHaveAttribute(
       'href',

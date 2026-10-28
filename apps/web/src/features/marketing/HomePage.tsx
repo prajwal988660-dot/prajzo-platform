@@ -64,12 +64,17 @@ export function HomePage() {
 
       <section aria-labelledby="customize-heading" className="bg-surface py-16 sm:py-20">
         <Container className="grid items-center gap-12 lg:grid-cols-2">
-          <SectionHeading
-            eyebrow="Make it yours"
-            id="customize-heading"
-            title="Customize every detail"
-            description="Every Prajzo website is shaped around you. Start from a proven layout, then decide the pages, look, content and features."
-          />
+          <div className="grid gap-8">
+            <SectionHeading
+              eyebrow="Make it yours"
+              id="customize-heading"
+              title="Customize every detail"
+              description="Every Prajzo website is shaped around you. Start from a proven layout, then decide the pages, look, content and features."
+            />
+            <ButtonLink to="/build" className="justify-self-start">
+              Build Your Website
+            </ButtonLink>
+          </div>
           <ul className="grid gap-4 sm:grid-cols-2">
             {customizationOptions.map((option, index) => {
               const Icon = customizationIcons[index] ?? Layers;

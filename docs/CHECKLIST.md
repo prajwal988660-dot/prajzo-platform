@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 28 October 2026 (Phase 8: everything built; end-to-end checks, then your approval)
+Last updated: 29 October 2026 (Phase 9 built; pull request #9 for your approval)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -291,32 +291,34 @@ Started 28 October 2026, on branch `phase-8-template-engine` (stacked on Phase 7
 
 ## Phase 9: Website builder (core)
 
-- [ ] `/build` wizard steps 1–8:
-  - [ ] Category, template, pages
-  - [ ] Sections, with required sections enforced
-  - [ ] Content
-  - [ ] Design
-  - [ ] Preview
-  - [ ] Save
-- [ ] Content editors for text, links and buttons, repeatable lists, and images
-- [ ] Design controls: themes, custom colours with a contrast warning, fonts, button style, spacing, layout variants, image position
-- [ ] Preview frame at desktop, tablet and mobile widths, updated as you type; same renderer as the demos
-- [ ] Configuration API: create, list, read, update, delete and duplicate; owner-only; re-validated on the server
-- [ ] Saved Configurations page: open, rename, duplicate, delete
-- [ ] Anonymous draft kept in this browser, with a prompt to create an account
-- [ ] Unsaved-changes warning; loading, empty and error states
-- [ ] Image upload:
-  - [ ] Signed-in users only; JPEG, PNG or WebP up to 5 MB
-  - [ ] File content checked and re-encoded on the server
-  - [ ] Local storage driver for development
+Built 28-29 October 2026 on branch `phase-9-builder`. Left: putting it online (with Phase 7), and choosing where uploaded pictures are kept in production.
+
+- [x] `/build` wizard steps 1–8:
+  - [x] Category, template, pages
+  - [x] Sections, with required sections enforced
+  - [x] Content
+  - [x] Design
+  - [x] Preview
+  - [x] Save
+- [x] Content editors for text, links and buttons, repeatable lists, and images
+- [x] Design controls: themes, custom colours with a contrast warning, fonts, button style, spacing, layout variants, image position
+- [x] Preview frame at desktop, tablet and mobile widths, updated as you type; same renderer as the demos
+- [x] Configuration API: create, list, read, update, delete and duplicate; owner-only; re-validated on the server
+- [x] Saved Configurations page: open, rename, duplicate, delete
+- [x] Anonymous draft kept in this browser, with a prompt to create an account
+- [x] Unsaved-changes warning; loading, empty and error states
+- [x] Image upload:
+  - [x] Signed-in users only; JPEG, PNG or WebP up to 5 MB
+  - [x] File content checked and re-encoded on the server
+  - [x] Local storage driver for development
 - [ ] Builder deployed to the live site; production image storage (cloud bucket) chosen and set up
-- [ ] "Customize This Design" button live on Templates, Template Details and `/demo/portfolio`; it loads the portfolio defaults
-- [ ] Home: the "Build Your Website" button appears
-- [ ] Tests:
-  - [ ] End to end: Customize → edit → preview → save → reload
-  - [ ] Invalid configuration and unknown template are rejected
-  - [ ] Ownership rules
-  - [ ] Upload type and size limits
+- [x] "Customize This Design" button live on Templates, Template Details and `/demo/portfolio`; it loads the portfolio defaults
+- [x] Home: the "Build Your Website" button appears
+- [x] Tests:
+  - [x] End to end: Customize → edit → preview → save → reload
+  - [x] Invalid configuration and unknown template are rejected
+  - [x] Ownership rules
+  - [x] Upload type and size limits
 - [ ] **(gate)** Approval for Phase 10
 
 ## Phase 10: Demo 2 (Business, `/demo/business`)

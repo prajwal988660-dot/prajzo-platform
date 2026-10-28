@@ -59,6 +59,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | 2 (added) | `ADMIN_NOTIFY_EMAIL` (default: contact@prajzo.com) | Where Prajzo's own notifications go: contact-form messages, new project requests, and what customers do to their projects (accept or decline a quote, answer, ask for changes, say it looks good, cancel). In development they are printed to the API console, not sent |
 | 2 (added) | `CONTACT_RATE_LIMIT_MAX` (default `5`) | Contact-form messages allowed per connection every 15 minutes |
 | 6 (added) | `CLIENT_ERROR_RATE_LIMIT_MAX` (default `20`) | Browser error reports allowed per connection every 15 minutes (D-058) |
+| 9 (added) | `DESIGN_SAVE_RATE_LIMIT_MAX` (default `300`) | Saves in the website builder one customer may make per hour |
+| 9 (added) | `UPLOAD_DIR` (default `apps/api/storage/uploads`), `UPLOAD_RATE_LIMIT_MAX` (default `60`) | Where uploaded pictures are kept (D-012; ignored by git), and how many one customer may upload per hour |
 | 7 (added) | `MAIL_TRANSPORT` (`console` or `smtp`, default `console`) | `console` prints emails to the log; `smtp` really sends them (D-060). Set it with **Set up email.cmd** / `npm run mail:setup -w @prajzo/api` |
 | 7 (added) | `SMTP_HOST`, `SMTP_PORT` (`465` or `587`, default `465`), `SMTP_USER`, `SMTP_PASSWORD` | The mailbox that sends. Hostinger: `smtp.hostinger.com`, `465`, `contact@prajzo.com` and its password. Required when `MAIL_TRANSPORT=smtp`. **Secret:** only in `.env` or the host's settings |
 | 7 (added) | `MAIL_FROM` (default: `SMTP_USER`), `MAIL_FROM_NAME` (default `Prajzo`) | The sender people see |

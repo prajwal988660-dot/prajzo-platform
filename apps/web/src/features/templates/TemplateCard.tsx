@@ -52,6 +52,13 @@ export function TemplateCard({
           >
             View Live Demo
           </ButtonLink>
+          <ButtonLink
+            to={`/build?template=${template.key}`}
+            variant="secondary"
+            aria-label={`Customize This Design: ${template.name}`}
+          >
+            Customize This Design
+          </ButtonLink>
           <Link
             to={`/templates/${template.key}`}
             aria-label={`Details of the ${template.name} template`}

@@ -50,7 +50,10 @@ export function serveWebApp(
       fallthrough: false,
     }),
   );
-  app.use(express.static(distDir, { index: false, maxAge: '1h' }));
+  // redirect: false, because a page can share its address with a folder of files: /demo/portfolio
+  // is the live demo, and /demo/portfolio/ holds its pictures. Without it, the page's address would
+  // be redirected to the folder's (with a slash on the end).
+  app.use(express.static(distDir, { index: false, maxAge: '1h', redirect: false }));
 
   // Every other address opens the web app, which shows the page (or its own "not found" page). The
   // server only decides what the page is called, and says so honestly: an address that is nothing

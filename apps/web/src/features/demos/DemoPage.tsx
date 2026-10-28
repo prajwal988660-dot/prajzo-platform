@@ -24,6 +24,7 @@ export function DemoPage({ templateKey }: { templateKey: TemplateKey }) {
           <span>Everyone and everything in it is made up.</span>
         </p>
         <nav aria-label="Demo" className="demo-bar-links">
+          <Link to={`/build?template=${templateKey}`}>Customize This Design</Link>
           <Link to="/start-project">Start a project like this</Link>
           <Link to="/">Back to Prajzo</Link>
         </nav>

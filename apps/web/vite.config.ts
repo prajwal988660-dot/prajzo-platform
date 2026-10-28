@@ -40,7 +40,11 @@ export default defineConfig({
     strictPort: true,
     // In development the API runs separately; the browser still talks to one address.
     // End-to-end tests point this at their own throw-away API.
-    proxy: { '/api': process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:4000' },
+    // The API also serves uploaded pictures (D-012).
+    proxy: {
+      '/api': process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:4000',
+      '/uploads': process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:4000',
+    },
   },
   preview: { port: 4173, strictPort: true },
   test: {

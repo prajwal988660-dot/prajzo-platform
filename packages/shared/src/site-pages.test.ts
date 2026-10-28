@@ -121,6 +121,7 @@ describe('addresses', () => {
     expect(kindOfAddress('/account')).toBe('private');
     expect(kindOfAddress('/no-such-page')).toBe('unknown');
     expect(kindOfAddress('/dev/ui')).toBe('unknown');
-    expect(privateAreas).toEqual(['/account', '/admin']);
+    expect(privateAreas).toEqual(['/account', '/admin', '/build', '/preview']);
+    expect(kindOfAddress('/build/abc123')).toBe('private');
   });
 });

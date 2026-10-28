@@ -60,6 +60,8 @@ const publicPages = [
   '/templates',
   '/templates/portfolio',
   '/projects',
+  '/build',
+  '/build?template=portfolio',
   '/login',
   '/register',
   '/forgot-password',
