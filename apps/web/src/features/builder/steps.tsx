@@ -37,6 +37,10 @@ export const sectionNames: Record<Section['type'], string> = {
   gallery: 'Gallery',
   testimonials: 'Reviews',
   cta: 'Call to action',
+  facts: 'Key facts (date, time, place)',
+  schedule: 'Schedule',
+  guidelines: 'Guidelines',
+  registration: 'Registration form',
 };
 
 const variantNames: Record<string, string> = {
@@ -53,6 +57,9 @@ const variantNames: Record<string, string> = {
   band: 'Coloured band with a picture',
   banner: 'Coloured band, centred',
   cards: 'Cards',
+  columns: 'Days side by side',
+  numbered: 'Numbered list',
+  form: 'Form',
 };
 
 function StepHeading({ title, children }: { title: string; children?: ReactNode }) {

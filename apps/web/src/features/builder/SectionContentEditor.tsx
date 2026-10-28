@@ -2,6 +2,7 @@ import type { DefinedTemplate, Section } from '@prajzo/shared';
 import type { ReactNode } from 'react';
 import { CheckboxField } from '../../components/ui/Field';
 import { BusinessContentEditor } from './BusinessContentEditor';
+import { EventContentEditor } from './EventContentEditor';
 import { ImageInput, LinkInput, ListEditor, optional, TextInput } from './fields';
 
 type Props = {
@@ -533,6 +534,19 @@ export function SectionContentEditor({
         </div>
       );
     }
+    case 'facts':
+    case 'schedule':
+    case 'guidelines':
+    case 'registration':
+      return (
+        <EventContentEditor
+          section={section}
+          path={path}
+          max={max}
+          onChange={onChange}
+          issueAt={issueAt}
+        />
+      );
     case 'services':
     case 'highlights':
     case 'gallery':

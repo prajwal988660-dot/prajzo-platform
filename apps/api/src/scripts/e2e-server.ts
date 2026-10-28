@@ -46,6 +46,9 @@ const env = parseEnv({
   // Many tests share one address and one administrator; the limits have their own tests.
   API_RATE_LIMIT_MAX: '100000',
   ADMIN_RATE_LIMIT_MAX: '100000',
+  DEMO_SUBMISSION_RATE_LIMIT_MAX: '100',
+  DESIGN_SAVE_RATE_LIMIT_MAX: '1000',
+  UPLOAD_RATE_LIMIT_MAX: '100',
 });
 
 await connectDatabase(env.MONGODB_URI);

@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  demoSubmissionRequestSchema,
+  demoContactSchema,
   demoSubmissionResponseSchema,
-  type DemoSubmissionRequest,
   type DemoSubmissionValues,
 } from '@prajzo/shared';
 import { useId, useRef, useState } from 'react';
+import type { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { ApiError, apiRequest } from '../lib/api';
 import { useSite } from './context';
+
+type DemoContact = z.output<typeof demoContactSchema>;
 
 type Outcome =
   { kind: 'idle' } | { kind: 'sent' } | { kind: 'previewed' } | { kind: 'failed'; message: string };
@@ -24,8 +26,8 @@ export function SiteContactForm() {
   const statusRef = useRef<HTMLParagraphElement>(null);
   const formId = useId();
   const empty = { template: config.template.key, name: '', email: '', message: '', company: '' };
-  const form = useForm<DemoSubmissionValues, unknown, DemoSubmissionRequest>({
-    resolver: zodResolver(demoSubmissionRequestSchema),
+  const form = useForm<DemoSubmissionValues, unknown, DemoContact>({
+    resolver: zodResolver(demoContactSchema),
     defaultValues: empty,
   });
   const { errors, isSubmitting } = form.formState;
@@ -37,7 +39,7 @@ export function SiteContactForm() {
     requestAnimationFrame(() => statusRef.current?.focus());
   };
 
-  const send = async (values: DemoSubmissionRequest) => {
+  const send = async (values: DemoContact) => {
     if (mode === 'preview') {
       show({ kind: 'previewed' });
       return;

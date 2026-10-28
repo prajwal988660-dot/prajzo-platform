@@ -41,8 +41,8 @@ describe.each(Object.values(templates))('the $name template', (template) => {
   });
 
   it('only uses pictures that are illustrations shipped with the site, each described', () => {
+    // A demo may have no pictures at all (the Event demo's banner has none).
     const images = JSON.stringify(template.defaultConfig).match(/"src":"[^"]+"/g) ?? [];
-    expect(images.length).toBeGreaterThan(0);
     for (const image of images) expect(image).toMatch(new RegExp(`"src":"/demo/${template.key}/`));
   });
 

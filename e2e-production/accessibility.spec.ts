@@ -25,6 +25,8 @@ const publicPages = [
   '/terms',
   '/demo/portfolio',
   '/demo/business',
+  '/demo/event',
+  '/templates/event',
   '/templates/business',
   '/templates',
   '/templates/portfolio',

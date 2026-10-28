@@ -64,4 +64,26 @@ export const defaultTemplateEntries: Partial<
     previewAlt:
       'The Business demo on a computer screen: a print studio’s headline on a teal band with its numbers, and its services below.',
   },
+  event: {
+    name: 'College and Event',
+    tagline: 'A one-page website for fests, conferences and workshops.',
+    description:
+      'Everything people need before they come: the dates, time and place, a schedule by day, the events they can enter, the guidelines, and a registration form that saves every registration. Three looks to start from, and it works on phones, tablets and computers.',
+    categories: ['college-education', 'events-conferences'],
+    features: [
+      'Event banner with the dates and place',
+      'Date, time and venue cards',
+      'Schedule by day, with times and places',
+      'Events people can enter, with team sizes and fees',
+      'Numbered guidelines',
+      'Registration form, saved on the server',
+      'Contact details for questions',
+      'Three looks: Spectrum, Campus Blue and Night Stage',
+    ],
+    featured: true,
+    published: true,
+    order: 3,
+    previewAlt:
+      'The College and Event demo on a computer screen: the fest’s name on a violet banner, with date, time and venue cards below.',
+  },
 };

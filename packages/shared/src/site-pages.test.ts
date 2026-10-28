@@ -52,6 +52,7 @@ describe('the table of pages', () => {
       '/projects',
       '/templates',
       '/templates/business',
+      '/templates/event',
       '/templates/portfolio',
     ]);
     for (const path of ['/login', '/register', '/forgot-password', '/reset-password'] as const) {

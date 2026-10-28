@@ -90,3 +90,19 @@ test.describe('the Portfolio live demo', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
   });
 });
+
+test.describe('the College and Event live demo', () => {
+  test('a visitor registers for an event, and it is saved', async ({ page }) => {
+    await page.goto('/demo/event');
+    await expect(page.getByRole('heading', { level: 1, name: 'Spectra 2027' })).toBeVisible();
+    const form = page.getByRole('form', { name: 'Registration form' });
+    await form.getByLabel('Name').fill('Asha Test');
+    await form.getByLabel('Email').fill('asha@example.com');
+    await form.getByLabel('College (optional)').fill('A college');
+    await form.getByLabel('Event').selectOption('Hackathon');
+    const sent = page.waitForResponse('**/api/v1/demo-submissions');
+    await form.getByRole('button', { name: 'Register' }).click();
+    expect((await sent).status()).toBe(201);
+    await expect(form.getByRole('status')).toContainText("You're registered for Hackathon.");
+  });
+});

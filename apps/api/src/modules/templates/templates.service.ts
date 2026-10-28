@@ -168,10 +168,14 @@ type SubmissionDocument = DemoSubmissionRecord & { id: string; createdAt: Date }
 function toSubmission(submission: SubmissionDocument): AdminDemoSubmission {
   return {
     id: submission.id,
+    form: submission.form,
     template: submission.template,
     name: submission.name,
     email: submission.email,
-    message: submission.message,
+    message: submission.message ?? null,
+    phone: submission.phone ?? null,
+    organisation: submission.organisation ?? null,
+    choice: submission.choice ?? null,
     status: submission.status,
     createdAt: submission.createdAt.toISOString(),
     expiresAt: submission.expiresAt.toISOString(),
