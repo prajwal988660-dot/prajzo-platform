@@ -7,6 +7,23 @@ import { idSchema, imageSchema, linkSchema, optionalSiteText, siteText } from '.
  * add their own types here (services, gallery, schedule, products, form…).
  */
 
+/** Small pictures a service can have (drawn by the website; no uploads needed). */
+export const serviceIcons = [
+  'sparkles',
+  'sign',
+  'card',
+  'banner',
+  'printer',
+  'brush',
+  'truck',
+  'clock',
+  'shield',
+  'star',
+  'phone',
+  'leaf',
+] as const;
+export type ServiceIcon = (typeof serviceIcons)[number];
+
 const item = <T extends z.ZodRawShape>(shape: T) => z.object({ id: idSchema, ...shape });
 
 /** A period such as "2021" or "Mar 2021", and "Present" for one still going on. */
@@ -28,6 +45,11 @@ export const sectionContentSchemas = {
     primaryAction: linkSchema.optional(),
     secondaryAction: linkSchema.optional(),
     image: imageSchema.optional(),
+    /** A few big numbers under the buttons, such as "12 yrs" in business (Business). */
+    stats: z
+      .array(item({ value: siteText(16, 'A number'), label: siteText(40, 'A label') }))
+      .max(4)
+      .default([]),
   }),
   about: z.object({
     heading: siteText(80, 'The heading'),
@@ -112,6 +134,49 @@ export const sectionContentSchemas = {
     text: optionalSiteText(160),
     showSocial: z.boolean(),
   }),
+  services: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    items: z
+      .array(
+        item({
+          title: siteText(60, 'A service'),
+          description: siteText(300, 'A description'),
+          /** Shown as written, such as "From ₹2,500". */
+          priceNote: optionalSiteText(40),
+          icon: z.enum(serviceIcons).default('sparkles'),
+        }),
+      )
+      .min(1),
+  }),
+  highlights: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    items: z.array(item({ title: siteText(50, 'A title'), text: siteText(160, 'A line') })).min(1),
+  }),
+  gallery: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    items: z.array(item({ image: imageSchema, caption: optionalSiteText(80) })).min(1),
+  }),
+  /** Customers' words. On a live demo they are always labelled as sample content (D-014). */
+  testimonials: z.object({
+    heading: siteText(80, 'The heading'),
+    items: z
+      .array(
+        item({
+          quote: siteText(400, 'A quote'),
+          name: siteText(60, 'A name'),
+          role: optionalSiteText(60),
+        }),
+      )
+      .min(1),
+  }),
+  cta: z.object({
+    heading: siteText(100, 'The heading'),
+    text: optionalSiteText(240),
+    action: linkSchema,
+  }),
 } as const;
 
 export type SectionType = keyof typeof sectionContentSchemas;
@@ -141,6 +206,11 @@ export const sectionSchema = z.discriminatedUnion('type', [
   sectionOf('education'),
   sectionOf('contact'),
   sectionOf('footer'),
+  sectionOf('services'),
+  sectionOf('highlights'),
+  sectionOf('gallery'),
+  sectionOf('testimonials'),
+  sectionOf('cta'),
 ]);
 
 export type SectionContent<T extends SectionType> = z.infer<(typeof sectionContentSchemas)[T]>;
@@ -156,6 +226,10 @@ export function itemCount(section: Section): number {
     case 'projects':
     case 'experience':
     case 'education':
+    case 'services':
+    case 'highlights':
+    case 'gallery':
+    case 'testimonials':
       return section.content.items.length;
     case 'about':
       return section.content.facts.length;

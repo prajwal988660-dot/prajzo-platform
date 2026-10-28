@@ -1,6 +1,7 @@
 import type { DefinedTemplate, Section } from '@prajzo/shared';
 import type { ReactNode } from 'react';
 import { CheckboxField } from '../../components/ui/Field';
+import { BusinessContentEditor } from './BusinessContentEditor';
 import { ImageInput, LinkInput, ListEditor, optional, TextInput } from './fields';
 
 type Props = {
@@ -100,6 +101,31 @@ export function SectionContentEditor({
               set({ ...content, image: { src, alt: content.image?.alt ?? '' } }),
             )}
             onChange={(image) => set({ ...content, image })}
+          />
+          <ListEditor<(typeof content.stats)[number]>
+            label="Big numbers"
+            itemLabel="number"
+            items={content.stats}
+            min={0}
+            max={4}
+            newItem={(id) => ({ id, value: '10+', label: 'Years in business' })}
+            onChange={(stats) => set({ ...content, stats })}
+            render={(stat, index, change) => (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextInput
+                  label="Number"
+                  value={stat.value}
+                  error={at(`stats.${String(index)}.value`)}
+                  onChange={(value) => change({ ...stat, value })}
+                />
+                <TextInput
+                  label="What it means"
+                  value={stat.label}
+                  error={at(`stats.${String(index)}.label`)}
+                  onChange={(label) => change({ ...stat, label })}
+                />
+              </div>
+            )}
           />
         </div>
       );
@@ -507,5 +533,20 @@ export function SectionContentEditor({
         </div>
       );
     }
+    case 'services':
+    case 'highlights':
+    case 'gallery':
+    case 'testimonials':
+    case 'cta':
+      return (
+        <BusinessContentEditor
+          section={section}
+          path={path}
+          max={max}
+          onChange={onChange}
+          issueAt={issueAt}
+          upload={(apply) => uploadFor(apply)}
+        />
+      );
   }
 }

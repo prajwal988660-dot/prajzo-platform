@@ -123,6 +123,12 @@ export const sitePages = {
       'Website templates you can try before you choose: open a live demo, click around and send its contact form. Every website is then built for you.',
     index: true,
   },
+  '/templates/business': {
+    name: 'Business template',
+    description:
+      'A one-page website for shops, studios and service businesses, with services and prices, reviews, a gallery and a contact form. Try the live demo.',
+    index: true,
+  },
   '/templates/portfolio': {
     name: 'Portfolio template',
     description:
@@ -131,6 +137,12 @@ export const sitePages = {
   },
   // Live demos are kept out of search results: the people in them are made up, and someone
   // searching for a name should never land on one (D-063). The Templates page is listed instead.
+  '/demo/business': {
+    name: 'Business demo',
+    description:
+      'A live demo of the Prajzo Business template: a one-page website for a fictional print studio, with services, reviews and a contact form that works.',
+    index: false,
+  },
   '/demo/portfolio': {
     name: 'Portfolio demo',
     description:

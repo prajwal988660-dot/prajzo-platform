@@ -65,7 +65,7 @@ describe('the template catalogue (Phase 8, D-005)', () => {
       const response = await request(app).get('/api/v1/templates');
       expect(response.status).toBe(200);
       const { items } = templateListResponseSchema.parse(response.body);
-      expect(items).toHaveLength(1);
+      expect(items.map((item) => item.key)).toEqual(['portfolio', 'business']);
       expect(items[0]).toMatchObject({
         key: 'portfolio',
         name: 'Portfolio',
@@ -86,8 +86,11 @@ describe('the template catalogue (Phase 8, D-005)', () => {
 
       await TemplateEntryModel.updateOne({ key: 'portfolio' }, { published: false });
       expect((await request(app).get('/api/v1/templates/portfolio')).status).toBe(404);
-      expect((await request(app).get('/api/v1/templates')).body).toEqual({ items: [] });
-      for (const key of ['business', 'nope', '__proto__', 'toString']) {
+      const left = templateListResponseSchema.parse(
+        (await request(app).get('/api/v1/templates')).body,
+      );
+      expect(left.items.map((item) => item.key)).toEqual(['business']);
+      for (const key of ['event', 'nope', '__proto__', 'toString']) {
         expect((await request(app).get(`/api/v1/templates/${key}`)).status, key).toBe(404);
       }
     });
@@ -122,7 +125,10 @@ describe('the template catalogue (Phase 8, D-005)', () => {
       const { items } = adminTemplateListSchema.parse(
         (await admin.get('/api/v1/admin/templates')).body,
       );
-      expect(items.map((item) => [item.key, item.published])).toEqual([['portfolio', false]]);
+      expect(items.map((item) => [item.key, item.published])).toEqual([
+        ['portfolio', false],
+        ['business', true],
+      ]);
     });
 
     it('changes the listing and records it in the activity log', async () => {
@@ -159,7 +165,7 @@ describe('the template catalogue (Phase 8, D-005)', () => {
         categories: "These categories don't exist: made-up-category",
       });
       const missing = await admin
-        .patch('/api/v1/admin/templates/business')
+        .patch('/api/v1/admin/templates/event')
         .send(await portfolioForm());
       expect(missing.status).toBe(404);
     });

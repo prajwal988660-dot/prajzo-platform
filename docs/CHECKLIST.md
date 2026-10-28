@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 29 October 2026 (Phase 9 built; pull request #9 for your approval)
+Last updated: 29 October 2026 (Phase 10 built; your choice of look and approval next)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -323,19 +323,19 @@ Built 28-29 October 2026 on branch `phase-9-builder`. Left: putting it online (w
 
 ## Phase 10: Demo 2 (Business, `/demo/business`)
 
-- [ ] Your approval of the design brief
-- [ ] Template definition and default content: fictional, with testimonials labelled as demonstration content
-- [ ] Sections: navigation, hero, company introduction, services, feature highlights, projects or gallery, testimonials, contact form, footer
-- [ ] Calls to action work; contact form saved, with honest success and error states
-- [ ] Builder integration: defaults load, every section is editable, the preview updates
-- [ ] Preview image; Templates, Template Details and Our Projects entries
-- [ ] Tests:
-  - [ ] Template validation and section components
-  - [ ] Form states
-  - [ ] End to end: live demo
-  - [ ] End to end: Customize This Design
-- [ ] Responsive check at 390, 768 and 1280 px; keyboard check
-- [ ] Summary with the tests that ran
+- [ ] Your approval of the design brief ([the brief](https://claude.ai/artifact/V1CqGZRNcyLqoTwdfKbEsQ); built with look A, Harbour, until you choose)
+- [x] Template definition and default content: fictional, with testimonials labelled as demonstration content
+- [x] Sections: navigation, hero, company introduction, services, feature highlights, projects or gallery, testimonials, contact form, footer
+- [x] Calls to action work; contact form saved, with honest success and error states
+- [x] Builder integration: defaults load, every section is editable, the preview updates
+- [x] Preview image; Templates, Template Details and Our Projects entries
+- [x] Tests:
+  - [x] Template validation and section components
+  - [x] Form states
+  - [x] End to end: live demo
+  - [x] End to end: Customize This Design
+- [x] Responsive check at 390, 768 and 1280 px; keyboard check
+- [x] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
 ## Phase 11: Demo 3 (College and Event, `/demo/event`)

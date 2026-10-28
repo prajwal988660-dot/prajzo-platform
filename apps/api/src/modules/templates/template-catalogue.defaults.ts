@@ -42,4 +42,26 @@ export const defaultTemplateEntries: Partial<
     previewAlt:
       'The Portfolio demo on a computer screen: a designer’s introduction with an illustrated portrait, and her selected work below.',
   },
+  business: {
+    name: 'Business',
+    tagline: 'A one-page website for shops, studios and service businesses.',
+    description:
+      'Show what you offer and what it costs, why customers choose you, your recent work and what people say, with a quote button on every screen and a contact form. Three looks to start from, and it works on phones, tablets and computers.',
+    categories: ['business-websites', 'printing-services'],
+    features: [
+      'Hero on a coloured band, with three big numbers',
+      'Services as cards or a list, with prices',
+      'Why choose us highlights',
+      'Gallery of recent work',
+      'Customer reviews',
+      'Call-to-action band',
+      'Contact form, email, phone and WhatsApp',
+      'Three looks: Harbour, Indigo Night and Terracotta',
+    ],
+    featured: true,
+    published: true,
+    order: 2,
+    previewAlt:
+      'The Business demo on a computer screen: a print studio’s headline on a teal band with its numbers, and its services below.',
+  },
 };
