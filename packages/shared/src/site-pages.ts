@@ -145,7 +145,7 @@ export type SitePagePath = keyof typeof sitePages;
  * Parts of the website that are private. They open the web app (which asks people to sign in), but
  * are never listed, and are never in the sitemap.
  */
-export const privateAreas = ['/account', '/admin'] as const;
+export const privateAreas = ['/account', '/admin', '/build', '/preview'] as const;
 
 /** An address as the website treats it: no query, no trailing slash, lower case. */
 export function normalizePath(pathname: string): string {

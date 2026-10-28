@@ -183,6 +183,28 @@ export const routes: RouteObject[] = [
       },
       // Live demos: the demo's own website under a demo bar, without Prajzo's header and footer.
       ...demoPages,
+      // The website builder and its preview: their own full-screen frames (Phase 9).
+      {
+        path: 'build',
+        errorElement: <RouteErrorPage />,
+        lazy: async () => ({
+          Component: (await import('../features/builder/BuilderPage')).BuilderPage,
+        }),
+      },
+      {
+        path: 'build/:id',
+        errorElement: <RouteErrorPage />,
+        lazy: async () => ({
+          Component: (await import('../features/builder/BuilderPage')).BuilderPage,
+        }),
+      },
+      {
+        path: 'preview',
+        errorElement: <RouteErrorPage />,
+        lazy: async () => ({
+          Component: (await import('../features/builder/PreviewPage')).PreviewPage,
+        }),
+      },
       {
         // The administration area: its own plain frame.
         path: 'admin',
