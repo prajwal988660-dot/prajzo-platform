@@ -88,6 +88,9 @@ describe('Home page', () => {
     const knownPages = [
       '/',
       '/services',
+      '/templates',
+      '/templates/portfolio',
+      '/demo/portfolio',
       '/how-it-works',
       '/pricing',
       '/about',

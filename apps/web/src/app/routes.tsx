@@ -50,6 +50,20 @@ const lazyPages: RouteObject[] = [
     lazy: async () => ({ Component: (await import('../features/legal/TermsPage')).TermsPage }),
   },
   {
+    path: 'templates',
+    lazy: async () => ({
+      Component: (await import('../features/templates/TemplatesPage')).TemplatesPage,
+    }),
+  },
+  // One details page per template built so far, each at a fixed address (like the demos).
+  ...(['portfolio'] as const).map((key) => ({
+    path: `templates/${key}`,
+    lazy: async () => {
+      const { TemplateDetailsPage } = await import('../features/templates/TemplateDetailsPage');
+      return { Component: () => <TemplateDetailsPage templateKey={key} /> };
+    },
+  })),
+  {
     path: 'start-project',
     lazy: async () => ({
       Component: (await import('../features/projects/StartProjectPage')).StartProjectPage,

@@ -1,4 +1,8 @@
-import { categoryListSchema, servicePackageListSchema } from '@prajzo/shared';
+import {
+  categoryListSchema,
+  servicePackageListSchema,
+  templateListResponseSchema,
+} from '@prajzo/shared';
 import { ArrowRight, Check, Layers, Palette, Puzzle, Type } from 'lucide-react';
 import { Container } from '../../components/layout/Container';
 import { Badge } from '../../components/ui/Badge';
@@ -7,6 +11,7 @@ import { LoadError, LoadingBlock } from '../../components/ui/LoadStates';
 import { SectionHeading } from '../../components/ui/SectionHeading';
 import { usePageMeta } from '../../lib/use-page-meta';
 import { useApi } from '../../lib/use-api';
+import { TemplateCard } from '../templates/TemplateCard';
 import { CallToActionBand } from './components/CallToActionBand';
 import { CategoryCard } from './components/CategoryCard';
 import { DeliveryHighlights } from './components/DeliveryHighlights';
@@ -85,6 +90,8 @@ export function HomePage() {
         </Container>
       </section>
 
+      <FeaturedTemplates />
+
       <PackagesPreview />
 
       <section aria-labelledby="why-heading" className="bg-surface py-16 sm:py-20">
@@ -150,8 +157,8 @@ function Hero() {
             <ButtonLink to="/start-project" size="lg">
               Start a Project <ArrowRight aria-hidden="true" className="size-4" />
             </ButtonLink>
-            <ButtonLink to="/services" variant="secondary" size="lg">
-              View services
+            <ButtonLink to="/templates" variant="secondary" size="lg">
+              Explore Templates
             </ButtonLink>
           </div>
           <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
@@ -168,6 +175,37 @@ function Hero() {
           </ul>
         </div>
         <HeroPreview />
+      </Container>
+    </section>
+  );
+}
+
+/**
+ * The featured templates, each with its live demo (Phase 8). Shown only when there is one to
+ * show: if the list is empty or can't be loaded, the home page simply goes on without it.
+ */
+function FeaturedTemplates() {
+  const templates = useApi('/v1/templates', templateListResponseSchema);
+  if (templates.status !== 'success') return null;
+  const featured = templates.data.items.filter((template) => template.featured).slice(0, 3);
+  if (featured.length === 0) return null;
+  return (
+    <section aria-labelledby="templates-heading" className="py-16 sm:py-20">
+      <Container>
+        <SectionHeading
+          eyebrow="Templates and live demos"
+          id="templates-heading"
+          title="Try a live demo"
+          description="Open a working website, click around and send its contact form, then make it yours."
+        />
+        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {featured.map((template) => (
+            <TemplateCard key={template.key} template={template} headingLevel={3} />
+          ))}
+        </div>
+        <ButtonLink to="/templates" variant="secondary" className="mt-8">
+          See all templates
+        </ButtonLink>
       </Container>
     </section>
   );

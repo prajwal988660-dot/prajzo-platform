@@ -88,6 +88,8 @@ describe('the activity page', () => {
       'Messages',
       'Categories',
       'Packages',
+      'Templates',
+      'Demo messages',
     ]);
     expect(filters.getByRole('link', { name: 'Everything' })).toHaveAttribute(
       'aria-current',

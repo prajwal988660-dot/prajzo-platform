@@ -111,6 +111,18 @@ export const sitePages = {
       'Choose a new password for your Prajzo account, using the link we sent to your email.',
     index: false,
   },
+  '/templates': {
+    name: 'Templates and Live Demos',
+    description:
+      'Website templates you can try before you choose: open a live demo, click around and send its contact form. Every website is then built for you.',
+    index: true,
+  },
+  '/templates/portfolio': {
+    name: 'Portfolio template',
+    description:
+      'A one-page portfolio for designers, developers and creative professionals, with projects, experience, skills and a contact form. Try the live demo.',
+    index: true,
+  },
   // Live demos are kept out of search results: the people in them are made up, and someone
   // searching for a name should never land on one (D-063). The Templates page is listed instead.
   '/demo/portfolio': {

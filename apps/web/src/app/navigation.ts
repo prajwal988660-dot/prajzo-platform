@@ -9,7 +9,7 @@ export type NavItem = {
 export const primaryNavigation: NavItem[] = [
   { label: 'Home', to: '/', available: true },
   { label: 'Services', to: '/services', available: true },
-  { label: 'Templates', to: '/templates', available: false }, // template phases
+  { label: 'Templates', to: '/templates', available: true },
   { label: 'How It Works', to: '/how-it-works', available: true },
   { label: 'Pricing', to: '/pricing', available: true },
   { label: 'Projects', to: '/projects', available: false }, // template phases
