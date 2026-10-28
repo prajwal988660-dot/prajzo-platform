@@ -46,6 +46,9 @@ export function TemplateDetailsPage({ templateKey }: { templateKey: TemplateKey 
             <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">{template.tagline}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink to={template.demoPath}>View Live Demo</ButtonLink>
+              <ButtonLink to={`/build?template=${template.key}`} variant="secondary">
+                Customize This Design
+              </ButtonLink>
               <ButtonLink to="/start-project" variant="secondary">
                 Start a project with this design
               </ButtonLink>
