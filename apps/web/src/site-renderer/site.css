@@ -628,7 +628,6 @@
 }
 .ps-hero-band .ps-lead {
   color: var(--site-on-primary);
-  opacity: 0.92;
 }
 .ps-hero-band .ps-hero {
   padding-block: 3rem;
@@ -675,9 +674,9 @@
   margin: 0;
   font: 700 1.5rem/1.2 var(--site-font-heading);
 }
+/* Full strength: the band's colours just meet the contrast minimum, and see-through text would not. */
 .ps-stats dt {
   font-size: 0.85rem;
-  opacity: 0.85;
 }
 
 /* Services */
@@ -850,7 +849,6 @@
 }
 .ps-cta p {
   margin-top: 0.4rem;
-  opacity: 0.92;
 }
 @container site (min-width: 760px) {
   .ps-cta {

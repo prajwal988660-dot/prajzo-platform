@@ -86,6 +86,8 @@ test('no page scrolls sideways', async ({ page }) => {
     '/privacy',
     '/terms',
     '/demo/portfolio',
+    '/demo/business',
+    '/templates/business',
     '/templates',
     '/templates/portfolio',
     '/projects',

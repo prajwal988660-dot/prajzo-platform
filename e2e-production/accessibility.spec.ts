@@ -24,6 +24,8 @@ const publicPages = [
   '/privacy',
   '/terms',
   '/demo/portfolio',
+  '/demo/business',
+  '/templates/business',
   '/templates',
   '/templates/portfolio',
   '/projects',

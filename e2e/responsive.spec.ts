@@ -109,6 +109,8 @@ for (const width of widths) {
       '/privacy',
       '/terms',
       '/demo/portfolio',
+      '/demo/business',
+      '/templates/business',
       '/templates',
       '/templates/portfolio',
       '/projects',

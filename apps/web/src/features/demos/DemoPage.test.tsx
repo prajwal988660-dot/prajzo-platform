@@ -168,3 +168,34 @@ describe('the Portfolio live demo (/demo/portfolio)', () => {
     expect(site.dataset.buttons).toBe('rounded');
   });
 });
+
+describe('the Business live demo (/demo/business)', () => {
+  it('shows its services with prices, labels every review as a sample, and links its navigation', async () => {
+    mockApi({});
+    renderApp('/demo/business');
+    await screen.findByRole('heading', {
+      level: 1,
+      name: 'Signs, cards and banners, printed by Friday.',
+    });
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
+    ).toEqual([
+      'What we do',
+      'Why shops choose us',
+      'Recent work',
+      'About the studio',
+      'What customers say',
+      'Need something printed this week?',
+      'Visit or write to us',
+    ]);
+    expect(screen.getByText('From ₹2,500')).toBeInTheDocument();
+    expect(screen.getAllByText('Sample review')).toHaveLength(3);
+    const nav = screen.getByRole('navigation', { name: 'Site' });
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href')),
+    ).toEqual(['#services', '#why-us', '#work', '#about', '#reviews', '#contact']);
+    await waitFor(() => expect(document.title).toBe('Business demo · Prajzo'));
+  });
+});
