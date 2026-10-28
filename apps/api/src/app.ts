@@ -17,6 +17,7 @@ import { catalogueRouter } from './modules/catalogue/catalogue.routes';
 import { clientErrorsRouter } from './modules/client-errors/client-errors.routes';
 import { contactRouter } from './modules/contact/contact.routes';
 import { demoSubmissionsRouter } from './modules/demos/demo-submissions.routes';
+import { designsRouter } from './modules/designs/designs.routes';
 import { healthRouter } from './modules/health/health.routes';
 import { createProjectEffects } from './modules/projects/project-effects';
 import { projectRequestRouter } from './modules/projects/project-request.routes';
@@ -94,6 +95,13 @@ export function createApp({ env, logger, checkDatabase, mailer }: AppDependencie
   );
   v1.use(catalogueRouter({ publicCaching: !env.STAGING_PASSWORD }));
   v1.use(templatesRouter());
+  v1.use(
+    '/designs',
+    designsRouter({
+      sessions: accounts.sessions,
+      saveRateLimitMax: env.DESIGN_SAVE_RATE_LIMIT_MAX,
+    }),
+  );
   v1.use(
     contactRouter({
       mailer,

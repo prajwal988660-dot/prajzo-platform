@@ -16,6 +16,7 @@ export * from './client-error';
 export * from './contact';
 export * from './dates';
 export * from './demo-submission';
+export * from './designs';
 export * from './money';
 export * from './projects/admin-projects';
 export * from './projects/project-request';

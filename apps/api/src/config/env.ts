@@ -85,6 +85,8 @@ const envSchema = z
     // are kept before being deleted by themselves (D-014).
     DEMO_SUBMISSION_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(5),
     DEMO_SUBMISSION_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(7),
+    // Saves in the website builder one customer may make per hour (Phase 9).
+    DESIGN_SAVE_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(10_000).default(300),
     // Browser error reports allowed per connection every 15 minutes (D-058).
     CLIENT_ERROR_RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(1000).default(20),
     // Sign-in, sign-up and password-reset attempts allowed per connection every 15 minutes.
