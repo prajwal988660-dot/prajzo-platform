@@ -177,7 +177,26 @@ function SubmissionCard({
           </Badge>
         </div>
         <p className="break-all text-sm text-slate-700">{submission.email}</p>
-        <p className="whitespace-pre-line text-ink">{submission.message}</p>
+        {submission.form === 'registration' ? (
+          <dl className="grid gap-1 text-sm text-ink sm:grid-cols-[auto_1fr] sm:gap-x-4">
+            <dt className="font-semibold">Registered for</dt>
+            <dd>{submission.choice}</dd>
+            {submission.organisation ? (
+              <>
+                <dt className="font-semibold">Organisation</dt>
+                <dd>{submission.organisation}</dd>
+              </>
+            ) : null}
+            {submission.phone ? (
+              <>
+                <dt className="font-semibold">Phone</dt>
+                <dd>{submission.phone}</dd>
+              </>
+            ) : null}
+          </dl>
+        ) : (
+          <p className="whitespace-pre-line text-ink">{submission.message}</p>
+        )}
         <p className="text-sm text-slate-600">
           Deleted by itself on{' '}
           <time dateTime={submission.expiresAt}>{formatDateTime(submission.expiresAt)}</time>.

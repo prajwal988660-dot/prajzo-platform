@@ -2,7 +2,7 @@
 
 A box is ticked only after the work is done and its tests have run. Phase descriptions and exit criteria are in [ROADMAP.md](ROADMAP.md).
 
-Last updated: 29 October 2026 (Phase 10 built; your choice of look and approval next)
+Last updated: 29 October 2026 (Phase 11 built; your choice of look and approval next)
 
 Legend: `[x]` done and verified · `[ ]` to do · **(gate)** needs your approval
 
@@ -340,21 +340,21 @@ Built 28-29 October 2026 on branch `phase-9-builder`. Left: putting it online (w
 
 ## Phase 11: Demo 3 (College and Event, `/demo/event`)
 
-- [ ] Your approval of the design brief
-- [ ] Template definition and default content: a fictional college and event
-- [ ] Sections: event banner; date, time and location; introduction; schedule; event categories; guidelines; registration form; contact information; footer
-- [ ] Registration:
-  - [ ] Every field validated
-  - [ ] Saved on the server
-  - [ ] Confirmation shown only after the server succeeds; error state otherwise
-- [ ] Builder integration; preview image; catalogue entries
-- [ ] Tests:
-  - [ ] Validation, including invalid registrations
-  - [ ] Section components
-  - [ ] End to end: live demo
-  - [ ] End to end: Customize This Design
-- [ ] Responsive check at 390, 768 and 1280 px; keyboard check
-- [ ] Summary with the tests that ran
+- [ ] Your approval of the design brief ([the brief](https://claude.ai/artifact/2JGTYW9JCNa3sbaJpASDsR); built with look A, Spectrum, until you choose)
+- [x] Template definition and default content: a fictional college and event
+- [x] Sections: event banner; date, time and location; introduction; schedule; event categories; guidelines; registration form; contact information; footer
+- [x] Registration:
+  - [x] Every field validated
+  - [x] Saved on the server
+  - [x] Confirmation shown only after the server succeeds; error state otherwise
+- [x] Builder integration; preview image; catalogue entries
+- [x] Tests:
+  - [x] Validation, including invalid registrations
+  - [x] Section components
+  - [x] End to end: live demo
+  - [x] End to end: Customize This Design
+- [x] Responsive check at 390, 768 and 1280 px; keyboard check
+- [x] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
 ## Phase 12: Demo 4 (Product Catalogue, `/demo/catalogue`)

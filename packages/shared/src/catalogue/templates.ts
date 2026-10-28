@@ -72,10 +72,16 @@ export type DemoSubmissionStatus = (typeof demoSubmissionStatuses)[number];
 
 export const adminDemoSubmissionSchema = z.object({
   id: z.string(),
+  /** A contact message, or a registration (Event demo). */
+  form: z.enum(['contact', 'registration']),
   template: z.enum(templateKeys),
   name: z.string(),
   email: z.string(),
-  message: z.string(),
+  message: z.string().nullable(),
+  phone: z.string().nullable(),
+  organisation: z.string().nullable(),
+  /** The event a registration is for. */
+  choice: z.string().nullable(),
   status: z.enum(demoSubmissionStatuses),
   createdAt: z.string(),
   /** When it will be deleted by itself (D-014). */

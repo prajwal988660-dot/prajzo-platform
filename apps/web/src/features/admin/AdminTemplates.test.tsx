@@ -123,10 +123,14 @@ describe('admin: templates', () => {
 describe('admin: demo messages', () => {
   const message: AdminDemoSubmission = {
     id: 'a'.repeat(24),
+    form: 'contact',
     template: 'portfolio',
     name: 'Kiran Test',
     email: 'kiran@example.com',
     message: 'Could my portfolio look like this one?',
+    phone: null,
+    organisation: null,
+    choice: null,
     status: 'new',
     createdAt: '2026-10-28T10:00:00.000Z',
     expiresAt: '2026-11-04T10:00:00.000Z',

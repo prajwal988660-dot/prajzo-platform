@@ -129,6 +129,12 @@ export const sitePages = {
       'A one-page website for shops, studios and service businesses, with services and prices, reviews, a gallery and a contact form. Try the live demo.',
     index: true,
   },
+  '/templates/event': {
+    name: 'College and Event template',
+    description:
+      'A one-page website for fests, conferences and workshops, with dates, a schedule, events to enter, guidelines and a registration form. Try the live demo.',
+    index: true,
+  },
   '/templates/portfolio': {
     name: 'Portfolio template',
     description:
@@ -141,6 +147,12 @@ export const sitePages = {
     name: 'Business demo',
     description:
       'A live demo of the Prajzo Business template: a one-page website for a fictional print studio, with services, reviews and a contact form that works.',
+    index: false,
+  },
+  '/demo/event': {
+    name: 'College and Event demo',
+    description:
+      'A live demo of the Prajzo College and Event template: a fictional two-day college fest with a schedule, events and a registration form that works.',
     index: false,
   },
   '/demo/portfolio': {

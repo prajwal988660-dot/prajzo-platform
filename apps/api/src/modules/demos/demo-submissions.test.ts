@@ -105,4 +105,63 @@ describe('POST /api/v1/demo-submissions (D-014)', () => {
     expect(refused.status).toBe(429);
     expect(await DemoSubmissionModel.countDocuments()).toBe(2);
   });
+
+  describe('registrations (Event demo, Phase 11)', () => {
+    const registration = {
+      form: 'registration',
+      template: 'event',
+      name: 'Asha Test',
+      email: 'Asha@Example.com',
+      phone: '+91 98765 43210',
+      organisation: 'A college',
+      choice: 'Hackathon',
+    };
+
+    it('saves a registration with the event chosen', async () => {
+      const response = await request(testApp()).post('/api/v1/demo-submissions').send(registration);
+      expect(response.status).toBe(201);
+      const saved = await DemoSubmissionModel.findOne().lean();
+      expect(saved).toMatchObject({
+        form: 'registration',
+        template: 'event',
+        email: 'asha@example.com',
+        phone: '+91 98765 43210',
+        organisation: 'A college',
+        choice: 'Hackathon',
+      });
+      expect(saved?.message).toBeUndefined();
+    });
+
+    it('only accepts one of the events the form offers', async () => {
+      const response = await request(testApp())
+        .post('/api/v1/demo-submissions')
+        .send({ ...registration, choice: 'Free lunch' });
+      expect(response.status).toBe(400);
+      expect(apiErrorBodySchema.parse(response.body).error.fields).toEqual({
+        choice: 'Choose one of the events on the form',
+      });
+    });
+
+    it('refuses a registration for a demo that has no registration form', async () => {
+      const response = await request(testApp())
+        .post('/api/v1/demo-submissions')
+        .send({ ...registration, template: 'portfolio' });
+      expect(response.status).toBe(400);
+      expect(await DemoSubmissionModel.countDocuments()).toBe(0);
+    });
+
+    it('checks the fields like the browser does, with the optional ones left out', async () => {
+      const bare = await request(testApp())
+        .post('/api/v1/demo-submissions')
+        .send({ ...registration, phone: '', organisation: '' });
+      expect(bare.status).toBe(201);
+      const wrong = await request(testApp())
+        .post('/api/v1/demo-submissions')
+        .send({ ...registration, phone: 'call me', email: 'nope' });
+      expect(Object.keys(apiErrorBodySchema.parse(wrong.body).error.fields ?? {}).sort()).toEqual([
+        'email',
+        'phone',
+      ]);
+    });
+  });
 });

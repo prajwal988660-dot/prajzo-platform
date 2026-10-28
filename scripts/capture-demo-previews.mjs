@@ -8,14 +8,14 @@
  *
  * Run it again whenever a demo's look changes.
  */
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const site = process.argv[2] ?? 'http://localhost:8080';
-const demos = ['portfolio', 'business'];
+const demos = ['portfolio', 'business', 'event'];
 
 // The installed Chrome on this PC (as the tests use); the downloaded one on GitHub.
 const browser = await chromium.launch(process.env.CI ? {} : { channel: 'chrome' });
@@ -39,6 +39,8 @@ try {
       return canvas.toDataURL('image/webp', 0.84).split(',')[1];
     }, png.toString('base64'));
     const target = path.join(root, 'apps/web/public/demo', key, 'preview.webp');
+    // A demo with no pictures of its own (Event) has no folder yet.
+    mkdirSync(path.dirname(target), { recursive: true });
     writeFileSync(target, Buffer.from(base64, 'base64'));
     console.log(
       `${path.relative(root, target)}  ${String(Math.round(Buffer.byteLength(base64, 'base64') / 1024))} KB`,

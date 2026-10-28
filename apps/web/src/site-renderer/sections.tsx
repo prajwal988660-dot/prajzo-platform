@@ -8,6 +8,12 @@ import {
   TestimonialsSection,
 } from './business-sections';
 import { useSite } from './context';
+import {
+  FactsSection,
+  GuidelinesSection,
+  RegistrationSection,
+  ScheduleSection,
+} from './event-sections';
 import { DemoAction } from './DemoAction';
 import { SectionShell, SiteAction, SiteImageTag } from './parts';
 import { SiteContactForm } from './SiteContactForm';
@@ -29,16 +35,28 @@ const navLabels: Partial<Record<Section['type'], string>> = {
   highlights: 'Why us',
   gallery: 'Work',
   testimonials: 'Reviews',
+  schedule: 'Schedule',
+  guidelines: 'Guidelines',
+  registration: 'Register',
   contact: 'Contact',
+};
+
+/** Where a template calls a kind of section something else: an event lists events, not services. */
+const templateNavLabels: Partial<
+  Record<WebsiteConfig['template']['key'], Partial<Record<Section['type'], string>>>
+> = {
+  event: { services: 'Events' },
 };
 
 function HeaderSection({ section, config }: Props<'header'> & { config: WebsiteConfig }) {
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const page = config.pages.find((candidate) => candidate.sections.includes(section));
+  const labelOf = (type: Section['type']) =>
+    templateNavLabels[config.template.key]?.[type] ?? navLabels[type];
   const links = (page?.sections ?? [])
-    .filter((item) => item.enabled && navLabels[item.type])
-    .map((item) => ({ href: `#${item.id}`, label: navLabels[item.type] ?? '' }));
+    .filter((item) => item.enabled && labelOf(item.type))
+    .map((item) => ({ href: `#${item.id}`, label: labelOf(item.type) ?? '' }));
 
   return (
     <header className="ps-header">
@@ -399,5 +417,13 @@ export function SiteSection({ section, config }: { section: Section; config: Web
       return <TestimonialsSection section={section} />;
     case 'cta':
       return <CtaSection section={section} />;
+    case 'facts':
+      return <FactsSection section={section} />;
+    case 'schedule':
+      return <ScheduleSection section={section} />;
+    case 'guidelines':
+      return <GuidelinesSection section={section} />;
+    case 'registration':
+      return <RegistrationSection section={section} />;
   }
 }

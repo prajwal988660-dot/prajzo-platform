@@ -62,7 +62,7 @@ const lazyPages: RouteObject[] = [
     }),
   },
   // One details page per template built so far, each at a fixed address (like the demos).
-  ...(['portfolio', 'business'] as const).map((key) => ({
+  ...(['portfolio', 'business', 'event'] as const).map((key) => ({
     path: `templates/${key}`,
     lazy: async () => {
       const { TemplateDetailsPage } = await import('../features/templates/TemplateDetailsPage');
@@ -139,9 +139,9 @@ const customerPages: RouteObject = {
 
 /**
  * One live demo per template built so far (D-007), each at its own fixed address so the server
- * knows it exists. Event, Catalogue and Forms are added in Phases 11 to 13.
+ * knows it exists. Catalogue and Forms are added in Phases 12 and 13.
  */
-const demoPages: RouteObject[] = (['portfolio', 'business'] as const).map((key) => ({
+const demoPages: RouteObject[] = (['portfolio', 'business', 'event'] as const).map((key) => ({
   path: `demo/${key}`,
   errorElement: <RouteErrorPage />,
   lazy: async () => {

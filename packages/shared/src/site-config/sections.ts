@@ -24,6 +24,10 @@ export const serviceIcons = [
 ] as const;
 export type ServiceIcon = (typeof serviceIcons)[number];
 
+/** Small pictures for an event's key facts. */
+export const factIcons = ['calendar', 'clock', 'map', 'ticket', 'users', 'trophy'] as const;
+export type FactIcon = (typeof factIcons)[number];
+
 const item = <T extends z.ZodRawShape>(shape: T) => z.object({ id: idSchema, ...shape });
 
 /** A period such as "2021" or "Mar 2021", and "Present" for one still going on. */
@@ -177,6 +181,60 @@ export const sectionContentSchemas = {
     text: optionalSiteText(240),
     action: linkSchema,
   }),
+  /** Key facts in cards: date, time, venue… (Event, Phase 11). */
+  facts: z.object({
+    heading: optionalSiteText(80),
+    items: z
+      .array(
+        item({
+          label: siteText(30, 'A label'),
+          value: siteText(80, 'A value'),
+          icon: z.enum(factIcons).default('calendar'),
+        }),
+      )
+      .min(1),
+  }),
+  schedule: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    days: z
+      .array(
+        item({
+          name: siteText(60, 'A day'),
+          slots: z
+            .array(
+              item({
+                time: siteText(20, 'A time'),
+                title: siteText(80, 'What happens'),
+                place: optionalSiteText(60),
+              }),
+            )
+            .min(1),
+        }),
+      )
+      .min(1),
+  }),
+  guidelines: z.object({
+    heading: siteText(80, 'The heading'),
+    items: z.array(item({ text: siteText(240, 'A guideline') })).min(1),
+  }),
+  /**
+   * A registration form. Each registration is saved; on a live demo it goes to the demo inbox
+   * (D-014). People choose one of `events`.
+   */
+  registration: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    eventLabel: siteText(30, 'The label'),
+    events: z
+      .array(siteText(60, 'An event'))
+      .min(1, 'List at least one thing people can register for')
+      .max(20),
+    askPhone: z.boolean(),
+    askOrganisation: z.boolean(),
+    organisationLabel: siteText(30, 'The label'),
+    closingNote: optionalSiteText(200),
+  }),
 } as const;
 
 export type SectionType = keyof typeof sectionContentSchemas;
@@ -211,6 +269,10 @@ export const sectionSchema = z.discriminatedUnion('type', [
   sectionOf('gallery'),
   sectionOf('testimonials'),
   sectionOf('cta'),
+  sectionOf('facts'),
+  sectionOf('schedule'),
+  sectionOf('guidelines'),
+  sectionOf('registration'),
 ]);
 
 export type SectionContent<T extends SectionType> = z.infer<(typeof sectionContentSchemas)[T]>;
@@ -230,7 +292,13 @@ export function itemCount(section: Section): number {
     case 'highlights':
     case 'gallery':
     case 'testimonials':
+    case 'facts':
+    case 'guidelines':
       return section.content.items.length;
+    case 'schedule':
+      return section.content.days.reduce((sum, day) => sum + day.slots.length, 0);
+    case 'registration':
+      return section.content.events.length;
     case 'about':
       return section.content.facts.length;
     default:

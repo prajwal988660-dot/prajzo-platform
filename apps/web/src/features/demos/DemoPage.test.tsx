@@ -126,6 +126,7 @@ describe('the Portfolio live demo (/demo/portfolio)', () => {
     expect(await screen.findByRole('button', { name: 'Sending…' })).toBeDisabled();
     expect(screen.queryByText('Thank you. Your message was received.')).not.toBeInTheDocument();
     expect(JSON.parse(demoPosts(fetchMock)[0]?.[1]?.body as string)).toEqual({
+      form: 'contact',
       template: 'portfolio',
       name: 'Kiran Test',
       email: 'kiran@example.com',
@@ -197,5 +198,58 @@ describe('the Business live demo (/demo/business)', () => {
         .map((link) => link.getAttribute('href')),
     ).toEqual(['#services', '#why-us', '#work', '#about', '#reviews', '#contact']);
     await waitFor(() => expect(document.title).toBe('Business demo · Prajzo'));
+  });
+});
+
+describe('the College and Event live demo (/demo/event)', () => {
+  async function openEvent(routes: Parameters<typeof mockApi>[0] = {}) {
+    const fetchMock = mockApi(routes);
+    renderApp('/demo/event');
+    await screen.findByRole('heading', { level: 1, name: 'Spectra 2027' });
+    return { fetchMock, user: userEvent.setup() };
+  }
+
+  it('shows the key facts, the schedule by day, the events and numbered guidelines', async () => {
+    await openEvent();
+    const facts = screen.getByRole('region', { name: 'Key facts' });
+    expect(facts).toHaveTextContent('12–13 February 2027');
+    expect(screen.getByRole('region', { name: 'Day 1 · Friday 12 February' })).toHaveTextContent(
+      'Opening ceremony',
+    );
+    expect(screen.getByText('Teams of 2–4 · ₹400 a team')).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Site' });
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['Schedule', 'Events', 'Guidelines', 'Register', 'Contact']);
+  });
+
+  it('registers for an event, and says so only after the server has saved it', async () => {
+    const { user, fetchMock } = await openEvent({
+      'POST /api/v1/demo-submissions': () =>
+        jsonResponse(201, { received: true, deleteAfter: '2026-11-05T10:00:00.000Z' }),
+    });
+    const form = screen.getByRole('form', { name: 'Registration form' });
+    await user.click(within(form).getByRole('button', { name: 'Register' }));
+    expect(await within(form).findByText('Choose one')).toBeInTheDocument();
+    expect(demoPosts(fetchMock)).toHaveLength(0);
+
+    await user.type(within(form).getByLabelText('Name'), 'Asha Test');
+    await user.type(within(form).getByLabelText('Email'), 'asha@example.com');
+    await user.type(within(form).getByLabelText('College (optional)'), 'A college');
+    await user.selectOptions(within(form).getByLabelText('Event'), 'Robo race');
+    await user.click(within(form).getByRole('button', { name: 'Register' }));
+
+    expect(await within(form).findByRole('status')).toHaveTextContent(
+      'You’re registered for Robo race. We will email you within two days.'.replace('’', "'"),
+    );
+    expect(JSON.parse(demoPosts(fetchMock)[0]?.[1]?.body as string)).toMatchObject({
+      form: 'registration',
+      template: 'event',
+      name: 'Asha Test',
+      organisation: 'A college',
+      choice: 'Robo race',
+    });
   });
 });

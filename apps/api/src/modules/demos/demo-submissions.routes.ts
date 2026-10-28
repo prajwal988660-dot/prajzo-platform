@@ -1,9 +1,20 @@
 import { demoSubmissionRequestSchema, type DemoSubmissionResponse } from '@prajzo/shared';
+import { templateFor } from '@prajzo/shared/templates';
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { AppError } from '../../lib/errors';
 import { requireDatabase } from '../../middleware/require-database';
 import { DemoSubmissionModel } from './demo-submission.model';
+
+/** The events a demo's registration form offers: only those can be chosen. */
+function registrationEventsOf(key: string): string[] {
+  const template = templateFor(key);
+  return (template?.parsedDefault.pages ?? []).flatMap((page) =>
+    page.sections.flatMap((section) =>
+      section.type === 'registration' ? section.content.events : [],
+    ),
+  );
+}
 
 type DemoSubmissionsRouterOptions = {
   /** Demo messages allowed per connection every 15 minutes. */
@@ -41,14 +52,36 @@ export function demoSubmissionsRouter({
   // requireDatabase comes first, so attempts during an outage don't use up the visitor's quota.
   router.post('/demo-submissions', requireDatabase, limiter, async (req, res) => {
     const input = demoSubmissionRequestSchema.parse(req.body);
+    if (
+      input.form === 'registration' &&
+      !registrationEventsOf(input.template).includes(input.choice)
+    ) {
+      throw new AppError(400, 'VALIDATION_FAILED', 'Some details need fixing.', {
+        choice: 'Choose one of the events on the form',
+      });
+    }
     const expiresAt = new Date(Date.now() + keepDays * 24 * 60 * 60 * 1000);
-    await DemoSubmissionModel.create({
-      template: input.template,
-      name: input.name,
-      email: input.email,
-      message: input.message,
-      expiresAt,
-    });
+    await DemoSubmissionModel.create(
+      input.form === 'contact'
+        ? {
+            form: 'contact',
+            template: input.template,
+            name: input.name,
+            email: input.email,
+            message: input.message,
+            expiresAt,
+          }
+        : {
+            form: 'registration',
+            template: input.template,
+            name: input.name,
+            email: input.email,
+            phone: input.phone,
+            organisation: input.organisation,
+            choice: input.choice,
+            expiresAt,
+          },
+    );
     const body: DemoSubmissionResponse = { received: true, deleteAfter: expiresAt.toISOString() };
     res.status(201).json(body);
   });

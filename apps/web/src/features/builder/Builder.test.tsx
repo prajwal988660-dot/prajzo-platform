@@ -107,7 +107,9 @@ describe('the builder (/build)', () => {
     const content = await screen.findByRole('region', { name: 'Edit your website' });
     const heading = within(content).getAllByLabelText('Heading', { selector: 'input' })[0]!;
     await user.clear(heading);
-    await user.type(heading, 'My own heading');
+    // Pasted, not typed key by key: every keystroke re-checks the whole design, slow in jsdom.
+    await user.click(heading);
+    await user.paste('My own heading');
     await waitFor(() => {
       const hero = readDraft('portfolio')?.pages[0]?.sections.find(
         (section) => section.type === 'hero',
