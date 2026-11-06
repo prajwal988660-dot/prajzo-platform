@@ -1,5 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { visibleNavigation } from '../apps/web/src/app/navigation';
 import { sendProjectQuietly, signUpQuietly, strongPassword, uniqueEmail } from './helpers';
+
+/** The header's links, taken from the navigation itself so a new page cannot leave this behind. */
+const navigationStops = visibleNavigation.map((item) => `a: ${item.label}`);
 
 /**
  * Everything a person who can't use a mouse (or prefers not to) does, with the keyboard only: the
@@ -63,26 +67,25 @@ test('Tab visits the header in reading order and always shows where focus is', a
   // "Sign in" appears once the site has checked whether anyone is signed in.
   await expect(page.getByRole('banner').getByRole('link', { name: 'Sign in' })).toBeVisible();
 
+  // The skip link, the logo, every navigation link, then "Sign in" and the call to action.
+  const header = [
+    'a: Skip to main content',
+    'a: Prajzo home',
+    ...navigationStops,
+    'a: Sign in',
+    'a: Start a Project',
+  ];
+
   const stops: string[] = [];
-  for (let step = 0; step < 11; step += 1) {
+  for (let step = 0; step < header.length + 1; step += 1) {
     await page.keyboard.press('Tab');
     stops.push(await focused(page));
     expect(await focusIsVisible(page), `stop ${step + 1}: ${stops.at(-1)}`).toBe(true);
   }
 
-  expect(stops.slice(0, 9)).toEqual([
-    'a: Skip to main content',
-    'a: Prajzo home',
-    'a: Home',
-    'a: Services',
-    'a: How It Works',
-    'a: Pricing',
-    'a: Contact',
-    'a: Sign in',
-    'a: Start a Project',
-  ]);
+  expect(stops.slice(0, header.length)).toEqual(header);
   // Then the page itself, starting with its own links and buttons.
-  expect(stops[9]).toMatch(/^a: /);
+  expect(stops[header.length]).toMatch(/^a: /);
 });
 
 test('moving to another page with the keyboard puts focus on its heading', async ({
@@ -120,7 +123,9 @@ test('moving to another page with the keyboard puts focus on its heading', async
 
 test('following a link inside a page also puts focus on the new page', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'View services' }).focus();
+  // The Services link in the content, not the header one. Its wording counts the services, so it
+  // is found by where it goes.
+  await page.getByRole('main').locator('a[href="/services"]').first().focus();
   await page.keyboard.press('Enter');
 
   await expect(
@@ -165,17 +170,11 @@ test.describe('the phone menu', () => {
     await page.keyboard.press('Enter');
 
     const order: string[] = [];
-    for (let step = 0; step < 5; step += 1) {
+    for (let step = 0; step < navigationStops.length; step += 1) {
       order.push(await focused(page));
       await page.keyboard.press('Tab');
     }
-    expect(order).toEqual([
-      'a: Home',
-      'a: Services',
-      'a: How It Works',
-      'a: Pricing',
-      'a: Contact',
-    ]);
+    expect(order).toEqual(navigationStops);
 
     await page.keyboard.press('Shift+Tab'); // back to Contact
     await page.keyboard.press('Enter');

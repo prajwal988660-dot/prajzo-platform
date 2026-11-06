@@ -52,6 +52,7 @@ describe('the table of pages', () => {
       '/projects',
       '/templates',
       '/templates/business',
+      '/templates/catalogue',
       '/templates/event',
       '/templates/portfolio',
     ]);

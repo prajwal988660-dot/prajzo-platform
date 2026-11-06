@@ -129,6 +129,12 @@ export const sitePages = {
       'A one-page website for shops, studios and service businesses, with services and prices, reviews, a gallery and a contact form. Try the live demo.',
     index: true,
   },
+  '/templates/catalogue': {
+    name: 'Product Catalogue template',
+    description:
+      'A product catalogue without a checkout: products by category, details, prices, and enquiries by form or WhatsApp. Try the live demo.',
+    index: true,
+  },
   '/templates/event': {
     name: 'College and Event template',
     description:
@@ -147,6 +153,12 @@ export const sitePages = {
     name: 'Business demo',
     description:
       'A live demo of the Prajzo Business template: a one-page website for a fictional print studio, with services, reviews and a contact form that works.',
+    index: false,
+  },
+  '/demo/catalogue': {
+    name: 'Product Catalogue demo',
+    description:
+      'A live demo of the Prajzo Product Catalogue template: a fictional handloom shop with category filters, product details and an enquiry form that works.',
     index: false,
   },
   '/demo/event': {

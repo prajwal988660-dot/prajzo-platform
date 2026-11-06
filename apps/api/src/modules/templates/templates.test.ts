@@ -65,7 +65,12 @@ describe('the template catalogue (Phase 8, D-005)', () => {
       const response = await request(app).get('/api/v1/templates');
       expect(response.status).toBe(200);
       const { items } = templateListResponseSchema.parse(response.body);
-      expect(items.map((item) => item.key)).toEqual(['portfolio', 'business', 'event']);
+      expect(items.map((item) => item.key)).toEqual([
+        'portfolio',
+        'business',
+        'event',
+        'catalogue',
+      ]);
       expect(items[0]).toMatchObject({
         key: 'portfolio',
         name: 'Portfolio',
@@ -89,8 +94,8 @@ describe('the template catalogue (Phase 8, D-005)', () => {
       const left = templateListResponseSchema.parse(
         (await request(app).get('/api/v1/templates')).body,
       );
-      expect(left.items.map((item) => item.key)).toEqual(['business', 'event']);
-      for (const key of ['catalogue', 'nope', '__proto__', 'toString']) {
+      expect(left.items.map((item) => item.key)).toEqual(['business', 'event', 'catalogue']);
+      for (const key of ['forms', 'nope', '__proto__', 'toString']) {
         expect((await request(app).get(`/api/v1/templates/${key}`)).status, key).toBe(404);
       }
     });
@@ -129,6 +134,7 @@ describe('the template catalogue (Phase 8, D-005)', () => {
         ['portfolio', false],
         ['business', true],
         ['event', true],
+        ['catalogue', true],
       ]);
     });
 
@@ -166,7 +172,7 @@ describe('the template catalogue (Phase 8, D-005)', () => {
         categories: "These categories don't exist: made-up-category",
       });
       const missing = await admin
-        .patch('/api/v1/admin/templates/catalogue')
+        .patch('/api/v1/admin/templates/forms')
         .send(await portfolioForm());
       expect(missing.status).toBe(404);
     });
