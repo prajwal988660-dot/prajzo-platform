@@ -60,14 +60,45 @@ export const demoRegistrationSchema = z.object({
   company,
 });
 
-/** Either form. A request with no `form` is a contact message (as before Phase 11). */
+/** An enquiry about a product (Catalogue demo, Phase 12). There are no payments. */
+export const demoEnquirySchema = z.object({
+  form: z.literal('enquiry'),
+  template: z.enum(templateKeys),
+  name,
+  email,
+  phone: demoRegistrationSchema.shape.phone,
+  /** Which product; the server checks it is one the catalogue has. */
+  choice: z.string().trim().min(1, 'Choose a product').max(60),
+  quantity: z
+    .union([z.number(), z.string()])
+    .optional()
+    .transform((value) => (value === '' || value === undefined ? undefined : Number(value)))
+    .pipe(
+      z
+        .number()
+        .int('Enter a whole number')
+        .min(1, 'Enter 1 or more')
+        .max(10_000, 'Enter 10,000 or less')
+        .optional(),
+    ),
+  message: z
+    .string()
+    .trim()
+    .max(1000, 'Keep your note under 1,000 characters')
+    .optional()
+    .transform((value) => (value === '' ? undefined : value)),
+  company,
+});
+
+/** Any of the forms. A request with no `form` is a contact message (as before Phase 11). */
 export const demoSubmissionRequestSchema = z.preprocess(
   (value) =>
     value && typeof value === 'object' && !('form' in value)
       ? { ...value, form: 'contact' }
       : value,
-  z.discriminatedUnion('form', [demoContactSchema, demoRegistrationSchema]),
+  z.discriminatedUnion('form', [demoContactSchema, demoRegistrationSchema, demoEnquirySchema]),
 );
+export type DemoEnquiryValues = z.input<typeof demoEnquirySchema>;
 
 export type DemoSubmissionValues = z.input<typeof demoContactSchema>;
 export type DemoRegistrationValues = z.input<typeof demoRegistrationSchema>;

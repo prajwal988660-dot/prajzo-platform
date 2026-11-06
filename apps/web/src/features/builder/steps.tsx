@@ -41,6 +41,8 @@ export const sectionNames: Record<Section['type'], string> = {
   schedule: 'Schedule',
   guidelines: 'Guidelines',
   registration: 'Registration form',
+  products: 'Products',
+  enquiry: 'Enquiry form',
 };
 
 const variantNames: Record<string, string> = {

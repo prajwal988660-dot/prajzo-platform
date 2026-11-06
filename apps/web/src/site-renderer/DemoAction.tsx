@@ -9,8 +9,11 @@ export function DemoAction({
   children,
   note,
   className,
+  label,
 }: {
   children: ReactNode;
+  /** A fuller name for screen readers; it starts with the visible words. */
+  label?: string;
   /** What would happen on the real website. */
   note: string;
   className?: string;
@@ -22,6 +25,7 @@ export function DemoAction({
       <button
         type="button"
         className={className}
+        aria-label={label}
         aria-expanded={open}
         aria-controls={noteId}
         onClick={() => setOpen((value) => !value)}

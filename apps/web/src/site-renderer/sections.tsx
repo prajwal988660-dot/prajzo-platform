@@ -7,6 +7,7 @@ import {
   ServicesSection,
   TestimonialsSection,
 } from './business-sections';
+import { EnquirySection, ProductsSection } from './catalogue-sections';
 import { useSite } from './context';
 import {
   FactsSection,
@@ -38,6 +39,8 @@ const navLabels: Partial<Record<Section['type'], string>> = {
   schedule: 'Schedule',
   guidelines: 'Guidelines',
   registration: 'Register',
+  products: 'Products',
+  enquiry: 'Enquire',
   contact: 'Contact',
 };
 
@@ -425,5 +428,9 @@ export function SiteSection({ section, config }: { section: Section; config: Web
       return <GuidelinesSection section={section} />;
     case 'registration':
       return <RegistrationSection section={section} />;
+    case 'products':
+      return <ProductsSection section={section} />;
+    case 'enquiry':
+      return <EnquirySection section={section} />;
   }
 }

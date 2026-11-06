@@ -131,6 +131,7 @@ describe('admin: demo messages', () => {
     phone: null,
     organisation: null,
     choice: null,
+    quantity: null,
     status: 'new',
     createdAt: '2026-10-28T10:00:00.000Z',
     expiresAt: '2026-11-04T10:00:00.000Z',
