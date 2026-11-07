@@ -4,9 +4,14 @@ Decided 7 November 2026 (D-065, replacing D-061): the website runs on **Hostinge
 Node.js web app in hPanel, next to the domain, DNS and mailbox you already have there. The database
 stays on **MongoDB Atlas**. Billing is in rupees, and no card in US dollars is needed.
 
-> **Before any of this: upgrade the plan.** Hostinger **Premium cannot run the site** — it has "No
-> Web Apps". Everything below needs **Business Web Hosting** (or a Cloud plan). Nothing here can be
-> done until the upgrade is on the account. Tell Claude once it is.
+> **Waiting, as of 7 November 2026 (D-066).** You decided not to upgrade for now, so prajzo.com
+> keeps its WordPress site and the platform runs on your own computer with `npm run host:local`.
+> Nothing below has been done, and none of it needs doing yet.
+>
+> **When you do want it online: upgrade the plan first.** Hostinger **Premium cannot run the site** —
+> it has "No Web Apps". Everything below needs **Business Web Hosting** (or a Cloud plan). Tell
+> Claude once the upgrade is on the account. A host with a free Node.js tier is the other route;
+> ask for a comparison with prices at the time.
 
 | | Staging (test copy) | Live |
 |---|---|---|
