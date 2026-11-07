@@ -570,6 +570,8 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 
 ### D-061: The website runs on Render; domain, DNS and email stay at Hostinger
 
+> **Superseded by [D-065](#d-065-the-website-runs-on-hostinger-business-not-render) on 7 November 2026: the site runs on Hostinger Business instead. Kept as a record of what was decided and why.**
+
 - **Found:** the Hostinger plan is **Premium Web Hosting**, which says "No Web Apps": it runs PHP (the WordPress now at prajzo.com) but not a Node.js app.
 - **Your choice (27 October 2026):** option A of three (A: Render for the app; B: upgrade Hostinger to Business; C: a Hostinger VPS), and the new site **replaces the WordPress site** at prajzo.com.
 - **Decision:**
@@ -602,3 +604,12 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **The chosen category is in the address** on a live demo (`/demo/catalogue?category=Bedding`), so a filtered page can be shared and survives a reload. It replaces the current entry rather than adding one, so Back leaves the demo instead of undoing filters one at a time.
 - **Not in the builder's preview.** The same product list is drawn in the builder's preview and in an administrator's review, where the address belongs to the builder and not to the design. There the choice is only remembered in the page. An unknown category in the address (a misspelling, or a product list that has since changed) shows everything rather than nothing.
 - **An empty list says so.** A category with nothing in it offers a way back to everything; a catalogue with no products at all says that instead of drawing an empty grid, and shows no filters.
+
+### D-065: The website runs on Hostinger Business, not Render
+
+- **Your choice (7 November 2026):** host on Hostinger with the correct plan, and tell Claude once the upgrade is done. This replaces D-061 (Render) and ends the pause in D-062.
+- **Why:** billed in rupees on an account you already have, no card in US dollars, and the domain, DNS and mailbox are already there, so going live changes fewer things at once. The cost is that a web app sleeps when nobody visits and wakes on the next request, which suits this site.
+- **Premium cannot do it.** Hostinger Premium has "No Web Apps". **Business** (or a Cloud plan) is required, and nothing can be set up before the upgrade is on the account.
+- **No code change was needed:** the server already listens on `process.env.PORT` and binds to every interface, the entry file is `apps/api/dist/server.js`, and `TRUST_PROXY=true` is right for Hostinger's proxy just as it was for Render's. The settings files that `Prepare staging/live settings.cmd` write are plain `KEY=value` lines and suit either host, so they keep their `.env.render-*` names for now.
+- **Nothing depends on a timer**, which matters because the app sleeps: there is no `setInterval` in the server, and demo messages are deleted after 7 days by a MongoDB TTL index (`expireAfterSeconds`), inside the database, not by us.
+- **Open, and settled before customers upload pictures:** builder uploads are written to the app's own disk, which a redeploy replaces. Likely answer is to keep them in Atlas (GridFS), already backed up by D-059. See the "Known gap" section of [DEPLOYMENT.md](DEPLOYMENT.md).
