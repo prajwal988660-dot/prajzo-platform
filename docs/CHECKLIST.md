@@ -359,20 +359,20 @@ Built 28-29 October 2026 on branch `phase-9-builder`. Left: putting it online (w
 
 ## Phase 12: Demo 4 (Product Catalogue, `/demo/catalogue`)
 
-- [ ] Your approval of the design brief
-- [ ] Template definition and default content, with sample products labelled as demonstration content
-- [ ] Hero; category filters kept in the URL; product cards; product details; empty state when a filter matches nothing
-- [ ] Enquiry and quotation request, saved on the server with honest success and error states
-- [ ] WhatsApp enquiry: in demo mode it shows the message it would send; on a customer's site it opens their number. No payments.
-- [ ] Builder integration, including editing the product list; preview image; catalogue entries
-- [ ] Tests:
-  - [ ] Filters
-  - [ ] Product details
-  - [ ] Enquiry form states
-  - [ ] End to end: live demo
-  - [ ] End to end: Customize This Design
-- [ ] Responsive check at 390, 768 and 1280 px; keyboard check
-- [ ] Summary with the tests that ran
+- [ ] Your approval of the design brief ([the brief](https://claude.ai/artifact/TMNw6JJ2VQ2z22o7iqhSTN); built with look A, Indigo, until you choose)
+- [x] Template definition and default content, with sample products labelled as demonstration content
+- [x] Hero; category filters kept in the URL; product cards; product details; empty state when a filter matches nothing
+- [x] Enquiry and quotation request, saved on the server with honest success and error states
+- [x] WhatsApp enquiry: in demo mode it shows the message it would send; on a customer's site it opens their number. No payments.
+- [x] Builder integration, including editing the product list; preview image; catalogue entries
+- [x] Tests:
+  - [x] Filters, including a shared link to a category and an address asking for one that does not exist
+  - [x] Product details
+  - [x] Enquiry form states
+  - [x] End to end: live demo
+  - [x] End to end: Customize This Design
+- [x] Responsive check at 390, 768 and 1280 px; keyboard check
+- [x] Summary with the tests that ran
 - [ ] **(gate)** Demo approval
 
 ## Phase 13: Demo 5 (Forms and Quick Solutions, `/demo/forms`)

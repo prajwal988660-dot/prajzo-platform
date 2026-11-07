@@ -1,5 +1,6 @@
 import type { Section, WebsiteConfig } from '@prajzo/shared';
 import { useId, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { useSite } from './context';
 import { DemoAction } from './DemoAction';
 import { useEnquiry } from './enquiry-context';
@@ -20,6 +21,34 @@ function enquiryTarget(config: WebsiteConfig): string | undefined {
 }
 
 type Product = Extract<Section, { type: 'products' }>['content']['items'][number];
+
+/**
+ * The chosen category. On a live demo it is kept in the address (`?category=Bedding`), so a
+ * filtered page can be shared and survives a reload. In the builder's preview and in review the
+ * address belongs to the builder, not the design, so the choice is only remembered here.
+ */
+function useCategoryFilter(categories: string[]): [string | null, (next: string | null) => void] {
+  const { mode } = useSite();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [remembered, setRemembered] = useState<string | null>(null);
+
+  if (mode !== 'demo') return [remembered, setRemembered];
+
+  // An unknown or misspelled category in the address shows everything rather than nothing.
+  const asked = searchParams.get('category');
+  const chosen = asked && categories.includes(asked) ? asked : null;
+
+  return [
+    chosen,
+    (next: string | null) => {
+      const params = new URLSearchParams(searchParams);
+      if (next === null) params.delete('category');
+      else params.set('category', next);
+      // The filter is not a new page: Back should leave the demo, not undo each filter.
+      setSearchParams(params, { replace: true, preventScrollReset: true });
+    },
+  ];
+}
 
 function ProductCard({ product, enquireAt }: { product: Product; enquireAt: string | undefined }) {
   const { config, mode } = useSite();
@@ -87,7 +116,7 @@ export function ProductsSection({ section }: Props<'products'>) {
   const { config } = useSite();
   const { content } = section;
   const categories = [...new Set(content.items.map((product) => product.category))];
-  const [filter, setFilter] = useState<string | null>(null);
+  const [filter, setFilter] = useCategoryFilter(categories);
   const shown = filter
     ? content.items.filter((product) => product.category === filter)
     : content.items;
@@ -115,13 +144,24 @@ export function ProductsSection({ section }: Props<'products'>) {
           ? `Showing ${String(shown.length)} in ${filter}`
           : `Showing all ${String(shown.length)}`}
       </p>
-      <ul className="ps-products">
-        {shown.map((product) => (
-          <li key={product.id}>
-            <ProductCard product={product} enquireAt={enquireAt} />
-          </li>
-        ))}
-      </ul>
+      {shown.length ? (
+        <ul className="ps-products">
+          {shown.map((product) => (
+            <li key={product.id}>
+              <ProductCard product={product} enquireAt={enquireAt} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="ps-empty">
+          {filter ? `Nothing in ${filter} just now.` : 'No products yet.'}{' '}
+          {filter ? (
+            <button type="button" className="ps-link-button" onClick={() => setFilter(null)}>
+              Show everything
+            </button>
+          ) : null}
+        </p>
+      )}
     </SectionShell>
   );
 }

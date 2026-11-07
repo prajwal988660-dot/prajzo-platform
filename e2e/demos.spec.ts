@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { signUpQuietly, uniqueEmail } from './helpers';
 
 /**
  * The Portfolio live demo (Phase 8), in a real browser on a computer and a phone, against the
@@ -121,6 +122,8 @@ test.describe('the Product Catalogue live demo', () => {
     );
     await expect(products.getByRole('article')).toHaveCount(3);
     await expect(page.getByRole('status')).toContainText('Showing 3 in Bedding');
+    // The choice is in the address, so the filtered page can be shared or reloaded.
+    await expect(page).toHaveURL(/\/demo\/catalogue\?category=Bedding$/);
 
     // "Details" opens the measurements for one product, without leaving the page.
     const quilt = products.getByRole('article').filter({ hasText: 'Kantha-stitch quilt' });
@@ -145,6 +148,25 @@ test.describe('the Product Catalogue live demo', () => {
     );
   });
 
+  test('a shared link to a category opens already filtered', async ({ page }) => {
+    await page.goto('/demo/catalogue?category=Table%20linen');
+    const products = page
+      .getByRole('list')
+      .filter({ has: page.getByRole('article') })
+      .first();
+    await expect(products.getByRole('article')).toHaveCount(3);
+    await expect(
+      page
+        .getByRole('group', { name: 'Show products by category' })
+        .getByRole('button', { name: 'Table linen' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    // Going back to everything clears it from the address again.
+    await page.getByRole('button', { name: 'All' }).click();
+    await expect(products.getByRole('article')).toHaveCount(9);
+    await expect(page).toHaveURL(/\/demo\/catalogue$/);
+  });
+
   test('an enquiry without a product asks for one instead of sending', async ({ page }) => {
     await page.goto('/demo/catalogue');
     const form = page.getByRole('form', { name: 'Enquiry form' });
@@ -158,6 +180,21 @@ test.describe('the Product Catalogue live demo', () => {
     await form.getByRole('button', { name: 'Send enquiry' }).click();
     await expect(form.getByLabel('Product')).toHaveAttribute('aria-invalid', 'true');
     expect(posted).toBe(false);
+  });
+
+  test('Customize This Design opens the builder on the Catalogue design', async ({
+    page,
+  }, testInfo) => {
+    await signUpQuietly(page, uniqueEmail('catalogue', testInfo.project.name));
+    await page.goto('/demo/catalogue');
+    await page.getByRole('link', { name: 'Customize This Design' }).click();
+    await expect(page).toHaveURL(/\/build\?template=catalogue$/);
+
+    // The builder starts from this design, not an empty one.
+    const editor = page.getByRole('region', { name: 'Edit your website' });
+    await expect(editor.getByLabel('Heading', { exact: true }).first()).toHaveValue(
+      'Cotton for every room, woven by hand.',
+    );
   });
 
   test('WhatsApp about a product explains instead of contacting anyone', async ({ page }) => {

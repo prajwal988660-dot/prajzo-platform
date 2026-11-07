@@ -595,3 +595,10 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Light for the rest of the site.** Templates have their own import path (`@prajzo/shared/templates`) and each demo typeface is loaded only when a design uses it, so the main website downloads none of it. Checked in the build: the demo's content is only in the demo page's file.
 - **Nothing contacts anyone.** Email, phone, WhatsApp, social and outside links on a demo are buttons that say what would happen on a real site. The contact form really sends, to the demo inbox only (D-014).
 - **The Portfolio design brief** (Daylight, Night Shift, Botanical; Tara Vaidya; nine sections) was built while waiting for your choice of starting look, which is a one-line change. Two accent colours were darkened slightly so small accent text meets WCAG AA in every look.
+
+### D-064: A catalogue without a checkout, and where the chosen category is kept
+
+- **No payments, ever, in a demo.** The Product Catalogue (Phase 12) shows products and prices and then asks for an enquiry: there is no basket and no checkout. A price is a note ("₹650"), not a charge. WhatsApp on a product shows the message it would send (D-014); on a customer's own site it would open their number.
+- **The chosen category is in the address** on a live demo (`/demo/catalogue?category=Bedding`), so a filtered page can be shared and survives a reload. It replaces the current entry rather than adding one, so Back leaves the demo instead of undoing filters one at a time.
+- **Not in the builder's preview.** The same product list is drawn in the builder's preview and in an administrator's review, where the address belongs to the builder and not to the design. There the choice is only remembered in the page. An unknown category in the address (a misspelling, or a product list that has since changed) shows everything rather than nothing.
+- **An empty list says so.** A category with nothing in it offers a way back to everything; a catalogue with no products at all says that instead of drawing an empty grid, and shows no filters.
