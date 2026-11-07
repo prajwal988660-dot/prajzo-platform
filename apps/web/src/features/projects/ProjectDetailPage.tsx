@@ -39,7 +39,9 @@ function ProjectDetailView({ reference }: { reference: string }) {
   // The project after the customer did something, so the page shows the new state at once.
   const [changed, setChanged] = useState<ProjectDetail | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const project = changed ?? loaded.data?.project ?? null;
+  // `previous` keeps the project on the screen while it is loaded again after a refused action, so
+  // the notice saying why nothing changed is not replaced by a spinner.
+  const project = changed ?? loaded.data?.project ?? loaded.previous?.project ?? null;
   usePageTitle(project?.title ?? 'Project');
 
   const { retry } = loaded;
@@ -57,7 +59,9 @@ function ProjectDetailView({ reference }: { reference: string }) {
     [retry],
   );
 
-  if (loaded.status === 'loading') {
+  // Only when there is nothing to show yet, so a reload after a refused action keeps the project
+  // and the notice explaining it.
+  if (loaded.status === 'loading' && !project) {
     return (
       <Container className="py-16">
         <LoadingBlock label="Loading your project" />

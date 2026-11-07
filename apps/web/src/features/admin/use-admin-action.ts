@@ -42,11 +42,17 @@ export function useAdminProjectAction(
         onDone(project, notice);
         return { ok: true };
       } catch (error) {
+        // Out of date: the page keeps that explanation and moves focus to it, so this panel does
+        // not show the same words a second time.
+        if (error instanceof ApiError && error.status === 409) {
+          setState({ kind: 'idle' });
+          onOutOfDate(error.message);
+          return { ok: false, error };
+        }
         setState({
           kind: 'failed',
           message: submitErrorMessage(error, 'Something went wrong. Please try again.'),
         });
-        if (error instanceof ApiError && error.status === 409) onOutOfDate(error.message);
         return { ok: false, error };
       }
     },

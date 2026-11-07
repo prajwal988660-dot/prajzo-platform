@@ -10,9 +10,20 @@ export type ApiState<T> =
 /**
  * Loads `path` from the API when the component appears, with loading, success and error states
  * and a `retry` function. `schema` must be defined outside the component (it is a dependency).
+ *
+ * `previous` is what was loaded last time, kept while a `retry` is in flight. `status` still goes
+ * back to `loading`, so a page that only looks at `status` behaves exactly as before; a page that
+ * has something on the screen worth keeping (a message explaining why an action was refused, say)
+ * can show `data ?? previous` instead of replacing it all with a spinner.
  */
-export function useApi<T>(path: string, schema: z.ZodType<T>): ApiState<T> & { retry: () => void } {
+export function useApi<T>(
+  path: string,
+  schema: z.ZodType<T>,
+): ApiState<T> & { previous?: T; retry: () => void } {
   const [state, setState] = useState<ApiState<T>>({ status: 'loading' });
+  // What was loaded before a retry, remembered with the address it came from: a different address
+  // is a different thing, so nothing from the last one is offered for it.
+  const [kept, setKept] = useState<{ path: string; data: T } | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -32,10 +43,14 @@ export function useApi<T>(path: string, schema: z.ZodType<T>): ApiState<T> & { r
     return () => request.abort();
   }, [path, schema, attempt]);
 
+  const loadedData = state.status === 'success' ? state.data : undefined;
   const retry = useCallback(() => {
+    // Keep what is on the screen, so a reload after a refused action does not blank the page.
+    if (loadedData !== undefined) setKept({ path, data: loadedData });
     setState({ status: 'loading' });
     setAttempt((count) => count + 1);
-  }, []);
+  }, [loadedData, path]);
 
-  return { ...state, retry };
+  const previous = kept?.path === path ? kept.data : undefined;
+  return { ...state, previous, retry };
 }
