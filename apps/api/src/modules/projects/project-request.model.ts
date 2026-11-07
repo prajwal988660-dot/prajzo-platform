@@ -3,6 +3,7 @@ import {
   projectFeatures,
   projectIntegrations,
   projectStatuses,
+  templateKeys,
 } from '@prajzo/shared';
 import { model, Schema, type HydratedDocument, type InferSchemaType } from 'mongoose';
 
@@ -83,6 +84,23 @@ const contactSchema = new Schema(
   { _id: false },
 );
 
+/**
+ * A frozen copy of the design a request was built from (Phase 14). `config` is stored as it was
+ * checked by the shared schema (D-004) and is checked again before it is ever drawn, so a design
+ * saved under an older template version can still be read.
+ */
+const designSchema = new Schema(
+  {
+    /** Which saved design it came from, for support questions. May since have been deleted. */
+    savedDesignId: { type: Schema.Types.ObjectId, ref: 'SavedDesign', required: true },
+    name: { type: String, required: true, trim: true, maxlength: 60 },
+    templateKey: { type: String, required: true, enum: templateKeys },
+    templateVersion: { type: Number, required: true },
+    config: { type: Schema.Types.Mixed, required: true },
+  },
+  { _id: false },
+);
+
 const projectRequestSchema = new Schema(
   {
     /** What the customer and Prajzo quote to each other, for example PRZ-2026-0001. */
@@ -131,8 +149,16 @@ const projectRequestSchema = new Schema(
     /** The customer answered a question and nobody has moved the project on since. */
     customerReplyPending: { type: Boolean, default: false },
     adminNotes: { type: [adminNoteSchema], default: [] },
+    /**
+     * The design this request was built from (Phase 14), frozen as it was when it was sent. The
+     * customer may change or delete the saved design afterwards; what was asked for must not
+     * change with it, so this is a copy and never a reference to be read later.
+     */
+    design: { type: designSchema },
   },
-  { timestamps: true },
+  // minimize: false so the frozen design's configuration keeps any empty objects in it; without
+  // it Mongoose drops them and the design would not be drawn as it was saved.
+  { timestamps: true, minimize: false },
 );
 projectRequestSchema.index({ customerId: 1, createdAt: -1 });
 projectRequestSchema.index({ status: 1, updatedAt: -1 });

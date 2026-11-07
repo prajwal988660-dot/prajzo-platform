@@ -1,4 +1,5 @@
 import {
+  designSubmissionSchema,
   formatRupees,
   paginationQuerySchema,
   projectActionRequestSchema,
@@ -25,6 +26,7 @@ import {
   replyToQuestion,
   requestRevision,
   signOff,
+  submitDesignAsProject,
 } from './project-request.service';
 import { toProjectDetail } from './project-view';
 
@@ -87,6 +89,22 @@ export function projectRequestRouter({
     const input = projectRequestSchema.parse(req.body);
     const project = await createProjectRequest(customer, input);
     req.log.info({ userId: customer.id, reference: project.reference }, 'Project request received');
+    await effects.projectSent(req, customer, project);
+
+    const body: ProjectResponse = { project: toProjectDetail(project) };
+    res.status(201).json(body);
+  });
+
+  // One of the customer's own saved designs, sent as a project request (Phase 14). It counts
+  // against the same hourly limit as the form: both make a project request.
+  router.post('/from-design', requireCustomer, limitSending, async (req, res) => {
+    const customer = currentUser(res.locals);
+    const input = designSubmissionSchema.parse(req.body);
+    const project = await submitDesignAsProject(customer, input);
+    req.log.info(
+      { userId: customer.id, reference: project.reference, designId: input.designId },
+      'Project request received from a saved design',
+    );
     await effects.projectSent(req, customer, project);
 
     const body: ProjectResponse = { project: toProjectDetail(project) };

@@ -1,14 +1,17 @@
 import {
   canChangeStatus,
   projectReferencePattern,
+  type DesignSubmission,
   type PaginationQuery,
   type ProjectList,
   type ProjectRequest,
 } from '@prajzo/shared';
+import { templateFor } from '@prajzo/shared/templates';
 import mongoose from 'mongoose';
 import { AppError } from '../../lib/errors';
 import type { UserDocument } from '../auth/user.model';
 import { findActiveCategoryTitle, findActivePackageName } from '../catalogue/catalogue.service';
+import { checkedConfig, ownDesign } from '../designs/designs.service';
 import { ProjectRequestModel, type ProjectRequestDocument } from './project-request.model';
 import { toProjectSummary } from './project-view';
 import { nextProjectReference } from './reference';
@@ -58,6 +61,88 @@ export async function createProjectRequest(
     contactPreference: input.contactPreference,
     contact: { name: customer.name, email: customer.email, phone: input.phone },
     notes: input.notes,
+    status: 'received',
+    statusHistory: [
+      {
+        from: null,
+        to: 'received',
+        by: 'customer',
+        userId: customer._id,
+        byName: customer.name,
+        at: new Date(),
+      },
+    ],
+  });
+}
+
+/**
+ * Sends one of the customer's own saved designs as a project request (Phase 14).
+ *
+ * The design is read through the designs service, so "someone else's design" is answered exactly
+ * as "no such design" and nobody can learn which ids exist. Its configuration is checked again
+ * before anything is stored, because a design saved earlier may have been written under an older
+ * template version, and because what is in the database is never trusted on the way out. A frozen
+ * copy is kept on the request: the customer may change or delete the design afterwards, and what
+ * they asked for must not change with it.
+ */
+export async function submitDesignAsProject(
+  customer: UserDocument,
+  input: DesignSubmission,
+): Promise<ProjectRequestDocument> {
+  const design = await ownDesign(customer, input.designId);
+  // Checked again on the way out of the database, and it names the template it belongs to.
+  const config = checkedConfig(design.config);
+
+  const fields: Record<string, string> = {};
+  const categoryTitle =
+    input.categoryKey === 'other'
+      ? 'Something else'
+      : await findActiveCategoryTitle(input.categoryKey);
+  if (!categoryTitle) fields.categoryKey = 'Choose a website type from the list';
+  const packageName =
+    !input.packageKey || input.packageKey === 'not-sure'
+      ? null
+      : await findActivePackageName(input.packageKey);
+  if (input.packageKey && input.packageKey !== 'not-sure' && !packageName) {
+    fields.packageKey = 'Choose a package from the list';
+  }
+  if (!categoryTitle || Object.keys(fields).length > 0) {
+    throw new AppError(400, 'VALIDATION_FAILED', 'Some details need fixing.', fields);
+  }
+
+  // Written from the design rather than typed, so a request always describes what was really sent.
+  const pages = config.pages.filter((page) => page.enabled);
+  const pageNames = pages.map((page) => page.title).join(', ');
+  const description =
+    `Built with the website builder from the ${templateFor(config.template.key)?.name ?? config.template.key} design.\n\n` +
+    `Website name: ${config.site.name}\n` +
+    `Pages (${String(pages.length)}): ${pageNames}\n` +
+    `Colours: ${config.design.colors.primary} with ${config.design.colors.accent}\n` +
+    `Typefaces: ${config.design.fonts.heading} for headings, ${config.design.fonts.body} for text`;
+
+  const reference = await nextProjectReference();
+  return ProjectRequestModel.create({
+    reference,
+    customerId: customer._id,
+    source: 'builder',
+    title: design.name,
+    categoryKey: input.categoryKey,
+    categoryTitle,
+    ...(packageName ? { packageKey: input.packageKey, packageName } : {}),
+    description,
+    features: [],
+    integrations: [],
+    preferredDate: input.preferredDate,
+    contactPreference: input.contactPreference,
+    contact: { name: customer.name, email: customer.email, phone: input.phone },
+    notes: input.notes,
+    design: {
+      savedDesignId: design._id,
+      name: design.name,
+      templateKey: config.template.key,
+      templateVersion: config.template.version,
+      config,
+    },
     status: 'received',
     statusHistory: [
       {
