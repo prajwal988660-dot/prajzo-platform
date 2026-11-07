@@ -353,21 +353,28 @@ test.describe('two people working on one project', () => {
   test('a page that is out of date says why nothing changed, and shows the project as it is now', async ({
     page,
   }, testInfo) => {
+    // A customer registers and sends a project, then an administrator works on it from two pages
+    // at once: too many steps for the 30-second default under a full parallel run.
+    test.setTimeout(120_000);
     await signUpQuietly(page, uniqueEmail('stale', testInfo.project.name));
     const reference = await sendProjectQuietly(page);
     await signOutQuietly(page);
     await signInAsAdminQuietly(page);
 
-    // Two pages are open on the same project, both showing "Request Received".
+    // Two pages are open on the same project, both showing "Request Received". The first load of
+    // an administration page pulls a few hundred separate modules from the development server
+    // (there is no bundle in these tests), which takes well over the usual ten seconds when the
+    // whole suite is running at once, so both pages are given longer to appear.
+    const slowFirstLoad = { timeout: 60_000 };
     const other = await page.context().newPage();
     await other.goto(`/admin/projects/${reference}`);
     await expect(
       other.getByRole('heading', { level: 1, name: 'Website for my studio' }),
-    ).toBeVisible();
+    ).toBeVisible(slowFirstLoad);
     await page.goto(`/admin/projects/${reference}`);
     await expect(
       page.getByRole('heading', { level: 1, name: 'Website for my studio' }),
-    ).toBeVisible();
+    ).toBeVisible(slowFirstLoad);
 
     // One moves it on...
     await plainMove(other, 'Under Review');

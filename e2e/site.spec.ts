@@ -75,30 +75,37 @@ test('unknown addresses show the 404 page', async ({ page }) => {
   await expect(page).toHaveURL('/');
 });
 
-test('no page scrolls sideways', async ({ page }) => {
-  for (const path of [
-    '/',
-    '/services',
-    '/how-it-works',
-    '/pricing',
-    '/about',
-    '/contact',
-    '/privacy',
-    '/terms',
-    '/demo/portfolio',
-    '/demo/business',
-    '/demo/event',
-    '/templates/event',
-    '/templates/business',
-    '/templates',
-    '/templates/portfolio',
-    '/projects',
-  ]) {
+/**
+ * One test per page rather than one long loop: sixteen page loads in a single test ran into the
+ * 30-second limit when the whole suite is running at once, which looked like a layout fault when
+ * it was only slowness. Each page also names itself when it fails.
+ */
+for (const path of [
+  '/',
+  '/services',
+  '/how-it-works',
+  '/pricing',
+  '/about',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/demo/portfolio',
+  '/demo/business',
+  '/demo/event',
+  '/demo/catalogue',
+  '/templates/event',
+  '/templates/business',
+  '/templates',
+  '/templates/portfolio',
+  '/templates/catalogue',
+  '/projects',
+]) {
+  test(`${path} does not scroll sideways`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow, `${path} is wider than the screen`).toBeLessThanOrEqual(0);
-  }
-});
+  });
+}
