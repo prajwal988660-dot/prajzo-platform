@@ -621,3 +621,10 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **What this means day to day:** the platform runs on your own computer with `npm run host:local` (http://localhost:8080, and on your phone over the same Wi-Fi). It keeps being built, phase by phase, exactly as before. Nothing is thrown away and nothing is spent.
 - **What is already ready for the day it goes online:** [DEPLOYMENT.md](DEPLOYMENT.md) (written for Hostinger Business), the settings launchers, real email (D-060), backups (D-059). No code change is needed to run on Hostinger (D-065).
 - **When money allows**, there are two routes and neither is urgent: upgrade to Hostinger Business (billed in rupees, D-065), or a host with a free tier that runs Node.js. Ask for a comparison with real prices at the time rather than relying on numbers from today.
+
+### D-067: Phase 13 waits for your own design and content
+
+- **Your choice (7 November 2026):** "skip demo i will give u the demo template and content" — Phase 13 (the Forms and Quick Solutions demo) is held until you hand over the design and the words for it. No design brief is written for it, and no template code is guessed at.
+- **Why this is fine:** the five demos are a showcase, not something the platform needs in order to work. Phases 8 to 12 already prove the template engine, the builder and the renderer with four demos. Phase 13 adds a fifth; it blocks nothing.
+- **What is still true for it when it comes:** a new template is `packages/shared/src/templates/<key>.ts` plus the registry, the two key lists in `routes.tsx`, the entries in `site-pages.ts`, the catalogue defaults, the demo-pictures and preview scripts, and the tests that count templates. The forms themselves already exist (contact in Phase 8, registration in Phase 11, enquiry in Phase 12), so a Forms demo is mostly arrangement, not new machinery.
+- **Order now:** Phase 14 (sending a design as a project request) is built first, as it needs nothing from you. Phase 13 is picked up when you give the design and content.

@@ -262,6 +262,7 @@ export function sampleAdminProject(
   return {
     ...shared,
     source: 'start-form',
+    design: null,
     customer: {
       id: 'user-1',
       name: 'Asha Rao',

@@ -233,6 +233,15 @@ export function toAdminProjectDetail(project: ProjectRequestDocument): AdminProj
   return adminProjectDetailSchema.parse({
     ...commonDetails(project),
     source: project.source,
+    // Sent from the builder (Phase 14): the frozen design, so an admin sees what was asked for.
+    design: project.design
+      ? {
+          name: project.design.name,
+          templateKey: project.design.templateKey,
+          templateVersion: project.design.templateVersion,
+          config: project.design.config as unknown,
+        }
+      : null,
     customer: {
       id: project.customerId.toString(),
       name: project.contact.name,

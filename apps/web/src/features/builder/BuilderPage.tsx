@@ -22,6 +22,7 @@ import { useAuth } from '../auth/auth-context';
 import { clearDraft, readDraft, writeDraft } from './drafts';
 import { PreviewFrame, devices, type Device } from './PreviewFrame';
 import { SaveStep } from './SaveStep';
+import { SendStep } from './SendStep';
 import { UploadButton } from './UploadButton';
 import { ContentStep, DesignStep, SectionsStep, SiteStep } from './steps';
 import { useBuilder } from './use-builder';
@@ -34,6 +35,7 @@ const steps = [
   { key: 'design', label: 'Design' },
   { key: 'preview', label: 'Preview' },
   { key: 'save', label: 'Save' },
+  { key: 'send', label: 'Send' },
 ] as const;
 type Step = (typeof steps)[number]['key'];
 
@@ -198,7 +200,12 @@ function Workspace({
   );
   const builder = useBuilder(template, initial);
   const { user } = useAuth();
-  const [step, setStep] = useState<Step>('content');
+  // ?step=send opens straight on a step, so "Send as a project" on a saved design can link to it.
+  const [stepParams] = useSearchParams();
+  const asked = stepParams.get('step');
+  const [step, setStep] = useState<Step>(() =>
+    steps.some((item) => item.key === asked) ? (asked as Step) : 'content',
+  );
   const [device, setDevice] = useState<Device>('desktop');
   const [design, setDesign] = useState(initialDesign);
   const [showRestored, setShowRestored] = useState(restored);
@@ -262,6 +269,7 @@ function Workspace({
         />
       )}
       {step === 'design' && <DesignStep builder={builder} template={template} />}
+      {step === 'send' && <SendStep builder={builder} template={template} design={design} />}
       {step === 'save' && (
         <SaveStep builder={builder} template={template} design={design} onSaved={setDesign} />
       )}
