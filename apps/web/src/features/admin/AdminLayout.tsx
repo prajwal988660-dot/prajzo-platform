@@ -1,6 +1,7 @@
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
+import { ScrollMemory } from '../../components/layout/ScrollMemory';
 import { Container } from '../../components/layout/Container';
 import { FocusOnNavigation } from '../../components/layout/FocusOnNavigation';
 import { Logo } from '../../components/layout/Logo';
@@ -115,7 +116,7 @@ export function AdminLayout() {
         <Outlet />
       </main>
       <FocusOnNavigation />
-      <ScrollRestoration />
+      <ScrollMemory />
     </div>
   );
 }

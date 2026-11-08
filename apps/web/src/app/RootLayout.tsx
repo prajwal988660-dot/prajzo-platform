@@ -1,5 +1,6 @@
-import { Outlet, ScrollRestoration } from 'react-router';
+import { Outlet } from 'react-router';
 import { FocusOnNavigation } from '../components/layout/FocusOnNavigation';
+import { ScrollMemory } from '../components/layout/ScrollMemory';
 import { NavigationProgress } from '../components/layout/NavigationProgress';
 import { SiteFooter } from '../components/layout/SiteFooter';
 import { SiteHeader } from '../components/layout/SiteHeader';
@@ -20,7 +21,7 @@ export function RootLayout() {
       </main>
       <SiteFooter />
       <WhatsAppButton />
-      <ScrollRestoration />
+      <ScrollMemory />
     </div>
   );
 }
