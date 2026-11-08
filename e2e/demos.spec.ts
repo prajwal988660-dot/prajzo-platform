@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { signUpQuietly, uniqueEmail } from './helpers';
 
 /**
  * The Portfolio live demo (Phase 8), in a real browser on a computer and a phone, against the
@@ -88,6 +89,124 @@ test.describe('the Portfolio live demo', () => {
     // The real 404 status is checked on the production build (e2e-production/build.spec.ts).
     await page.goto('/demo/not-a-template');
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
+  });
+});
+
+/**
+ * The Product Catalogue live demo (Phase 12): a catalogue without a checkout, so the thing that
+ * has to work is the enquiry. Products are marked Sample, "Enquire" carries the product into the
+ * form, and WhatsApp explains instead of contacting anyone (D-014).
+ */
+test.describe('the Product Catalogue live demo', () => {
+  test('a visitor filters by category, then enquires about a product and it is saved', async ({
+    page,
+  }) => {
+    await page.goto('/demo/catalogue');
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cotton for every room, woven by hand.' }),
+    ).toBeVisible();
+
+    // All nine products to start with, each one marked as a sample.
+    const products = page
+      .getByRole('list')
+      .filter({ has: page.getByRole('article') })
+      .first();
+    await expect(products.getByRole('article')).toHaveCount(9);
+
+    // Filtering by category narrows the list, and says so for a screen reader.
+    const filters = page.getByRole('group', { name: 'Show products by category' });
+    await filters.getByRole('button', { name: 'Bedding' }).click();
+    await expect(filters.getByRole('button', { name: 'Bedding' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(products.getByRole('article')).toHaveCount(3);
+    await expect(page.getByRole('status')).toContainText('Showing 3 in Bedding');
+    // The choice is in the address, so the filtered page can be shared or reloaded.
+    await expect(page).toHaveURL(/\/demo\/catalogue\?category=Bedding$/);
+
+    // "Details" opens the measurements for one product, without leaving the page.
+    const quilt = products.getByRole('article').filter({ hasText: 'Kantha-stitch quilt' });
+    await quilt.getByRole('button', { name: 'Details' }).click();
+    await expect(quilt.getByText('Hand stitched, takes 3 weeks')).toBeVisible();
+
+    // "Enquire" goes to the form with that product already chosen.
+    await quilt.getByRole('link', { name: 'Enquire about the Kantha-stitch quilt' }).click();
+    const form = page.getByRole('form', { name: 'Enquiry form' });
+    await expect(form.getByLabel('Product')).toHaveValue('Kantha-stitch quilt');
+
+    await form.getByLabel('Name').fill('Asha Test');
+    await form.getByLabel('Email').fill('asha@example.com');
+    await form.getByLabel('Phone (optional)').fill('+91 99999 99999');
+    await form.getByLabel('How many (optional)').fill('2');
+    await form.getByLabel('Anything else? (optional)').fill('Do you have this in a lighter blue?');
+    const sent = page.waitForResponse('**/api/v1/demo-submissions');
+    await form.getByRole('button', { name: 'Send enquiry' }).click();
+    expect((await sent).status()).toBe(201);
+    await expect(form.getByRole('status')).toContainText(
+      'Thank you. Your enquiry about the Kantha-stitch quilt was received. We will reply within a day.',
+    );
+  });
+
+  test('a shared link to a category opens already filtered', async ({ page }) => {
+    await page.goto('/demo/catalogue?category=Table%20linen');
+    const products = page
+      .getByRole('list')
+      .filter({ has: page.getByRole('article') })
+      .first();
+    await expect(products.getByRole('article')).toHaveCount(3);
+    await expect(
+      page
+        .getByRole('group', { name: 'Show products by category' })
+        .getByRole('button', { name: 'Table linen' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    // Going back to everything clears it from the address again.
+    await page.getByRole('button', { name: 'All' }).click();
+    await expect(products.getByRole('article')).toHaveCount(9);
+    await expect(page).toHaveURL(/\/demo\/catalogue$/);
+  });
+
+  test('an enquiry without a product asks for one instead of sending', async ({ page }) => {
+    await page.goto('/demo/catalogue');
+    const form = page.getByRole('form', { name: 'Enquiry form' });
+    await form.getByLabel('Name').fill('Kiran Test');
+    await form.getByLabel('Email').fill('kiran@example.com');
+
+    let posted = false;
+    page.on('request', (request) => {
+      if (request.url().includes('/demo-submissions')) posted = true;
+    });
+    await form.getByRole('button', { name: 'Send enquiry' }).click();
+    await expect(form.getByLabel('Product')).toHaveAttribute('aria-invalid', 'true');
+    expect(posted).toBe(false);
+  });
+
+  test('Customize This Design opens the builder on the Catalogue design', async ({
+    page,
+  }, testInfo) => {
+    await signUpQuietly(page, uniqueEmail('catalogue', testInfo.project.name));
+    await page.goto('/demo/catalogue');
+    await page.getByRole('link', { name: 'Customize This Design' }).click();
+    await expect(page).toHaveURL(/\/build\?template=catalogue$/);
+
+    // The builder starts from this design, not an empty one.
+    const editor = page.getByRole('region', { name: 'Edit your website' });
+    await expect(editor.getByLabel('Heading', { exact: true }).first()).toHaveValue(
+      'Cotton for every room, woven by hand.',
+    );
+  });
+
+  test('WhatsApp about a product explains instead of contacting anyone', async ({ page }) => {
+    await page.goto('/demo/catalogue');
+    const leaving: string[] = [];
+    page.on('request', (request) => {
+      if (!request.url().startsWith('http://localhost')) leaving.push(request.url());
+    });
+    await page.getByRole('button', { name: 'WhatsApp about the Ikat cushion cover' }).click();
+    await expect(page.getByText(/this opens WhatsApp to Indigo Loom/)).toBeVisible();
+    expect(page.url()).toMatch(/\/demo\/catalogue$/);
+    expect(leaving).toEqual([]);
   });
 });
 

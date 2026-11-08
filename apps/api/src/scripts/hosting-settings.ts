@@ -1,6 +1,7 @@
 /**
- * Writes the settings for the website on Render (D-061) into a file you paste into Render's
- * "Add from .env" box, so no secret has to be typed or sent anywhere else:
+ * Writes the settings for the website on Hostinger (D-065) into a file you paste into the web
+ * app's "Environment variables", so no secret has to be typed or sent anywhere else. The file is
+ * plain KEY=value lines, which suits any host; the names below are kept for now:
  *
  *   npm run hosting:settings -w @prajzo/api -- staging   -> apps/api/.env.render-staging
  *   npm run hosting:settings -w @prajzo/api -- live      -> apps/api/.env.render-live
@@ -57,7 +58,7 @@ export function hostingSettings(
     ['APP_ORIGIN', origin],
     ['MONGODB_URI', withDatabase(dev.MONGODB_URI, database)],
     ['SESSION_SECRET', randomBytes(48).toString('base64url')],
-    // Render puts a proxy in front of the app, which says who the visitor really is.
+    // The host puts a proxy in front of the app, which says who the visitor really is.
     ['TRUST_PROXY', 'true'],
     ['ADMIN_NOTIFY_EMAIL', siteContact.email],
   ];
@@ -107,9 +108,10 @@ async function main(): Promise<void> {
       `Settings for the ${site} site written to:`,
       `  ${file}`,
       '',
-      'To use them: open the file in Notepad, select all (Ctrl+A), copy (Ctrl+C). In Render, open',
-      'the service, click Environment, then "Add from .env", paste, and Save.',
-      'Keep the file private; delete it once Render has the settings.',
+      'To use them: open the file in Notepad, select all (Ctrl+A), copy (Ctrl+C). In Hostinger,',
+      'open the web app and paste them into its Environment variables. It rebuilds by itself so',
+      'the new values take effect.',
+      'Keep the file private; delete it once Hostinger has the settings.',
       ...(stagingPassword
         ? [
             '',

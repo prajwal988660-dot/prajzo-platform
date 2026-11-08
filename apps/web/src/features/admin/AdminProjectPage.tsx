@@ -42,7 +42,9 @@ function AdminProjectView({ reference }: { reference: string }) {
   // The project after the admin did something, so the page shows the new state at once.
   const [changed, setChanged] = useState<AdminProjectDetail | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const project = changed ?? loaded.data?.project ?? null;
+  // `previous` keeps the project on the screen while it is loaded again after a refused move, so
+  // the notice saying why nothing changed is not replaced by a spinner.
+  const project = changed ?? loaded.data?.project ?? loaded.previous?.project ?? null;
   usePageTitle(project ? `${project.reference} · ${project.title}` : 'Project');
 
   const { retry } = loaded;
@@ -60,7 +62,9 @@ function AdminProjectView({ reference }: { reference: string }) {
     [retry],
   );
 
-  if (loaded.status === 'loading') {
+  // Only when there is nothing to show yet: a reload that already has the project keeps it, and
+  // the notice with it.
+  if (loaded.status === 'loading' && !project) {
     return (
       <Container className="py-16">
         <LoadingBlock label="Loading the project" />

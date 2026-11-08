@@ -3,8 +3,8 @@ import { templateKeys } from '@prajzo/shared';
 
 const demoSubmissionSchema = new Schema(
   {
-    /** A contact message, or a registration (Event demo, Phase 11). */
-    form: { type: String, enum: ['contact', 'registration'], default: 'contact' },
+    /** A contact message, a registration (Event demo) or an enquiry (Catalogue demo). */
+    form: { type: String, enum: ['contact', 'registration', 'enquiry'], default: 'contact' },
     template: { type: String, required: true, enum: templateKeys },
     name: { type: String, required: true, trim: true, maxlength: 100 },
     email: { type: String, required: true, trim: true, lowercase: true, maxlength: 200 },
@@ -12,6 +12,7 @@ const demoSubmissionSchema = new Schema(
     phone: { type: String, trim: true, maxlength: 30 },
     organisation: { type: String, trim: true, maxlength: 100 },
     choice: { type: String, trim: true, maxlength: 60 },
+    quantity: { type: Number, min: 1, max: 10_000 },
     status: { type: String, enum: ['new', 'read'], default: 'new' },
     /** MongoDB deletes the submission at this time by itself (D-014). */
     expiresAt: { type: Date, required: true },

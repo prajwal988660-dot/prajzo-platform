@@ -15,7 +15,7 @@ import { chromium } from '@playwright/test';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const site = process.argv[2] ?? 'http://localhost:8080';
-const demos = ['portfolio', 'business', 'event'];
+const demos = ['portfolio', 'business', 'event', 'catalogue'];
 
 // The installed Chrome on this PC (as the tests use); the downloaded one on GitHub.
 const browser = await chromium.launch(process.env.CI ? {} : { channel: 'chrome' });

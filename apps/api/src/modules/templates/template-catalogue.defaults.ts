@@ -86,4 +86,26 @@ export const defaultTemplateEntries: Partial<
     previewAlt:
       'The College and Event demo on a computer screen: the fest’s name on a violet banner, with date, time and venue cards below.',
   },
+  catalogue: {
+    name: 'Product Catalogue',
+    tagline: 'Show your products and take enquiries, with no checkout to run.',
+    description:
+      'Products with pictures, prices and details, filtered by category. Visitors ask about a product with an enquiry form or on WhatsApp, and you reply with the price and delivery. No payments on the website. Three looks to start from, and it works on phones, tablets and computers.',
+    categories: ['ecommerce'],
+    features: [
+      'Products with pictures, prices and details',
+      'Filter by category',
+      'Enquire about a product in one tap',
+      'WhatsApp enquiry with the product in the message',
+      'Enquiry form with quantity, saved on the server',
+      'Why buy from us highlights',
+      'No checkout or payments to manage',
+      'Three looks: Indigo, Market Day and Charcoal',
+    ],
+    featured: true,
+    published: true,
+    order: 4,
+    previewAlt:
+      'The Product Catalogue demo on a computer screen: a handloom shop’s headline beside a stack of woven cloths, with its products below.',
+  },
 };

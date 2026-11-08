@@ -135,7 +135,72 @@ const business = [
   })),
 ];
 
-const sets = { portfolio, business };
+/** Demo 4: a handloom textile shop (all made up). Each product is a woven pattern. */
+const weave = (kind, main, second) => {
+  if (kind === 'stripes') {
+    return Array.from(
+      { length: 8 },
+      (_, i) =>
+        `<rect x="${String(90 + i * 54)}" y="90" width="${i % 2 ? 16 : 30}" height="420" fill="${i % 3 ? main : second}"/>`,
+    ).join('');
+  }
+  if (kind === 'checks') {
+    return (
+      Array.from(
+        { length: 6 },
+        (_, i) =>
+          `<rect x="90" y="${String(110 + i * 66)}" width="420" height="22" fill="${main}" opacity="0.85"/>`,
+      ).join('') +
+      Array.from(
+        { length: 6 },
+        (_, i) =>
+          `<rect x="${String(110 + i * 66)}" y="90" width="22" height="420" fill="${second}" opacity="0.75"/>`,
+      ).join('')
+    );
+  }
+  // ikat: soft zigzag bands, 370 px wide, moved 25 px right to sit in the middle of the cloth
+  return `<g transform="translate(25 0)">${Array.from({ length: 5 }, (_, i) => {
+    const y = 120 + i * 80;
+    return `<path d="M90 ${String(y)} l50 30 l50 -30 l50 30 l50 -30 l50 30 l50 -30 l50 30 l20 -12 v26 l-20 12 l-50 -30 l-50 30 l-50 -30 l-50 30 l-50 -30 l-50 30 l-50 -30 z" fill="${i % 2 ? main : second}"/>`;
+  }).join('')}</g>`;
+};
+const catalogue = [
+  {
+    file: 'hero.webp',
+    width: 960,
+    height: 720,
+    svg: `
+      <rect width="960" height="720" fill="${palette.paper}"/>
+      <rect x="140" y="420" width="680" height="120" rx="14" fill="${palette.slate}"/>
+      <rect x="180" y="330" width="600" height="100" rx="14" fill="${palette.coral}"/>
+      <rect x="220" y="250" width="520" height="90" rx="14" fill="${palette.sand}"/>
+      <rect x="260" y="180" width="440" height="80" rx="14" fill="${palette.teal}"/>
+      ${Array.from({ length: 9 }, (_, i) => `<rect x="${String(200 + i * 60)}" y="420" width="14" height="120" fill="${palette.paper}" opacity="0.35"/>`).join('')}
+      <rect x="0" y="560" width="960" height="160" fill="${palette.ink}" opacity="0.08"/>`,
+  },
+  ...[
+    ['product-ikat-cushion.webp', 'ikat', palette.slate, palette.coral],
+    ['product-check-cushions.webp', 'checks', palette.teal, palette.sand],
+    ['product-stripe-cushion.webp', 'stripes', palette.slate, palette.ink],
+    ['product-double-bedspread.webp', 'checks', palette.coral, palette.slate],
+    ['product-single-bedspread.webp', 'stripes', palette.teal, palette.coral],
+    ['product-kantha-quilt.webp', 'ikat', palette.coral, palette.sand],
+    ['product-table-runner.webp', 'stripes', palette.coral, palette.sand],
+    ['product-napkins.webp', 'checks', palette.slate, palette.coral],
+    ['product-tablecloth.webp', 'ikat', palette.teal, palette.slate],
+  ].map(([file, kind, main, second]) => ({
+    file,
+    width: 600,
+    height: 600,
+    svg: `
+      <rect width="600" height="600" fill="${palette.paper}"/>
+      <rect x="70" y="70" width="460" height="460" rx="26" fill="#ffffff"/>
+      ${weave(kind, main, second)}
+      <rect x="70" y="70" width="460" height="460" rx="26" fill="none" stroke="${palette.ink}" stroke-opacity="0.12" stroke-width="4"/>`,
+  })),
+];
+
+const sets = { portfolio, business, catalogue };
 
 // The installed Chrome on this PC (as the tests use); the downloaded one on GitHub.
 const browser = await chromium.launch(process.env.CI ? {} : { channel: 'chrome' });

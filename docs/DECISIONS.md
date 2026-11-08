@@ -570,6 +570,8 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 
 ### D-061: The website runs on Render; domain, DNS and email stay at Hostinger
 
+> **Superseded by [D-065](#d-065-the-website-runs-on-hostinger-business-not-render) on 7 November 2026: the site runs on Hostinger Business instead. Kept as a record of what was decided and why.**
+
 - **Found:** the Hostinger plan is **Premium Web Hosting**, which says "No Web Apps": it runs PHP (the WordPress now at prajzo.com) but not a Node.js app.
 - **Your choice (27 October 2026):** option A of three (A: Render for the app; B: upgrade Hostinger to Business; C: a Hostinger VPS), and the new site **replaces the WordPress site** at prajzo.com.
 - **Decision:**
@@ -595,3 +597,27 @@ D-001 to D-020 were proposed in Phase 0 and **accepted** when you approved the p
 - **Light for the rest of the site.** Templates have their own import path (`@prajzo/shared/templates`) and each demo typeface is loaded only when a design uses it, so the main website downloads none of it. Checked in the build: the demo's content is only in the demo page's file.
 - **Nothing contacts anyone.** Email, phone, WhatsApp, social and outside links on a demo are buttons that say what would happen on a real site. The contact form really sends, to the demo inbox only (D-014).
 - **The Portfolio design brief** (Daylight, Night Shift, Botanical; Tara Vaidya; nine sections) was built while waiting for your choice of starting look, which is a one-line change. Two accent colours were darkened slightly so small accent text meets WCAG AA in every look.
+
+### D-064: A catalogue without a checkout, and where the chosen category is kept
+
+- **No payments, ever, in a demo.** The Product Catalogue (Phase 12) shows products and prices and then asks for an enquiry: there is no basket and no checkout. A price is a note ("₹650"), not a charge. WhatsApp on a product shows the message it would send (D-014); on a customer's own site it would open their number.
+- **The chosen category is in the address** on a live demo (`/demo/catalogue?category=Bedding`), so a filtered page can be shared and survives a reload. It replaces the current entry rather than adding one, so Back leaves the demo instead of undoing filters one at a time.
+- **Not in the builder's preview.** The same product list is drawn in the builder's preview and in an administrator's review, where the address belongs to the builder and not to the design. There the choice is only remembered in the page. An unknown category in the address (a misspelling, or a product list that has since changed) shows everything rather than nothing.
+- **An empty list says so.** A category with nothing in it offers a way back to everything; a catalogue with no products at all says that instead of drawing an empty grid, and shows no filters.
+
+### D-065: The website runs on Hostinger Business, not Render
+
+- **Your choice (7 November 2026):** host on Hostinger with the correct plan, and tell Claude once the upgrade is done. This replaces D-061 (Render) and ends the pause in D-062.
+- **Why:** billed in rupees on an account you already have, no card in US dollars, and the domain, DNS and mailbox are already there, so going live changes fewer things at once. The cost is that a web app sleeps when nobody visits and wakes on the next request, which suits this site.
+- **Premium cannot do it.** Hostinger Premium has "No Web Apps". **Business** (or a Cloud plan) is required, and nothing can be set up before the upgrade is on the account.
+- **No code change was needed:** the server already listens on `process.env.PORT` and binds to every interface, the entry file is `apps/api/dist/server.js`, and `TRUST_PROXY=true` is right for Hostinger's proxy just as it was for Render's. The settings files that `Prepare staging/live settings.cmd` write are plain `KEY=value` lines and suit either host, so they keep their `.env.render-*` names for now.
+- **Nothing depends on a timer**, which matters because the app sleeps: there is no `setInterval` in the server, and demo messages are deleted after 7 days by a MongoDB TTL index (`expireAfterSeconds`), inside the database, not by us.
+- **Open, and settled before customers upload pictures:** builder uploads are written to the app's own disk, which a redeploy replaces. Likely answer is to keep them in Atlas (GridFS), already backed up by D-059. See the "Known gap" section of [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### D-066: prajzo.com keeps the WordPress site; hosting waits
+
+- **Your choice (7 November 2026):** do not upgrade the Hostinger plan, and leave the WordPress site at prajzo.com for now. This pauses D-065 (Hostinger Business) rather than replacing it; nothing about the plan was wrong, it is only a question of when.
+- **Why this is the safe answer:** the platform is a Node.js application (customer accounts, the project workflow, the admin dashboard, the builder, the demos). WordPress runs PHP and cannot run any of it, so moving the work "into WordPress" would mean dropping Phases 3, 4, 5, 8, 9, 10, 11 and 12 and rebuilding them in a different language. That is far more work than the upgrade, not less.
+- **What this means day to day:** the platform runs on your own computer with `npm run host:local` (http://localhost:8080, and on your phone over the same Wi-Fi). It keeps being built, phase by phase, exactly as before. Nothing is thrown away and nothing is spent.
+- **What is already ready for the day it goes online:** [DEPLOYMENT.md](DEPLOYMENT.md) (written for Hostinger Business), the settings launchers, real email (D-060), backups (D-059). No code change is needed to run on Hostinger (D-065).
+- **When money allows**, there are two routes and neither is urgent: upgrade to Hostinger Business (billed in rupees, D-065), or a host with a free tier that runs Node.js. Ask for a comparison with real prices at the time rather than relying on numbers from today.

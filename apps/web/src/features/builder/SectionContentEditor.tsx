@@ -2,6 +2,7 @@ import type { DefinedTemplate, Section } from '@prajzo/shared';
 import type { ReactNode } from 'react';
 import { CheckboxField } from '../../components/ui/Field';
 import { BusinessContentEditor } from './BusinessContentEditor';
+import { CatalogueContentEditor } from './CatalogueContentEditor';
 import { EventContentEditor } from './EventContentEditor';
 import { ImageInput, LinkInput, ListEditor, optional, TextInput } from './fields';
 
@@ -545,6 +546,18 @@ export function SectionContentEditor({
           max={max}
           onChange={onChange}
           issueAt={issueAt}
+        />
+      );
+    case 'products':
+    case 'enquiry':
+      return (
+        <CatalogueContentEditor
+          section={section}
+          path={path}
+          max={max}
+          onChange={onChange}
+          issueAt={issueAt}
+          upload={(apply) => uploadFor(apply)}
         />
       );
     case 'services':

@@ -176,6 +176,7 @@ function toSubmission(submission: SubmissionDocument): AdminDemoSubmission {
     phone: submission.phone ?? null,
     organisation: submission.organisation ?? null,
     choice: submission.choice ?? null,
+    quantity: submission.quantity ?? null,
     status: submission.status,
     createdAt: submission.createdAt.toISOString(),
     expiresAt: submission.expiresAt.toISOString(),

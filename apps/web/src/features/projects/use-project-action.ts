@@ -38,13 +38,18 @@ export function useProjectAction(
         onDone(project, notice);
         return true;
       } catch (error) {
+        // Someone may have moved the project on while this page was open: show how it is now,
+        // and say why the click did nothing. That explanation belongs to the page, which keeps it
+        // and moves focus to it, so this panel does not repeat it.
+        if (error instanceof ApiError && error.status === 409) {
+          setState({ kind: 'idle' });
+          onOutOfDate(error.message);
+          return false;
+        }
         setState({
           kind: 'failed',
           message: submitErrorMessage(error, 'Something went wrong. Please try again.'),
         });
-        // Someone may have moved the project on while this page was open: show how it is now,
-        // and say why the click did nothing.
-        if (error instanceof ApiError && error.status === 409) onOutOfDate(error.message);
         return false;
       }
     },

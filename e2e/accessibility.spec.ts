@@ -15,10 +15,12 @@ const publicPages = [
   '/demo/portfolio',
   '/demo/business',
   '/demo/event',
+  '/demo/catalogue',
   '/templates/event',
   '/templates/business',
   '/templates',
   '/templates/portfolio',
+  '/templates/catalogue',
   '/projects',
   '/build',
   '/build?template=portfolio',
@@ -62,6 +64,9 @@ test.describe('signed-in pages', () => {
   test('My projects and a project page (with the cancel question open)', async ({
     page,
   }, testInfo) => {
+    // Registering, sending a project and then three accessibility scans: more than the
+    // 30-second default allows when the whole suite is running at once.
+    test.setTimeout(120_000);
     await signUpQuietly(page, uniqueEmail('axe-projects', testInfo.project.name));
     const reference = await sendProjectQuietly(page, { notes: 'A note', features: ['gallery'] });
 

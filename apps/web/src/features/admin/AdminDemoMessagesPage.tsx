@@ -194,6 +194,28 @@ function SubmissionCard({
               </>
             ) : null}
           </dl>
+        ) : submission.form === 'enquiry' ? (
+          <div className="grid gap-2">
+            <dl className="grid gap-1 text-sm text-ink sm:grid-cols-[auto_1fr] sm:gap-x-4">
+              <dt className="font-semibold">Asked about</dt>
+              <dd>{submission.choice}</dd>
+              {submission.quantity !== null ? (
+                <>
+                  <dt className="font-semibold">How many</dt>
+                  <dd>{submission.quantity}</dd>
+                </>
+              ) : null}
+              {submission.phone ? (
+                <>
+                  <dt className="font-semibold">Phone</dt>
+                  <dd>{submission.phone}</dd>
+                </>
+              ) : null}
+            </dl>
+            {submission.message ? (
+              <p className="whitespace-pre-line text-ink">{submission.message}</p>
+            ) : null}
+          </div>
         ) : (
           <p className="whitespace-pre-line text-ink">{submission.message}</p>
         )}

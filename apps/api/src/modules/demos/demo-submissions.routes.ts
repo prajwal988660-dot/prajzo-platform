@@ -16,6 +16,16 @@ function registrationEventsOf(key: string): string[] {
   );
 }
 
+/** The products a demo's catalogue has: only those can be asked about. */
+function productNamesOf(key: string): string[] {
+  const template = templateFor(key);
+  return (template?.parsedDefault.pages ?? []).flatMap((page) =>
+    page.sections.flatMap((section) =>
+      section.type === 'products' ? section.content.items.map((product) => product.name) : [],
+    ),
+  );
+}
+
 type DemoSubmissionsRouterOptions = {
   /** Demo messages allowed per connection every 15 minutes. */
   rateLimitMax: number;
@@ -60,27 +70,32 @@ export function demoSubmissionsRouter({
         choice: 'Choose one of the events on the form',
       });
     }
+    if (input.form === 'enquiry' && !productNamesOf(input.template).includes(input.choice)) {
+      throw new AppError(400, 'VALIDATION_FAILED', 'Some details need fixing.', {
+        choice: 'Choose one of the products',
+      });
+    }
     const expiresAt = new Date(Date.now() + keepDays * 24 * 60 * 60 * 1000);
+    const who = { template: input.template, name: input.name, email: input.email, expiresAt };
     await DemoSubmissionModel.create(
       input.form === 'contact'
-        ? {
-            form: 'contact',
-            template: input.template,
-            name: input.name,
-            email: input.email,
-            message: input.message,
-            expiresAt,
-          }
-        : {
-            form: 'registration',
-            template: input.template,
-            name: input.name,
-            email: input.email,
-            phone: input.phone,
-            organisation: input.organisation,
-            choice: input.choice,
-            expiresAt,
-          },
+        ? { ...who, form: 'contact', message: input.message }
+        : input.form === 'registration'
+          ? {
+              ...who,
+              form: 'registration',
+              phone: input.phone,
+              organisation: input.organisation,
+              choice: input.choice,
+            }
+          : {
+              ...who,
+              form: 'enquiry',
+              phone: input.phone,
+              choice: input.choice,
+              quantity: input.quantity,
+              message: input.message,
+            },
     );
     const body: DemoSubmissionResponse = { received: true, deleteAfter: expiresAt.toISOString() };
     res.status(201).json(body);

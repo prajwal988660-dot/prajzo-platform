@@ -235,6 +235,35 @@ export const sectionContentSchemas = {
     organisationLabel: siteText(30, 'The label'),
     closingNote: optionalSiteText(200),
   }),
+  /**
+   * Products with categories people can filter by (Catalogue, Phase 12). There is no checkout:
+   * people ask about a product, by the enquiry form or on WhatsApp.
+   */
+  products: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    showFilters: z.boolean(),
+    items: z
+      .array(
+        item({
+          name: siteText(60, 'A product name'),
+          category: siteText(30, 'A category'),
+          priceNote: optionalSiteText(40),
+          summary: siteText(200, 'A short description'),
+          details: z.array(siteText(120, 'A detail')).max(6).default([]),
+          image: imageSchema,
+        }),
+      )
+      .min(1),
+  }),
+  /** An enquiry form whose product list comes from the products on the same page. */
+  enquiry: z.object({
+    heading: siteText(80, 'The heading'),
+    intro: optionalSiteText(300),
+    askPhone: z.boolean(),
+    askQuantity: z.boolean(),
+    closingNote: optionalSiteText(200),
+  }),
 } as const;
 
 export type SectionType = keyof typeof sectionContentSchemas;
@@ -273,6 +302,8 @@ export const sectionSchema = z.discriminatedUnion('type', [
   sectionOf('schedule'),
   sectionOf('guidelines'),
   sectionOf('registration'),
+  sectionOf('products'),
+  sectionOf('enquiry'),
 ]);
 
 export type SectionContent<T extends SectionType> = z.infer<(typeof sectionContentSchemas)[T]>;
@@ -299,6 +330,8 @@ export function itemCount(section: Section): number {
       return section.content.days.reduce((sum, day) => sum + day.slots.length, 0);
     case 'registration':
       return section.content.events.length;
+    case 'products':
+      return section.content.items.length;
     case 'about':
       return section.content.facts.length;
     default:

@@ -1,6 +1,7 @@
 import type { WebsiteConfig } from '@prajzo/shared';
 import './site.css';
 import { SiteContext, type RenderMode } from './context';
+import { EnquiryProvider } from './enquiry-context';
 import { useFonts } from './fonts';
 import { SiteSection } from './sections';
 import { designVariables } from './theme';
@@ -33,26 +34,28 @@ export function SiteRenderer({
 
   return (
     <SiteContext.Provider value={{ config, mode }}>
-      <div
-        id="top"
-        className="ps-site"
-        data-template={config.template.key}
-        data-buttons={design.buttonStyle}
-        data-spacing={design.spacing}
-        style={designVariables(design)}
-      >
-        {header.map((section) => (
-          <SiteSection key={section.id} section={section} config={config} />
-        ))}
-        <main id="site-main" tabIndex={-1} className="ps-main">
-          {body.map((section) => (
+      <EnquiryProvider>
+        <div
+          id="top"
+          className="ps-site"
+          data-template={config.template.key}
+          data-buttons={design.buttonStyle}
+          data-spacing={design.spacing}
+          style={designVariables(design)}
+        >
+          {header.map((section) => (
             <SiteSection key={section.id} section={section} config={config} />
           ))}
-        </main>
-        {footer.map((section) => (
-          <SiteSection key={section.id} section={section} config={config} />
-        ))}
-      </div>
+          <main id="site-main" tabIndex={-1} className="ps-main">
+            {body.map((section) => (
+              <SiteSection key={section.id} section={section} config={config} />
+            ))}
+          </main>
+          {footer.map((section) => (
+            <SiteSection key={section.id} section={section} config={config} />
+          ))}
+        </div>
+      </EnquiryProvider>
     </SiteContext.Provider>
   );
 }

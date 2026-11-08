@@ -105,6 +105,8 @@ test.describe('the administration pages', () => {
   });
 
   test('the catalogue forms, empty and with their error messages showing', async ({ page }) => {
+    // Six accessibility scans over four forms, like its neighbours above.
+    test.setTimeout(120_000);
     await signInAsAdminQuietly(page);
 
     await page.goto('/admin/catalogue/categories/new');
