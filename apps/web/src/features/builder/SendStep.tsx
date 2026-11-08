@@ -110,7 +110,8 @@ export function SendStep({
         projectResponseSchema,
         { method: 'POST', body: JSON.stringify({ ...values, designId: design.id }) },
       );
-      void navigate(`/account/projects/${project.reference}?sent=1`);
+      // The project page is the confirmation: the reference number, the status and the timeline.
+      void navigate(`/account/projects/${project.reference}`);
     } catch (error) {
       setFailure(submitErrorMessage(error, 'Something went wrong. Please try again.'));
     }
