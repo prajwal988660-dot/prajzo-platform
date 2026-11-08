@@ -589,12 +589,42 @@
   padding-top: 5rem;
 }
 
+/* Hero entrance (live demo only). The text slides in from the left, the picture rises from the
+   bottom, and they settle together. Nothing animates unless the site is marked data-animate, so
+   the builder's preview and an admin's review stay still, and so does a page with no script. */
+.ps-site[data-animate] .ps-hero-text {
+  opacity: 0;
+  transform: translateX(-2.5rem);
+}
+.ps-site[data-animate] .ps-hero-image {
+  opacity: 0;
+  transform: translateY(3rem);
+}
+.ps-site[data-animate] .ps-hero-text,
+.ps-site[data-animate] .ps-hero-image {
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ps-site[data-animate='in'] .ps-hero-text,
+.ps-site[data-animate='in'] .ps-hero-image {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ps-button {
     transition: none;
   }
   .ps-button:hover {
     transform: none;
+  }
+  /* No sliding for people who ask for less motion: show the hero in place. */
+  .ps-site[data-animate] .ps-hero-text,
+  .ps-site[data-animate] .ps-hero-image {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
