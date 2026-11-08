@@ -243,6 +243,7 @@ describe('adminProjectDetailSchema', () => {
     confirmedDeliveryDate: null,
     revisions: null,
     source: 'start-form',
+    design: null,
     customer: { id: 'abc', name: 'Asha Rao', email: 'asha@example.com', phone: null },
     timeline: [
       {
