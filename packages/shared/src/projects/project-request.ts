@@ -115,6 +115,53 @@ export type ProjectRequestFormValues = z.input<typeof projectRequestSchema>;
 /** What the server stores (after cleaning). */
 export type ProjectRequest = z.output<typeof projectRequestSchema>;
 
+/**
+ * Sending a saved design as a project request (Phase 14). The design already says what the website
+ * is, which pages it has and how it looks, so none of that is asked for again: only how to get in
+ * touch, when it is wanted, and anything the customer wants to add. The title and the description
+ * are written from the design by the server, so they cannot be forged.
+ */
+export const designSubmissionSchema = z
+  .object({
+    /** The saved design to send. Checked on the server: it must be the customer's own. */
+    designId: z
+      .string()
+      .trim()
+      .regex(/^[0-9a-f]{24}$/i, 'Choose one of your saved designs'),
+    /** Which kind of website this is, from the catalogue, so it is quoted like any other. */
+    categoryKey: z.string().trim().min(1, 'Choose the type of website you need').max(60),
+    /** Package key, or "not-sure". */
+    packageKey: optionalText(60),
+    preferredDate: optionalText(10)
+      .refine(
+        (value) => value === undefined || isCalendarDate(value),
+        'Choose a date from the calendar',
+      )
+      .refine(
+        (value) => value === undefined || !isCalendarDate(value) || value >= todayInIndia(),
+        "Choose a date that hasn't passed",
+      ),
+    contactPreference: z.enum(contactPreferences).default('email'),
+    phone: optionalText(30).refine(
+      (value) => value === undefined || /^\+?[0-9 ()-]{7,20}$/.test(value),
+      'Enter a phone number using digits, spaces or +',
+    ),
+    notes: optionalText(1000),
+  })
+  .refine((value) => value.contactPreference === 'email' || value.phone !== undefined, {
+    path: ['phone'],
+    error: 'Add a phone number so we can reach you that way',
+    when: (payload) =>
+      !payload.issues.some(
+        (issue) => issue.path?.[0] === 'phone' || issue.path?.[0] === 'contactPreference',
+      ),
+  });
+
+/** What the review step holds (before cleaning). */
+export type DesignSubmissionFormValues = z.input<typeof designSubmissionSchema>;
+/** What the server stores (after cleaning). */
+export type DesignSubmission = z.output<typeof designSubmissionSchema>;
+
 /** What a customer may do to a project right now. The server decides, so no rule is repeated in the app. */
 export const projectActions = [
   'cancel',

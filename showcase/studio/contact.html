@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STUDIO. — Let’s Work Together (Prajzo demo)</title>
+    <meta name="description" content="Let's work together. A demo by Prajzo; everything in it is made up." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="contact-page on-dark">
+    <div class="demo-bar">
+      <strong>Demo website by Prajzo, for evaluation only.</strong>
+      <span>Everyone and everything in it is made up.</span>
+    </div>
+
+    <header class="topbar on-dark" id="topbar">
+      <div class="wrap nav">
+        <a href="index.html" class="logo"><span class="mark"></span>STUDIO.</a>
+        <ul class="navlinks">
+          <li><a href="work.html">Work</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="contact.html" class="active">Contact</a></li>
+        </ul>
+        <button class="nav-toggle" aria-label="Menu" style="border-color: rgba(255,255,255,0.3); color: var(--cream)">☰</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="page-label" style="color: #9a9289"><span>04. Contact</span><span class="chip chip-sage">Interactive</span></div>
+
+      <section class="contact-inner">
+        <div>
+          <h1 class="contact-h1 reveal">Let’s work<br />together</h1>
+          <p class="contact-lead reveal d1">Have a fashion campaign or project in mind?…</p>
+        </div>
+
+        <div class="contact-card reveal d1">
+          <form class="contact-form" id="contactForm" novalidate>
+            <input type="text" placeholder="Name" aria-label="Name" required />
+            <input type="email" placeholder="Email Address" aria-label="Email address" required />
+            <textarea placeholder="Project Details" aria-label="Project details"></textarea>
+            <button type="submit">Send Message</button>
+            <p id="formNote" hidden style="font-size: 0.82rem; color: #ffe">
+              Thanks — this is a demo, so nothing was actually sent.
+            </p>
+          </form>
+          <div class="contact-info">
+            <h5>Contact</h5>
+            <a href="#" onclick="return false">hello@studio.com</a>
+            <h5>Follow us</h5>
+            <a href="#" onclick="return false">Instagram</a>
+            <a href="#" onclick="return false">LinkedIn</a>
+            <a href="#" onclick="return false">YouTube</a>
+            <a href="#" onclick="return false">Behance</a>
+            <h5>Studio</h5>
+            <a href="#" onclick="return false">Amsterdam · Local time</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <div class="site-foot">
+        <span>STUDIO. is a fictional fashion studio. A demo by Prajzo.</span>
+        <span>Europe · Available 2026</span>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

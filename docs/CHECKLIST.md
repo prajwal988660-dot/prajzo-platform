@@ -393,9 +393,16 @@ Built 28-29 October 2026 on branch `phase-9-builder`. Left: putting it online (w
 
 ## Phase 14: Submit a design as a project
 
-- [ ] Builder step 9: review summary → confirm → project request (source "builder")
-- [ ] The server re-validates the configuration (it must be the customer's own) and stores a frozen copy
-- [ ] Saved designs on the dashboard get a "Submit as a project" button
-- [ ] Admin project details show the design rendered read-only
-- [ ] Tests: ownership; end to end: customize → submit → My Projects
-- [ ] Known limitations and remaining manual tasks listed
+- [x] Builder step "Send": review summary → confirm → project request (source "builder"). The summary is written from the design (template, website name, pages, sections, colours, typefaces); the customer is asked only for the website type, package, preferred date, contact preference and notes
+- [x] The server re-validates the configuration (it must be the customer's own, read through the designs service's ownership check; another customer's design is "not found" exactly like a missing one) and stores a frozen copy. The project model needed `minimize: false` so Mongoose keeps empty objects in the stored configuration
+- [x] Saved designs on the dashboard get a "Send as a project" button, which opens the builder on the Send step (`/build/<id>?step=send`; the builder now reads `?step=`)
+- [x] Admin project details show the design rendered read-only, by the same renderer as the demos (`mode="review"`), after checking the frozen configuration against its template's rules; an unknown template or an older version that no longer fits is said so, not broken on
+- [x] Tests: ownership (6 server tests); end to end: customize → save → send → the project page → My Projects, and the Send step asking for a save first (`e2e/send-design.spec.ts`, 4 passed on a computer and a phone)
+- [x] Known limitations and remaining manual tasks:
+  - Features and integrations are not asked for on the Send step and are stored empty; the customer puts them in the notes and Prajzo asks in the quote. Adding the two pickers from the Start a Project form is a small follow-up
+  - The description of a sent design is written by the server and cannot be edited by the customer; the notes are theirs
+  - Sending the same design twice makes two requests; nothing stops it, like sending the form twice
+  - An admin can see the design but not open or change it in the builder; changes are agreed with the customer, who edits their own copy
+  - A design's uploaded pictures are served from the app's own disk, so they share the hosting gap in [DEPLOYMENT.md](DEPLOYMENT.md) (a redeploy replaces them) until uploads move to Atlas
+  - `?step=` is read when the builder opens, not while it is open; the step buttons do not change the address
+  - Manual: run the full `npm run check` and browser suites on this commit (the machine stopped both for low memory) before merging

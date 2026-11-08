@@ -92,6 +92,19 @@ export const adminProjectDetailSchema = projectDetailSchema
     customerSignedOff: z.boolean(),
     /** More revisions have been asked for than the accepted quote includes. */
     revisionsOverIncluded: z.boolean(),
+    /**
+     * The design this request was built from (Phase 14), frozen as it was sent. `config` is left
+     * loose here and checked against the template's own rules before it is drawn, because a design
+     * sent under an older template version must still be readable.
+     */
+    design: z
+      .object({
+        name: z.string(),
+        templateKey: z.string(),
+        templateVersion: z.number(),
+        config: z.unknown(),
+      })
+      .nullable(),
   });
 export type AdminProjectDetail = z.infer<typeof adminProjectDetailSchema>;
 

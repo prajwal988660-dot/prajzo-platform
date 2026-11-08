@@ -1,10 +1,27 @@
 import type { WebsiteConfig } from '@prajzo/shared';
 import './site.css';
+import { useEffect, useState } from 'react';
 import { SiteContext, type RenderMode } from './context';
 import { EnquiryProvider } from './enquiry-context';
 import { useFonts } from './fonts';
 import { SiteSection } from './sections';
 import { designVariables } from './theme';
+
+/**
+ * The hero's entrance, on a live demo only. It returns the value for the site's `data-animate`:
+ * nothing in the builder's preview or an admin's review (they stay still), "out" for the first
+ * paint of a demo and then "in" a moment later, which plays the slide-in. Undefined means no
+ * attribute at all, so a page without script still shows the hero in place.
+ */
+function useHeroEntrance(mode: RenderMode): 'out' | 'in' | undefined {
+  const [state, setState] = useState<'out' | 'in' | undefined>(mode === 'demo' ? 'out' : undefined);
+  useEffect(() => {
+    if (mode !== 'demo') return undefined;
+    const id = requestAnimationFrame(() => setState('in'));
+    return () => cancelAnimationFrame(id);
+  }, [mode]);
+  return state;
+}
 
 /**
  * Draws any website design (architecture 5.4). The live demos, the builder's preview and the
@@ -22,6 +39,7 @@ export function SiteRenderer({
 }) {
   const { design } = config;
   useFonts(design.fonts.heading, design.fonts.body);
+  const animate = useHeroEntrance(mode);
   const page =
     config.pages.find((candidate) => candidate.enabled && candidate.slug === pageSlug) ??
     config.pages.find((candidate) => candidate.enabled && candidate.type === 'home');
@@ -41,6 +59,7 @@ export function SiteRenderer({
           data-template={config.template.key}
           data-buttons={design.buttonStyle}
           data-spacing={design.spacing}
+          data-animate={animate}
           style={designVariables(design)}
         >
           {header.map((section) => (

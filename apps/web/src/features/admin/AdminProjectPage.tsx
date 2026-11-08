@@ -19,6 +19,7 @@ import { formatDate, formatDateTime } from '../../lib/format';
 import { useApi } from '../../lib/use-api';
 import { usePageTitle } from '../../lib/use-page-title';
 import { RequestDetails } from '../projects/RequestDetails';
+import { SubmittedDesign } from './SubmittedDesign';
 import { StatusBadge } from '../projects/StatusBadge';
 import { Timeline } from '../projects/Timeline';
 import type { Notice } from '../projects/use-project-action';
@@ -267,6 +268,15 @@ function ProjectView({
             </h2>
             <RequestDetails project={project} audience="admin" />
           </section>
+
+          {project.design ? (
+            <section aria-labelledby="design-heading">
+              <h2 id="design-heading" className="text-xl font-semibold tracking-tight">
+                The design they built
+              </h2>
+              <SubmittedDesign design={project.design} />
+            </section>
+          ) : null}
 
           {/* Keyed by status, so a move starts the panel afresh: nothing typed carries over. */}
           <StatusChangePanel

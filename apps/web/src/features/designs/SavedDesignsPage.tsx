@@ -172,13 +172,23 @@ function DesignCard({
               <time dateTime={design.updatedAt}>{formatDateTime(design.updatedAt)}</time>
             </p>
           </div>
-          <ButtonLink
-            to={`/build/${design.id}`}
-            size="sm"
-            aria-label={`Open ${design.name} in the builder`}
-          >
-            Open in the builder
-          </ButtonLink>
+          <div className="flex flex-wrap gap-2">
+            <ButtonLink
+              to={`/build/${design.id}?step=send`}
+              size="sm"
+              aria-label={`Send ${design.name} to us as a project`}
+            >
+              Send as a project
+            </ButtonLink>
+            <ButtonLink
+              to={`/build/${design.id}`}
+              size="sm"
+              variant="secondary"
+              aria-label={`Open ${design.name} in the builder`}
+            >
+              Open in the builder
+            </ButtonLink>
+          </div>
         </div>
 
         {mode === 'rename' ? (

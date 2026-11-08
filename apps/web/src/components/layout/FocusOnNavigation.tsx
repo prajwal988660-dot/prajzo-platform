@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router';
+import { NavigationType, useLocation, useNavigationType } from 'react-router';
 
 /**
  * After a visitor moves to another page of the app, puts keyboard focus (and what a screen reader
@@ -9,17 +9,22 @@ import { useLocation } from 'react-router';
  *
  * It does nothing:
  * - for the first page of a visit (the browser handles that),
+ * - going Back or Forward (a "POP"): ScrollMemory returns the visitor to where they were on that
+ *   page, so moving focus to the heading would scroll the page back to the top and undo that,
  * - when only the search or the page number of the same page changes: a filter box or a "Next"
  *   link keeps its own focus (see Pagination),
  * - when the new page has already put focus inside its content by itself.
  */
 export function FocusOnNavigation() {
   const { pathname } = useLocation();
+  const navigationType = useNavigationType();
   const shown = useRef(pathname);
 
   useEffect(() => {
     if (shown.current === pathname) return;
     shown.current = pathname;
+    // Back/Forward returns to a page the visitor already saw, at the place they left it.
+    if (navigationType === NavigationType.Pop) return;
 
     const main = document.getElementById('main');
     if (main?.contains(document.activeElement) && document.activeElement !== main) return;
@@ -28,9 +33,9 @@ export function FocusOnNavigation() {
     if (!target) return;
     // A heading is not normally focusable; this makes it focusable by script only (not by Tab).
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    // The page is already scrolled to the top by the router, so don't scroll again.
+    // ScrollMemory has already placed the page (at the top, for a new page), so don't scroll here.
     target.focus({ preventScroll: true });
-  }, [pathname]);
+  }, [pathname, navigationType]);
 
   return null;
 }

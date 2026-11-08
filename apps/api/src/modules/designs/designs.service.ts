@@ -56,7 +56,12 @@ function toDesign(design: DesignDocument): SavedDesign {
   return { ...toSummary(design), config: websiteConfigSchema.parse(design.config) };
 }
 
-async function ownDesign(owner: UserDocument, id: string): Promise<DesignDocument> {
+/**
+ * One of this customer's own designs, or "not found". Someone else's design is not found either,
+ * so nobody can learn whether an id exists. Exported so that submitting a design as a project
+ * (Phase 14) asks the same question in the same way.
+ */
+export async function ownDesign(owner: UserDocument, id: string): Promise<DesignDocument> {
   if (!/^[0-9a-f]{24}$/i.test(id)) throw notFound();
   const design = await SavedDesignModel.findOne({ _id: id, owner: owner._id });
   if (!design) throw notFound();
