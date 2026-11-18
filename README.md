@@ -1,4 +1,59 @@
-# Prajzo
+# Prajzo — Website Customization Platform
+
+> A web-development studio platform where customers browse template categories and live demos,
+> customize a template in a visual builder, preview it across desktop / tablet / mobile, and
+> submit it as a tracked project request — while administrators manage each project through a
+> defined workflow.
+
+<p>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black">
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-5FA04E?logo=nodedotjs&logoColor=white">
+  <img alt="Express" src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white">
+  <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white">
+</p>
+
+---
+
+## ✨ Highlights
+
+- **TypeScript monorepo** — a React + Vite web app (`apps/web`) and an Express + MongoDB API (`apps/api`) share schemas and validation rules through a common `packages/shared`, so the front-end and back-end agree by construction.
+- **Visual builder & multi-device preview** — customers customize a template and preview it on desktop, tablet, and mobile before saving it to their account.
+- **Project request workflow** — submitted requests move through a defined admin workflow (review, scope, price, delivery date, status tracking).
+- **Quality gate on every commit** — a single `npm run check` runs type-checking, linting, format-checking, the full test suite, and a production build; GitHub CI runs the exact same command on every pull request.
+- **Documented engineering** — roadmap, architecture, decisions, environment, and setup are all version-controlled under `docs/`.
+
+## 🧰 Tech Stack
+
+| Layer | Technologies |
+| --- | --- |
+| **Frontend** | React, Vite, TypeScript |
+| **Backend** | Node.js, Express, MongoDB (Atlas) |
+| **Shared** | TypeScript schemas & validation (`packages/shared`) |
+| **Tooling** | npm workspaces (monorepo), ESLint, Prettier, Vitest, GitHub Actions CI |
+
+## 🚀 Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+| Address | What it is |
+|---|---|
+| http://localhost:5173 | The web app |
+| http://localhost:4000/api/health/ready | API readiness (including the database) |
+
+> Requires Node.js 24 and a MongoDB Atlas connection string — see [`docs/SETUP.md`](docs/SETUP.md).
+
+Full roadmap, architecture, and setup documentation are below.
+
+---
+
+<details>
+<summary><strong>📖 Full documentation</strong> (click to expand)</summary>
+
 
 Prajzo is a web development studio and website customization platform. Customers will be able to explore website categories and five live demo websites, customize a template in a visual builder, preview it on desktop, tablet and mobile, save it to their account, submit it as a project request, and follow the project's status. Prajzo's administrators review each request, confirm scope, price and delivery date, and move the project through a defined workflow.
 
@@ -69,3 +124,5 @@ python -m http.server 1234 --directory C:\dev\mine\prajzo\legacy\static-site
 ```
 
 Known issues there, kept for the record: 4 of its 6 "View sample site" links return 404; its sign-in popup is a front-end demo; its contact details and Web3Forms key are placeholders.
+
+</details>
